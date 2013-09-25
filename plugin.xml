@@ -26,7 +26,7 @@
             </feature>
         </config-file>
 
-        <source-file src="src/android/Calendar.java" target-dir="src/org/transistorsoft/background-geolocation" />      
+        <source-file src="src/android/CDVBackgroundGeoLocation.java" target-dir="src/org/transistorsoft/background-geolocation" />      
      </platform>          
 
 </plugin>
