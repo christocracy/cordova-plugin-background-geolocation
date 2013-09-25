@@ -1,0 +1,28 @@
+//
+//  CDVBackgroundGeoLocation.hs
+//
+//  Created by Chris Scott <chris@transistorsoft.com>
+//
+
+#import <Cordova/CDVPlugin.h>
+#import <Cordova/CDVLocation.h>
+
+@interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
+- (void) configure:(CDVInvokedUrlCommand*)command;
+- (void) start:(CDVInvokedUrlCommand*)command;
+- (void) stop:(CDVInvokedUrlCommand*)command;
+- (void) sync;
+- (void) onSuspend:(NSNotification *)notification;
+- (void) onResume:(NSNotification *)notification;
+
+@property(nonatomic,retain) NSString *token;
+@property(nonatomic,retain) NSString *url;
+@property(nonatomic,assign) BOOL enabled;
+@property(nonatomic,retain) NSNumber *maxBackgroundHours;
+@property (nonatomic, strong) CLLocationManager* locationManager;
+@property (strong) CDVHeadingData* headingData;
+@property (nonatomic, strong) CDVLocationData* locationData;
+@property (strong) NSMutableArray *locationCache;
+@property (nonatomic, retain) NSDate *suspendedAt;
+@end
+
