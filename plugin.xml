@@ -17,6 +17,8 @@
         </config-file>
 
         <source-file src="src/android/CDVBackgroundGeoLocation.java" target-dir="src/org/transistorsoft/background-geolocation" />      
+        <asset src="www/android/BackgroundGeoLocation.js" target="plugins/BackgroundGeoLocation.js" />
+
      </platform>          
 
      <platform name="ios">
@@ -26,7 +28,9 @@
             </feature>
         </config-file>
 
-        <source-file src="src/android/CDVBackgroundGeoLocation.java" target-dir="src/org/transistorsoft/background-geolocation" />      
+        <source-file src="src/ios/CDVBackgroundGeoLocation.m" target-dir="src/org/transistorsoft/background-geolocation" />
+        <source-file src="src/ios/CDVBackgroundGeoLocation.h" target-dir="src/org/transistorsoft/background-geolocation" />
+        <asset src="www/ios/BackgroundGeoLocation.js" target="plugins/BackgroundGeoLocation.js" />
      </platform>          
 
 </plugin>
