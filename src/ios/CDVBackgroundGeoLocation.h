@@ -5,7 +5,7 @@
 //
 
 #import <Cordova/CDVPlugin.h>
-#import <Cordova/CDVLocation.h>
+#import "CDVLocation.h"
 
 @interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
 - (void) configure:(CDVInvokedUrlCommand*)command;
@@ -20,7 +20,6 @@
 @property(nonatomic,assign) BOOL enabled;
 @property(nonatomic,retain) NSNumber *maxBackgroundHours;
 @property (nonatomic, strong) CLLocationManager* locationManager;
-@property (strong) CDVHeadingData* headingData;
 @property (nonatomic, strong) CDVLocationData* locationData;
 @property (strong) NSMutableArray *locationCache;
 @property (nonatomic, retain) NSDate *suspendedAt;

@@ -4,13 +4,13 @@
 //  Created by Chris Scott <chris@transistorsoft.com> on 2013-06-15
 //  Largely based upon http://www.mindsizzlers.com/2011/07/ios-background-location/
 //
-
+#import "CDVLocation.h"
 #import "CDVBackgroundGeoLocation.h"
 #import <Cordova/CDVJSON.h>
 
 @implementation CDVBackgroundGeoLocation
 
-@synthesize enabled, token, url, locationManager, locationData, headingData, locationCache, suspendedAt;
+@synthesize enabled, token, url, locationManager, locationData, locationCache, suspendedAt;
 
 - (CDVPlugin*) initWithWebView:(UIWebView*) theWebView
 {
@@ -30,7 +30,7 @@
 }
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
-    self.locationManager = [[[CLLocationManager alloc] init] autorelease];
+    self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     
     self.token = [command.arguments objectAtIndex: 0];
@@ -177,15 +177,7 @@
 
 - (void)dealloc
 {
-    locationManager.delegate = nil;
-    [token release];
-    [url release];
-    [locationManager release];
-    [locationData release];
-    [headingData release];
-    [locationCache release];
-    [suspendedAt release];
-    [super dealloc];
+    self.locationManager.delegate = nil;
 }
 
 @end
