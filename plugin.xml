@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-           id="org.transistorsoft.cordova.background-geolocation"
+           id="org.transistorsoft.cordova.BackgroundGeolocation"
       version="0.1.0">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
@@ -16,7 +16,7 @@
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="org.transistorsoft.cordova.backgroundgeolocation"/>
+                <param name="android-package" value="org.transistorsoft.cordova.BackgroundGeolocation"/>
             </feature>
         </config-file>
 
@@ -30,7 +30,7 @@
      <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="org.transistorsoft.cordova.background-geolocation"/>
+                <param name="android-package" value="org.transistorsoft.cordova.BackgroundGeolocation"/>
             </feature>
         </config-file>
 
