@@ -16,7 +16,7 @@
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="org.transistorsoft.cordova.BackgroundGeolocation"/>
+                <param name="android-package" value="CDVBackgroundGeolocation"/>
             </feature>
         </config-file>
 
@@ -30,7 +30,7 @@
      <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="org.transistorsoft.cordova.BackgroundGeolocation"/>
+                <param name="ios-package" value="CDVBackgroundGeoLocation"/>
             </feature>
         </config-file>
 
