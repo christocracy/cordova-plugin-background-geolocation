@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-           id="org.transistorsoft.cordova.BackgroundGeolocation"
+           id="org.transistorsoft.cordova.background-geolocation"
       version="0.1.0">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
