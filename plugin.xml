@@ -34,8 +34,8 @@
             </feature>
         </config-file>
 
-        <source-file src="src/ios/CDVBackgroundGeoLocation.m" target-dir="src/org/transistorsoft/background-geolocation" />
-        <source-file src="src/ios/CDVBackgroundGeoLocation.h" target-dir="src/org/transistorsoft/background-geolocation" />
+        <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
+        <source-file src="src/ios/CDVBackgroundGeoLocation.h" />
         
         <js-module src="www/ios/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
             <clobbers target="cordova.plugins.backgroundGeoLocation" />
