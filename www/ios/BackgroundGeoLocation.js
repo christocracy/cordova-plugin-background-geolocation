@@ -21,7 +21,7 @@
  * under the License.
  *
 */
-cordova.define("org.transistorsoft.cordova.background-geolocation", function(require, exports, module) {
+cordova.define("org.transistorsoft.cordova.BackgroundGeolocation", function(require, exports, module) {
     var exec = require('cordova/exec');
 
     /**
