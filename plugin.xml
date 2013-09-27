@@ -8,16 +8,22 @@
     <license>MIT</license>
     <keywords>phonegap,background geolocation</keywords>
 
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="org.transistorsoft.cordova.background-geolocation"/>
+                <param name="android-package" value="org.transistorsoft.cordova.backgroundgeolocation"/>
             </feature>
         </config-file>
 
         <source-file src="src/android/CDVBackgroundGeoLocation.java" target-dir="src/org/transistorsoft/background-geolocation" />      
-        <asset src="www/android/BackgroundGeoLocation.js" target="plugins/BackgroundGeoLocation.js" />
+        <js-module src="www/android/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
+            <clobbers target="cordova.plugins.backgroundGeoLocation" />
+        </js-module>
 
      </platform>          
 
@@ -30,7 +36,11 @@
 
         <source-file src="src/ios/CDVBackgroundGeoLocation.m" target-dir="src/org/transistorsoft/background-geolocation" />
         <source-file src="src/ios/CDVBackgroundGeoLocation.h" target-dir="src/org/transistorsoft/background-geolocation" />
-        <asset src="www/ios/BackgroundGeoLocation.js" target="plugins/BackgroundGeoLocation.js" />
+        
+        <js-module src="www/ios/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
+            <clobbers target="cordova.plugins.backgroundGeoLocation" />
+        </js-module>
+
      </platform>          
 
 </plugin>
