@@ -38,7 +38,7 @@
         <source-file src="src/ios/CDVBackgroundGeoLocation.h" />
         
         <js-module src="www/ios/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
-            <clobbers target="cordova.plugins.backgroundGeoLocation" />
+            <clobbers target="plugins.backgroundGeoLocation" />
         </js-module>
 
      </platform>          
