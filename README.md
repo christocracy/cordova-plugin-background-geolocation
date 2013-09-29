@@ -16,7 +16,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 2. Add the plugin to your project (from the root of your project):
 
 ```
-   cordova plugin add <path_download_plugin>
+   cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
 ```
 
 A full example could be:
