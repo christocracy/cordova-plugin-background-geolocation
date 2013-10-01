@@ -22,7 +22,7 @@
 
         <source-file src="src/android/CDVBackgroundGeoLocation.java" target-dir="src/org/transistorsoft/background-geolocation" />      
         <js-module src="www/android/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
-            <clobbers target="cordova.plugins.backgroundGeoLocation" />
+            <clobbers target="plugins.backgroundGeoLocation" />
         </js-module>
 
      </platform>          
