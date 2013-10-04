@@ -85,9 +85,9 @@
     }
 }
 
--(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+-(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    NSLog(@"CDVBackgroundGeoLocation didUpdateLocation");
+    NSLog(@"CDVBackgroundGeoLocation didUpdateLocations");
     
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground)
     {
