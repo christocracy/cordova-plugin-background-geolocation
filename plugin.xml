@@ -29,8 +29,7 @@
 
      <platform name="ios">
         <!-- required background modes:  App registers for location updates -->
-        <config-file target="*-Info.plist">
-            <key>UIBackgroundModes</key>
+        <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
                 <string>location</string>
             </array>
