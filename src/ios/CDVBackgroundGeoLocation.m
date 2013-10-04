@@ -23,8 +23,8 @@
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                              selector:@selector(onResume:)
-                                                  name:UIApplicationWillEnterForegroundNotification
+                                             selector:@selector(onResume:)
+                                                 name:UIApplicationWillEnterForegroundNotification
                                                object:nil];
     return self;
 }
@@ -54,6 +54,16 @@
     [self.locationManager stopMonitoringSignificantLocationChanges];
 }
 
+- (void) test:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"CDVBackgroundGeoLocation test");
+    [self.locationManager startMonitoringSignificantLocationChanges];
+    if ([self.locationCache count] > 0){
+        [self sync];
+    } else {
+        NSLog(@"CDVBackgroundGeoLocation could not find a location to sync");
+    }
+}
 -(void) onSuspend:(NSNotification *) notification
 {
     NSLog(@"CDVBackgroundGeoLocation suspend");
@@ -63,7 +73,7 @@
         [self.locationManager startMonitoringSignificantLocationChanges];
     }
 }
- -(void) onResume:(NSNotification *) notification
+-(void) onResume:(NSNotification *) notification
 {
     NSLog(@"CDVBackgroundGeoLocation resume");
     if (self.enabled) {
@@ -107,15 +117,15 @@
     
     // Some voodoo.
     bgTask = [app beginBackgroundTaskWithExpirationHandler:
-            ^{
+              ^{
                   [app endBackgroundTask:bgTask];
-            }];
+              }];
     
     // Prepare a reusable Request instance.  We'll reuse it each time we iterate the queue below.
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString: self.url]
-        cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
-        timeoutInterval:10.0];
-
+                                                           cachePolicy:NSURLRequestReloadIgnoringLocalCacheData
+                                                       timeoutInterval:10.0];
+    
     [request setHTTPMethod:@"POST"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Accept"];
     [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
@@ -125,7 +135,7 @@
     
     // Iterate the queue.
     CLLocation *location;
-    for (location in self.locationCache) {        
+    for (location in self.locationCache) {
         // Build the json-data.
         NSString *lat = [NSString stringWithFormat: @"%f", location.coordinate.latitude];
         NSString *lng = [NSString stringWithFormat: @"%f", location.coordinate.longitude];
@@ -133,13 +143,15 @@
         NSMutableDictionary *params = [NSMutableDictionary dictionary];
         NSMutableDictionary *data = [NSMutableDictionary dictionary];
         [params setValue: self.token forKey: @"auth_token"];
+        [params setValue: @"true" forKey: @"background_geolocation"];
+        
         [data setValue: lat forKey: @"latitude"];
         [data setValue: lng forKey: @"longitude"];
         [data setValue: [location.timestamp descriptionWithLocale:[NSLocale systemLocale]] forKey: @"recorded_at"];
         [params setObject:data forKey:@"location"];
         NSString *json = [params JSONString];
         NSData *requestData = [NSData dataWithBytes:[json UTF8String] length:[json length]];
-    
+        
         [request setHTTPBody: requestData];
         
         // Synchronous HTTP request

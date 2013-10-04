@@ -47,6 +47,13 @@ module.exports = {
             'BackgroundGeoLocation',
             'stop',
             []);
+    },
+    test: function(success, failure, config) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'test',
+            []);
     }
 };
 

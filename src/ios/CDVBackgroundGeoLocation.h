@@ -11,6 +11,7 @@
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
+- (void) test:(CDVInvokedUrlCommand*)command;
 - (void) sync;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
