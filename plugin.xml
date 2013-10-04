@@ -28,6 +28,14 @@
      </platform>          
 
      <platform name="ios">
+        <!-- required background modes:  App registers for location updates -->
+        <config-file target="*-Info.plist">
+            <key>UIBackgroundModes</key>
+            <array>
+                <string>location</string>
+            </array>
+        </config-file>
+
         <config-file target="config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
                 <param name="ios-package" value="CDVBackgroundGeoLocation"/>
