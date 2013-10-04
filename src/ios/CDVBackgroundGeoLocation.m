@@ -85,7 +85,7 @@
     }
 }
 
--(void) locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+-(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
 {
     NSLog(@"CDVBackgroundGeoLocation didUpdateLocation");
     
@@ -98,7 +98,7 @@
     // The omitted code should determine whether to reject the location update for being too
     // old, too close to the previous one, too inaccurate and so forth according to your own
     // application design.
-    [self.locationCache addObject:newLocation];
+    [self.locationCache addObjectsFromArray:locations];
     [self sync];
 }
 
