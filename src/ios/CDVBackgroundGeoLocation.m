@@ -88,12 +88,7 @@
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     NSLog(@"CDVBackgroundGeoLocation didUpdateLocations");
-    
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground)
-    {
-        // Not in background:  we're done here.
-        return;
-    }
+
     // Handle location updates as normal, code omitted for brevity.
     // The omitted code should determine whether to reject the location update for being too
     // old, too close to the previous one, too inaccurate and so forth according to your own
