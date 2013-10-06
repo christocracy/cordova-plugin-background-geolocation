@@ -28,13 +28,12 @@
      </platform>          
 
      <platform name="ios">
-        <!-- required background modes:  App registers for location updates 
+        <!-- required background modes:  App registers for location updates -->
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
                 <string>location</string>
             </array>
-        </config-file> -->
-        <plugins-plist key="UIBackgroundModes" string="location" />
+        </config-file>
 
         <config-file target="config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
