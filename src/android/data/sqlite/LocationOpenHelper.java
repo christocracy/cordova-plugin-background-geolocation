@@ -1,7 +1,5 @@
-package com.tenforwardconsulting.cordova.backgroundgeolocation;
+package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
 
-
-import com.geocrowd.android.core.GeoCrowdApplication;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class LocationOpenHelper extends SQLiteOpenHelper {
-	
+	private static final String SQLITE_DATABASE_NAME = "cordova_bg_locations";
 	private static final int DATABASE_VERSION = 1;
     public static final String LOCATION_TABLE_NAME = "location";
     private static final String LOCATION_TABLE_COLUMNS = 
@@ -23,8 +21,8 @@ public class LocationOpenHelper extends SQLiteOpenHelper {
 	    ");";
 
     LocationOpenHelper(Context context) {
-        super(context, GeoCrowdApplication.SQLITE_DATABASE_NAME, null, DATABASE_VERSION);
-    }
+    	super(context, SQLITE_DATABASE_NAME, null, DATABASE_VERSION);
+    }    
 
     @Override
     public void onCreate(SQLiteDatabase db) {

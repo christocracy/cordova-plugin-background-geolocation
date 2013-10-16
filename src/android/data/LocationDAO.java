@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.backgroundgeolocation.data;
+package com.tenforwardconsulting.cordova.bgloc.data;
 
 public interface LocationDAO {
 	public Location[] getAllLocations();

@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.backgroundgeolocation;
+package com.tenforwardconsulting.cordova.bgloc;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -6,9 +6,10 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
-import com.tenforwardconsulting.cordova.backgroundgeolocation.data.DAOFactory;
-import com.tenforwardconsulting.cordova.backgroundgeolocation.data.LocationDAO;
+import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
+import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
+import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.support.v4.app.NotificationCompat;
@@ -110,11 +111,15 @@ public class LocationUpdateService extends Service implements LocationListener {
         PackageManager pm = this.getPackageManager();
         Intent notificationIntent = pm.getLaunchIntentForPackage(this.getPackageName());
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
+        
+        Application application = this.getApplication();
+        int backgroundIconId = application.getResources().getIdentifier("background_notification", "drawable", application.getPackageName());
+        int appNameId = application.getResources().getIdentifier("app_name", "string", application.getPackageName());
+        
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-			.setSmallIcon(R.drawable.notification)
-			.setContentTitle(this.getString(R.string.app_name))
+			.setSmallIcon(backgroundIconId)
+			.setContentTitle(this.getString(appNameId))
 			.setOngoing(true)
 			.setContentIntent(contentIntent)
 			.setWhen(System.currentTimeMillis());
@@ -164,7 +169,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     	Log.d(TAG, "afterexecute " +  task.getStatus());
 	}
 	
-	private boolean postLocation(com.tenforwardconsulting.cordova.backgroundgeolocation.data.Location l) {
+	private boolean postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location l) {
 		if (l == null) {
 			Log.w(TAG, "postLocation: null location");
 			return false;
@@ -203,8 +208,8 @@ public class LocationUpdateService extends Service implements LocationListener {
 		}
 	}
 	private void persistLocation(Location location) {
-		LocationDAO dao = DAOFactory.createLocationDAO();
-		com.tenforwardconsulting.cordova.backgroundgeolocation.data.Location savedLocation = com.tenforwardconsulting.cordova.backgroundgeolocation.data.Location.fromAndroidLocation(location);
+		LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
+		com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
 		
 		if (dao.persistLocation(savedLocation)) {
 			Log.d(TAG, "Persisted Location: " + savedLocation);
@@ -239,7 +244,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 				Log.d(TAG, "#timestamp " + System.currentTimeMillis());
 				if (lastUpdateTime + 5*60*1000 < SystemClock.elapsedRealtime()) {
 					Log.d(TAG, "5 minutes, forcing update with last location");
-					postLocation(com.tenforwardconsulting.cordova.backgroundgeolocation.Location.fromAndroidLocation(
+					postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(
 							locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)));
 				}
 				try {
@@ -258,8 +263,8 @@ public class LocationUpdateService extends Service implements LocationListener {
 		@Override
 		protected Boolean doInBackground(Object...objects) {
 			Log.d(TAG, "Executing PostLocationTask#doInBackground");
-			LocationDAO locationDAO = DAOFactory.createLocationDAO();
-			for (com.tenforwardconsulting.cordova.backgroundgeolocation.data.Location savedLocation : locationDAO.getAllLocations()) {
+			LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
+			for (com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
 				Log.d(TAG, "Posting saved location");
 				if (postLocation(savedLocation)) {
 					locationDAO.deleteLocation(savedLocation);

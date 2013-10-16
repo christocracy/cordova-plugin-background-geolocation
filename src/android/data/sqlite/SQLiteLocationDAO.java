@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.backgroundgeolocation.data.sqlite;
+package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -7,22 +7,29 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.tenforwardconsulting.cordova.backgroundgeolocation.data.Location;
-import com.tenforwardconsulting.cordova.backgroundgeolocation.LocationDAO;
+import com.tenforwardconsulting.cordova.bgloc.data.Location;
+import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
 public class SQLiteLocationDAO implements LocationDAO {
 	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	private static final String TAG = "SQLiteLocationDAO";
+	private Context context;
+	
+	public SQLiteLocationDAO(Context context) {
+		this.context = context;
+	}
+	
 	public Location[] getAllLocations() {
 		SQLiteDatabase db = null;
 		Cursor c = null;
 		List<Location> all = new ArrayList<Location>();
 		try {
-			db = new LocationOpenHelper(GeoCrowdApplication.getApplication().getApplicationContext()).getReadableDatabase();
+			db = new LocationOpenHelper(context).getReadableDatabase();
 			c = db.query(LocationOpenHelper.LOCATION_TABLE_NAME, null, null, null, null, null, null);
 			while (c.moveToNext()) {
 				all.add(hydrate(c));
@@ -39,7 +46,7 @@ public class SQLiteLocationDAO implements LocationDAO {
 	}
 
 	public boolean persistLocation(Location location) {
-		SQLiteDatabase db = new LocationOpenHelper(GeoCrowdApplication.getApplication().getApplicationContext()).getWritableDatabase();
+		SQLiteDatabase db = new LocationOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		ContentValues values = getContentValues(location);
 		long rowId = db.insert(LocationOpenHelper.LOCATION_TABLE_NAME, null, values);
@@ -57,7 +64,7 @@ public class SQLiteLocationDAO implements LocationDAO {
 	}
 	
 	public void deleteLocation(Location location) {
-		SQLiteDatabase db = new LocationOpenHelper(GeoCrowdApplication.getApplication().getApplicationContext()).getWritableDatabase();
+		SQLiteDatabase db = new LocationOpenHelper(context).getWritableDatabase();
 		db.beginTransaction();
 		db.delete(LocationOpenHelper.LOCATION_TABLE_NAME, "id = ?", new String[]{location.getId().toString()});
 		db.setTransactionSuccessful();

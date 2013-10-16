@@ -1,10 +1,12 @@
-package com.tenforwardconsulting.cordova.backgroundgeolocation.data;
+package com.tenforwardconsulting.cordova.bgloc.data;
 
-import com.tenforwardconsulting.cordova.backgroundgeolocation.data.sqlite.SQLiteLocationDAO;
+import android.content.Context;
+
+import com.tenforwardconsulting.cordova.bgloc.data.sqlite.SQLiteLocationDAO;
 
 public abstract class DAOFactory {
-	public static LocationDAO createLocationDAO() {
+	public static LocationDAO createLocationDAO(Context context) {
 		//Very basic for now
-		return new SQLiteLocationDAO();
+		return new SQLiteLocationDAO(context);
 	}
 }
