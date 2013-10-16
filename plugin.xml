@@ -26,6 +26,7 @@
         <source-file src="src/android/data/sqlite/LocationOpenHelper.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
         <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
 
+        <source-file src="src/android/notification.png" target-dir="res/drawable" />
         <source-file src="src/android/android-support-v4.jar" target-dir="libs" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">

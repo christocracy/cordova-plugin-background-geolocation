@@ -1,5 +1,7 @@
 package com.tenforwardconsulting.cordova.bgloc;
 
+import java.util.Arrays;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -113,7 +115,14 @@ public class LocationUpdateService extends Service implements LocationListener {
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         
         Application application = this.getApplication();
-        int backgroundIconId = application.getResources().getIdentifier("background_notification", "drawable", application.getPackageName());
+        int backgroundIconId = 0;
+        for (String s: Arrays.asList("ic_launcher", "icon", "notification") ) {
+        	backgroundIconId = application.getResources().getIdentifier(s, "drawable", application.getPackageName());
+        	if (backgroundIconId != 0) {
+        		break;
+        	}
+        }
+         
         int appNameId = application.getResources().getIdentifier("app_name", "string", application.getPackageName());
         
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
