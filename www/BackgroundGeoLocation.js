@@ -28,11 +28,15 @@ module.exports = {
         if (!config.auth_token || !config.url) {
             console.log("BackgroundGeoLocation requires an auth_token and url to report to the server");
         }
+        var stationaryRadius    = config.stationaryRadius   || 50,    // meters
+            distanceFilter      = config.distanceFilter     || 500,   // meters
+            locationTimeout     = config.locationTimeout    || 60;    // seconds
+               
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [config.auth_token, config.url]);
+             [config.auth_token, config.url, stationaryRadius, distanceFilter, locationTimeout]);
     },
     start: function(success, failure, config) {
         exec(success || function() {},
@@ -54,6 +58,14 @@ module.exports = {
             'BackgroundGeoLocation',
             'test',
             []);
+    },
+    finish: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'finish',
+            []);  
     }
 };
+
 
