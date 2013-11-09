@@ -35,13 +35,10 @@
     
     self.token = [command.arguments objectAtIndex: 0];
     self.url = [command.arguments objectAtIndex: 1];
-    self.callbackId = command.callbackId;
     
     NSLog(@"CDVBackgroundGeoLocation configure");
     NSLog(@"  -token: %@", self.token);
     NSLog(@"  -url: %@", self.url);
-    NSLog(@"  -callback: %@", self.callbackId);
-    
 }
 
 - (void) start:(CDVInvokedUrlCommand*)command
@@ -56,10 +53,7 @@
     self.enabled = NO;
     [self.locationManager stopMonitoringSignificantLocationChanges];
 }
-- (void) setHighAccuracy:(CDVInvokedUrlCommand *)command
-{
-    NSLog(@"- CDVBackgroundGeoLocation setHighAccuracy");
-}
+
 - (void) test:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"CDVBackgroundGeoLocation test");
@@ -101,20 +95,8 @@
     // application design.
     [self.locationCache addObjectsFromArray:locations];
     [self sync];
-    
 }
--(void) finish:(CDVInvokedUrlCommand*)command
-{
-    NSLog(@"CDVBackgroundGeoLocation finish");
-    //_completionHandler(UIBackgroundFetchResultNewData);
-    // Finish the voodoo.
-    if (self.bgTask != UIBackgroundTaskInvalid)
-    {
-        [[UIApplication sharedApplication] endBackgroundTask:self.bgTask];
-        self.bgTask = UIBackgroundTaskInvalid;
-    }
-    
-}
+
 /**
  * We are running in the background if this is being executed.
  * We can't assume normal network access.
@@ -122,49 +104,6 @@
  */
 -(void) sync
 {
-    NSLog(@"- CDVBackgroundGeoLocation sync");
-    // Some voodoo.
-    // Note that the expiration handler block simply ends the task. It is important that we always
-    // end tasks that we have started.
-    UIBackgroundTaskIdentifier bgTask = 0;
-    UIApplication *app = [UIApplication sharedApplication];
-    
-    // Some voodoo.
-    self.bgTask = [app beginBackgroundTaskWithExpirationHandler:
-                   ^{
-                       [app endBackgroundTask:bgTask];
-                   }];
-    
-    CDVPluginResult* result = nil;
-    
-    // The list of successfully recorded locations on server.
-    NSMutableArray *recordedLocations = [NSMutableArray array];
-    
-    // Iterate the queue.
-    CLLocation *location;
-    NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
-    location = [self.locationCache lastObject];
-    
-    NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
-    [returnInfo setObject:timestamp forKey:@"timestamp"];
-    [returnInfo setObject:[NSNumber numberWithDouble:location.speed] forKey:@"velocity"];
-    [returnInfo setObject:[NSNumber numberWithDouble:location.verticalAccuracy] forKey:@"altitudeAccuracy"];
-    [returnInfo setObject:[NSNumber numberWithDouble:location.horizontalAccuracy] forKey:@"accuracy"];
-    [returnInfo setObject:[NSNumber numberWithDouble:location.course] forKey:@"heading"];
-    [returnInfo setObject:[NSNumber numberWithDouble:location.altitude] forKey:@"altitude"];
-    [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.latitude] forKey:@"latitude"];
-    [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.longitude] forKey:@"longitude"];
-    
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
-    [result setKeepCallbackAsBool:YES];
-    
-    // Inform javascript a background-fetch event has occurred.
-    [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
-    
-    // Remove our successfully recorded locations from cache.
-    [self.locationCache removeAllObjects];
-    
-    /*
     NSLog(@"BackgroundGeoLocation sync");
     // Note that the expiration handler block simply ends the task. It is important that we always
     // end tasks that we have started.
@@ -234,7 +173,6 @@
         [app endBackgroundTask:bgTask];
         bgTask = UIBackgroundTaskInvalid;
     }
-     */
 }
 
 // If you don't stopMonitorying when application terminates, the app will be awoken still when a
