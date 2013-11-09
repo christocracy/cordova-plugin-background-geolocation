@@ -32,7 +32,7 @@ module.exports = {
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [config.auth_token, config.url]);
+             [config.auth_token, config.url, config.callback]);
     },
     start: function(success, failure, config) {
         exec(success || function() {},
@@ -54,6 +54,20 @@ module.exports = {
             'BackgroundGeoLocation',
             'test',
             []);
+    },
+    setHighAccuracy: function(enabled, success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'setHighAccuracy',
+            []);
+    },
+    finish: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'finish',
+            []);  
     }
 };
 
