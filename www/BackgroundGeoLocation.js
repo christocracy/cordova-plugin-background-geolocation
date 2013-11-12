@@ -65,7 +65,15 @@ module.exports = {
             'BackgroundGeoLocation',
             'finish',
             []);  
+    },
+    changePace: function(isMoving, success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'onPaceChange',
+            [isMoving]);   
     }
 };
+
 
 

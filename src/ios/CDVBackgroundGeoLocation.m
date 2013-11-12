@@ -15,6 +15,7 @@
     NSString *syncCallbackId;
     UIBackgroundTaskIdentifier bgTask;
     
+    BOOL isMoving;
     NSNumber *maxBackgroundHours;
     CLLocationManager *locationManager;
     CDVLocationData *locationData;
@@ -39,6 +40,14 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume:) name:UIApplicationWillEnterForegroundNotification object:nil];
     return self;
 }
+/**
+ * configure plugin
+ * @param {String} token
+ * @param {String} url
+ * @param {Number} stationaryRadius
+ * @param {Number} distanceFilter
+ * @param {Number} locationTimeout
+ */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
     // in iOS, we call to javascript for HTTP now so token and url should be @deprecated until Android calls out to javascript.
@@ -57,6 +66,8 @@
     locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     locationManager.distanceFilter = distanceFilter; // meters
     
+    myRegion = nil;
+    
     NSLog(@"CDVBackgroundGeoLocation configure");
     NSLog(@"  - token: %@", token);
     NSLog(@"  - url: %@", url);
@@ -64,19 +75,24 @@
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
 }
-
+/**
+ * Turn on background geolocation
+ */
 - (void) start:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"CDVBackgroundGeoLocation start");
     enabled = YES;
 }
-
+/**
+ * Turn it off
+ */
 - (void) stop:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"CDVBackgroundGeoLocation stop");
     enabled = NO;
     [locationManager stopUpdatingLocation];
     [locationManager stopMonitoringSignificantLocationChanges];
+    
 }
 - (void) test:(CDVInvokedUrlCommand*)command
 {
@@ -88,19 +104,46 @@
         NSLog(@"CDVBackgroundGeoLocation could not find a location to sync");
     }
 }
+/**
+ * Change pace to moving/stopped
+ * @param {Boolean} isMoving
+ */
+- (void) onPaceChange:(CDVInvokedUrlCommand *)command
+{
+    isMoving = [[command.arguments objectAtIndex: 0] boolValue];
+    NSLog(@"- CDVBackgroundGeoLocation onPaceChange %hhd", isMoving);
+    [self setPace:isMoving];
+}
+/**
+ * Called by js to signify the end of a background-geolocation event
+ */
+-(void) finish:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"CDVBackgroundGeoLocation finish");
+    //_completionHandler(UIBackgroundFetchResultNewData);
+    // Finish the voodoo.
+    if (bgTask != UIBackgroundTaskInvalid)
+    {
+        [[UIApplication sharedApplication] endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }
+}
+
+/**
+ * Suspend.  Turn on passive location services
+ */
 -(void) onSuspend:(NSNotification *) notification
 {
     NSLog(@"CDVBackgroundGeoLocation suspend");
     suspendedAt = [NSDate date];
     
     if (enabled) {
-        if (myRegion == nil) {
-            myRegion = [self createStationaryRegion];
-            [locationManager startMonitoringForRegion:myRegion];
-        }
-        [locationManager startMonitoringSignificantLocationChanges];
+        [self setPace: NO];
     }
 }
+/**
+ * Resume.  Turn background off
+ */
 -(void) onResume:(NSNotification *) notification
 {
     NSLog(@"CDVBackgroundGeoLocation resume");
@@ -123,9 +166,7 @@
     // old, too close to the previous one, too inaccurate and so forth according to your own
     // application design.
     [locationCache addObjectsFromArray:locations];
-    
     [self sync];
-    
 }
 /**
  * We are running in the background if this is being executed.
@@ -167,17 +208,6 @@
     // Inform javascript a background-fetch event has occurred.
     [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
 }
--(void) finish:(CDVInvokedUrlCommand*)command
-{
-    NSLog(@"CDVBackgroundGeoLocation finish");
-    //_completionHandler(UIBackgroundFetchResultNewData);
-    // Finish the voodoo.
-    if (bgTask != UIBackgroundTaskInvalid)
-    {
-        [[UIApplication sharedApplication] endBackgroundTask:bgTask];
-        bgTask = UIBackgroundTaskInvalid;
-    }
-}
 /**
  * Called when user exits their stationary radius (ie: they walked ~50m away from their last recorded location.
  * - turn on more aggressive location monitoring.
@@ -185,12 +215,7 @@
 - (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
 {
     NSLog(@"- CDVBackgroundGeoLocation exit region");
-    if (myRegion != nil) {
-        [locationManager stopMonitoringSignificantLocationChanges];
-        [locationManager stopMonitoringForRegion:myRegion];
-        [locationManager startUpdatingLocation];
-        myRegion = nil;
-    }
+    [self setPace:YES];
 }
 /**
  * 1. turn off std location services
@@ -201,11 +226,7 @@
 - (void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager
 {
     NSLog(@"- CDVBackgroundGeoLocation paused location updates");
-    [locationManager stopUpdatingLocation];
-    [locationManager startMonitoringSignificantLocationChanges];
-    
-    myRegion = [self createStationaryRegion];
-    [manager startMonitoringForRegion:myRegion];
+    [self setPace:NO];
 }
 /**
  * 1. Turn off significantChanges ApI
@@ -215,14 +236,37 @@
 - (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager
 {
     NSLog(@"- CDVBackgroundGeoLocation resume location updates");
-    [locationManager stopMonitoringSignificantLocationChanges];
-    [locationManager startUpdatingLocation];
+    [self setPace:YES];
 }
-
--(CLCircularRegion*) createStationaryRegion {
-    CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter: [[locationManager location] coordinate] radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
-    region.notifyOnExit = YES;
-    return region;
+/**
+ * toggle passive or aggressive location services
+ */
+- (void)setPace:(BOOL)value
+{
+    if (myRegion != nil) {
+        [locationManager stopMonitoringForRegion:myRegion];
+        myRegion = nil;
+    }
+    if (value == YES) {
+        [locationManager stopMonitoringSignificantLocationChanges];
+        [locationManager startUpdatingLocation];
+    } else {
+        [locationManager stopUpdatingLocation];
+        [self startMonitoringStationaryRegion];
+        [locationManager startMonitoringSignificantLocationChanges];
+    }
+}
+/**
+ * Creates a new circle around user and region-monitors it for exit
+ */
+- (void) startMonitoringStationaryRegion {
+    NSLog(@"CDVBackgroundGeoLocation createStationaryRegion");
+    if (myRegion != nil) {
+        [locationManager stopMonitoringForRegion:myRegion];
+    }
+    myRegion = [[CLCircularRegion alloc] initWithCenter: [[locationManager location] coordinate] radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
+    myRegion.notifyOnExit = YES;
+    [locationManager startMonitoringForRegion:myRegion];
 }
 
 // If you don't stopMonitorying when application terminates, the app will be awoken still when a

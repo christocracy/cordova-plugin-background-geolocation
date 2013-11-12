@@ -13,7 +13,8 @@
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) test:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
-
+- (void) onPaceChange:(CDVInvokedUrlCommand*)command;
+    
 - (void) sync;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
