@@ -82,6 +82,11 @@
 {
     NSLog(@"CDVBackgroundGeoLocation start");
     enabled = YES;
+    
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (state == UIApplicationStateBackground) {
+        [self setPace:NO];
+    }
 }
 /**
  * Turn it off
@@ -243,6 +248,8 @@
  */
 - (void)setPace:(BOOL)value
 {
+    NSLog(@"- CDVBackgroundGeoLocation setPace %d", value);
+    
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
         myRegion = nil;
