@@ -81,12 +81,12 @@
  */
 - (void) start:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"CDVBackgroundGeoLocation start");
+    NSLog(@"- CDVBackgroundGeoLocation start");
     enabled = YES;
     
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateBackground) {
-        [self setPace:NO];
+        [self setPace:isMoving];
     }
 }
 /**
@@ -94,7 +94,7 @@
  */
 - (void) stop:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"CDVBackgroundGeoLocation stop");
+    NSLog(@"- CDVBackgroundGeoLocation stop");
     enabled = NO;
     [locationManager stopUpdatingLocation];
     [locationManager stopMonitoringSignificantLocationChanges];
@@ -102,12 +102,12 @@
 }
 - (void) test:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"CDVBackgroundGeoLocation test");
+    NSLog(@"- CDVBackgroundGeoLocation test");
     [locationManager startMonitoringSignificantLocationChanges];
     if ([locationCache count] > 0){
         [self sync];
     } else {
-        NSLog(@"CDVBackgroundGeoLocation could not find a location to sync");
+        NSLog(@"- CDVBackgroundGeoLocation could not find a location to sync");
     }
 }
 /**
@@ -118,14 +118,18 @@
 {
     isMoving = [[command.arguments objectAtIndex: 0] boolValue];
     NSLog(@"- CDVBackgroundGeoLocation onPaceChange %hhd", isMoving);
-    [self setPace:isMoving];
+
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (state == UIApplicationStateBackground) {
+        [self setPace:isMoving];
+    }
 }
 /**
  * Called by js to signify the end of a background-geolocation event
  */
 -(void) finish:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"CDVBackgroundGeoLocation finish");
+    NSLog(@"- CDVBackgroundGeoLocation finish");
     [self stopBackgroundTask];
 }
 
@@ -134,7 +138,7 @@
  */
 -(void) onSuspend:(NSNotification *) notification
 {
-    NSLog(@"CDVBackgroundGeoLocation suspend");
+    NSLog(@"- CDVBackgroundGeoLocation suspend");
     suspendedAt = [NSDate date];
     
     if (enabled && !isMoving) {
@@ -146,7 +150,7 @@
  */
 -(void) onResume:(NSNotification *) notification
 {
-    NSLog(@"CDVBackgroundGeoLocation resume");
+    NSLog(@"- CDVBackgroundGeoLocation resume");
     if (enabled) {
         [locationManager stopMonitoringSignificantLocationChanges];
         [locationManager stopUpdatingLocation];
@@ -159,7 +163,7 @@
 
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    NSLog(@"CDVBackgroundGeoLocation didUpdateLocations");
+    NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations");
 
     // Handle location updates as normal, code omitted for brevity.
     // The omitted code should determine whether to reject the location update for being too
@@ -227,10 +231,9 @@
     backgroundTimer = nil;
     
     UIApplication *app = [UIApplication sharedApplication];
-    NSLog(@"CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
+    NSLog(@"- CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
     if (bgTask != UIBackgroundTaskInvalid)
     {
-        NSLog(@" -bgTask killed");
         [[UIApplication sharedApplication] endBackgroundTask:bgTask];
         bgTask = UIBackgroundTaskInvalid;
     }
@@ -289,7 +292,7 @@
  * Creates a new circle around user and region-monitors it for exit
  */
 - (void) startMonitoringStationaryRegion {
-    NSLog(@"CDVBackgroundGeoLocation createStationaryRegion");
+    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion");
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
     }
