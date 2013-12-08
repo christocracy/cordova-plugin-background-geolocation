@@ -14,6 +14,7 @@
     NSString *url;
     NSString *syncCallbackId;
     UIBackgroundTaskIdentifier bgTask;
+    NSTimer *backgroundTimer;
     
     BOOL isMoving;
     NSNumber *maxBackgroundHours;
@@ -125,13 +126,7 @@
 -(void) finish:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"CDVBackgroundGeoLocation finish");
-    //_completionHandler(UIBackgroundFetchResultNewData);
-    // Finish the voodoo.
-    if (bgTask != UIBackgroundTaskInvalid)
-    {
-        [[UIApplication sharedApplication] endBackgroundTask:bgTask];
-        bgTask = UIBackgroundTaskInvalid;
-    }
+    [self stopBackgroundTask];
 }
 
 /**
@@ -142,7 +137,7 @@
     NSLog(@"CDVBackgroundGeoLocation suspend");
     suspendedAt = [NSDate date];
     
-    if (enabled) {
+    if (enabled && !isMoving) {
         [self setPace: NO];
     }
 }
@@ -188,7 +183,15 @@
     
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
         [app endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
     }];
+    
+    // Set a timer to ensure our bgTask is murdered 1s before our remaining time expires.
+    backgroundTimer = [NSTimer scheduledTimerWithTimeInterval:app.backgroundTimeRemaining-1
+        target:self
+        selector:@selector(onTimeExpired:)
+        userInfo:nil
+        repeats:NO];
     
     // Fetch last recorded location
     CLLocation *location = [locationCache lastObject];
@@ -212,6 +215,25 @@
     
     // Inform javascript a background-fetch event has occurred.
     [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
+}
+- (void)onTimeExpired:(NSTimer *)timer
+{
+    NSLog(@"- CDVBackgroundGeoLocation TIME EXPIRED");
+    [self stopBackgroundTask];
+}
+- (void) stopBackgroundTask
+{
+    [backgroundTimer invalidate];
+    backgroundTimer = nil;
+    
+    UIApplication *app = [UIApplication sharedApplication];
+    NSLog(@"CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
+    if (bgTask != UIBackgroundTaskInvalid)
+    {
+        NSLog(@" -bgTask killed");
+        [[UIApplication sharedApplication] endBackgroundTask:bgTask];
+        bgTask = UIBackgroundTaskInvalid;
+    }
 }
 /**
  * Called when user exits their stationary radius (ie: they walked ~50m away from their last recorded location.
@@ -249,7 +271,7 @@
 - (void)setPace:(BOOL)value
 {
     NSLog(@"- CDVBackgroundGeoLocation setPace %d", value);
-    
+    isMoving = value;
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
         myRegion = nil;
