@@ -180,28 +180,16 @@
 -(void) sync
 {
     NSLog(@"- CDVBackgroundGeoLocation sync");
-    // Some voodoo.
-    // Note that the expiration handler block simply ends the task. It is important that we always
-    // end tasks that we have started.
+    
     UIApplication *app = [UIApplication sharedApplication];
     
+    // Inform javascript a background-fetch event has occurred.
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
-        [app endBackgroundTask:bgTask];
-        bgTask = UIBackgroundTaskInvalid;
+        [self stopBackgroundTask];
     }];
-    
-    // Set a timer to ensure our bgTask is murdered 1s before our remaining time expires.
-    backgroundTimer = [NSTimer scheduledTimerWithTimeInterval:app.backgroundTimeRemaining-1
-        target:self
-        selector:@selector(onTimeExpired:)
-        userInfo:nil
-        repeats:NO];
     
     // Fetch last recorded location
     CLLocation *location = [locationCache lastObject];
-    
-    // Build a resultset for javascript callback.
-    CDVPluginResult* result = nil;
     
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
@@ -214,11 +202,22 @@
     [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.latitude] forKey:@"latitude"];
     [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.longitude] forKey:@"longitude"];
     
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
-    [result setKeepCallbackAsBool:YES];
+    // Set a timer to ensure our bgTask is murdered 1s before our remaining time expires.
+    backgroundTimer = [NSTimer scheduledTimerWithTimeInterval:app.backgroundTimeRemaining-1
+                                                       target:self
+                                                     selector:@selector(onTimeExpired:)
+                                                     userInfo:nil
+                                                      repeats:NO];
     
-    // Inform javascript a background-fetch event has occurred.
-    [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
+    [self.commandDelegate runInBackground:^{
+        // Build a resultset for javascript callback.
+        CDVPluginResult* result = nil;
+        
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
+        [result setKeepCallbackAsBool:YES];
+    
+        [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
+    }];
 }
 - (void)onTimeExpired:(NSTimer *)timer
 {
