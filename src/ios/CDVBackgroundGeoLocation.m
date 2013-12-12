@@ -170,7 +170,18 @@
     // old, too close to the previous one, too inaccurate and so forth according to your own
     // application design.
     [locationCache addObjectsFromArray:locations];
-    [self sync];
+    
+    UIApplication *app = [UIApplication sharedApplication];
+    
+    bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self stopBackgroundTask];
+        });
+    }];
+    
+    [self.commandDelegate runInBackground:^{
+        [self sync];
+    }];
 }
 /**
  * We are running in the background if this is being executed.
@@ -179,18 +190,9 @@
  */
 -(void) sync
 {
-    NSLog(@"- CDVBackgroundGeoLocation sync");
-    
-    UIApplication *app = [UIApplication sharedApplication];
-    
-    // Inform javascript a background-fetch event has occurred.
-    bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
-        [self stopBackgroundTask];
-    }];
-    
     // Fetch last recorded location
     CLLocation *location = [locationCache lastObject];
-    
+
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
     [returnInfo setObject:timestamp forKey:@"timestamp"];
@@ -202,38 +204,21 @@
     [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.latitude] forKey:@"latitude"];
     [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.longitude] forKey:@"longitude"];
     
-    // Set a timer to ensure our bgTask is murdered 1s before our remaining time expires.
-    backgroundTimer = [NSTimer scheduledTimerWithTimeInterval:app.backgroundTimeRemaining-1
-                                                       target:self
-                                                     selector:@selector(onTimeExpired:)
-                                                     userInfo:nil
-                                                      repeats:NO];
+    // Build a resultset for javascript callback.
+    CDVPluginResult* result = nil;
     
-    [self.commandDelegate runInBackground:^{
-        // Build a resultset for javascript callback.
-        CDVPluginResult* result = nil;
-        
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
-        [result setKeepCallbackAsBool:YES];
-    
-        [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
-    }];
-}
-- (void)onTimeExpired:(NSTimer *)timer
-{
-    NSLog(@"- CDVBackgroundGeoLocation TIME EXPIRED");
-    [self stopBackgroundTask];
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
+    [result setKeepCallbackAsBool:YES];
+
+    [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
 }
 - (void) stopBackgroundTask
 {
-    [backgroundTimer invalidate];
-    backgroundTimer = nil;
-    
     UIApplication *app = [UIApplication sharedApplication];
     NSLog(@"- CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
     if (bgTask != UIBackgroundTaskInvalid)
     {
-        [[UIApplication sharedApplication] endBackgroundTask:bgTask];
+        [app endBackgroundTask:bgTask];
         bgTask = UIBackgroundTaskInvalid;
     }
 }

@@ -1,5 +1,5 @@
 //
-//  CDVBackgroundGeoLocation.hs
+//  CDVBackgroundGeoLocation.h
 //
 //  Created by Chris Scott <chris@transistorsoft.com>
 //
