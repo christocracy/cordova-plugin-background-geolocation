@@ -29,7 +29,7 @@
     NSInteger locationTimeout;
 }
 
-- (CDVPlugin*) initWithWebView:(UIWebView*) theWebView
+- (void)pluginInitialize
 {
     // background location cache, for when no network is detected.
     locationCache = [NSMutableArray array];
@@ -39,7 +39,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSuspend:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    return self;
 }
 /**
  * configure plugin
