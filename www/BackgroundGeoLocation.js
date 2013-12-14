@@ -52,13 +52,6 @@ module.exports = {
             'stop',
             []);
     },
-    test: function(success, failure, config) {
-        exec(success || function() {},
-            failure || function() {},
-            'BackgroundGeoLocation',
-            'test',
-            []);
-    },
     finish: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
@@ -72,6 +65,20 @@ module.exports = {
             'BackgroundGeoLocation',
             'onPaceChange',
             [isMoving]);   
+    },
+    setStationaryRadius: function(value, success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'setStationaryRadius',
+            [value]);
+    },
+    setDistanceFilter: function(value, success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'setDistanceFilter',
+            [value]);
     }
 };
 

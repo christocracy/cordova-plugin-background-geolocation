@@ -11,11 +11,12 @@
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
-- (void) test:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
 - (void) onPaceChange:(CDVInvokedUrlCommand*)command;
-    
-- (void) sync;
+- (void) setStationaryRadius:(CDVInvokedUrlCommand*)command;
+- (void) setDistanceFilter:(CDVInvokedUrlCommand*)command;
+
+- (void) sync:(CLLocation*)location;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
 

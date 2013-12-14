@@ -19,7 +19,7 @@
     NSNumber *maxBackgroundHours;
     CLLocationManager *locationManager;
     CDVLocationData *locationData;
-    NSMutableArray *locationCache;
+
     NSDate *suspendedAt;
     
     CLCircularRegion *myRegion;
@@ -31,7 +31,6 @@
 - (void)pluginInitialize
 {
     // background location cache, for when no network is detected.
-    locationCache = [NSMutableArray array];
     locationManager = [[CLLocationManager alloc] init];
     locationManager.delegate = self;
     
@@ -99,16 +98,6 @@
     [locationManager stopMonitoringSignificantLocationChanges];
     
 }
-- (void) test:(CDVInvokedUrlCommand*)command
-{
-    NSLog(@"- CDVBackgroundGeoLocation test");
-    [locationManager startMonitoringSignificantLocationChanges];
-    if ([locationCache count] > 0){
-        [self sync];
-    } else {
-        NSLog(@"- CDVBackgroundGeoLocation could not find a location to sync");
-    }
-}
 /**
  * Change pace to moving/stopped
  * @param {Boolean} isMoving
@@ -123,6 +112,31 @@
         [self setPace:isMoving];
     }
 }
+/**
+ * Change stationary radius
+ */
+- (void) setStationaryRadius:(CDVInvokedUrlCommand *)command
+{
+    stationaryRadius = [[command.arguments objectAtIndex: 0] intValue];
+    NSLog(@"- CDVBackgroundGeoLocation setStationaryRadius %d", stationaryRadius);
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+/**
+ * Change distance-filter
+ */
+- (void) setDistanceFilter:(CDVInvokedUrlCommand *)command
+{
+    distanceFilter = [[command.arguments objectAtIndex: 0] intValue];
+    NSLog(@"- CDVBackgroundGeoLocation setDistanceFilter %d", distanceFilter);
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 /**
  * Called by js to signify the end of a background-geolocation event
  */
@@ -140,8 +154,8 @@
     NSLog(@"- CDVBackgroundGeoLocation suspend");
     suspendedAt = [NSDate date];
     
-    if (enabled && !isMoving) {
-        [self setPace: NO];
+    if (enabled) {
+        [self setPace: isMoving];
     }
 }
 /**
@@ -154,30 +168,26 @@
         [locationManager stopMonitoringSignificantLocationChanges];
         [locationManager stopUpdatingLocation];
     }
-    // When coming back-to-life, flush the background queue.
-    if ([locationCache count] > 0){
-        [self sync];
-    }
 }
 
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations");
-
-    // Handle location updates as normal, code omitted for brevity.
-    // The omitted code should determine whether to reject the location update for being too
-    // old, too close to the previous one, too inaccurate and so forth according to your own
-    // application design.
-    [locationCache addObjectsFromArray:locations];
     
     UIApplication *app = [UIApplication sharedApplication];
     
+    // Bail out if there's already a background-task in-effect.
+    if (bgTask != UIBackgroundTaskInvalid) {
+        NSLog(@" Abort:  found existing background-task");
+        return;
+    }
+
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
         [self stopBackgroundTask];
     }];
     
     [self.commandDelegate runInBackground:^{
-        [self sync];
+        [self sync:[locations lastObject]];
     }];
 }
 /**
@@ -185,10 +195,9 @@
  * We can't assume normal network access.
  * bgTask is defined as an instance variable of type UIBackgroundTaskIdentifier
  */
--(void) sync
+-(void) sync:(CLLocation *)location
 {
     // Fetch last recorded location
-    CLLocation *location = [locationCache lastObject];
 
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
@@ -212,9 +221,9 @@
 - (void) stopBackgroundTask
 {
     UIApplication *app = [UIApplication sharedApplication];
-    NSLog(@"- CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
     if (bgTask != UIBackgroundTaskInvalid)
     {
+        NSLog(@"- CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
         [app endBackgroundTask:bgTask];
         bgTask = UIBackgroundTaskInvalid;
     }
@@ -262,6 +271,7 @@
     }
     if (value == YES) {
         [locationManager stopMonitoringSignificantLocationChanges];
+        locationManager.distanceFilter = distanceFilter;
         [locationManager startUpdatingLocation];
     } else {
         [locationManager stopUpdatingLocation];
