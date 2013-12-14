@@ -80,10 +80,11 @@
  */
 - (void) start:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"- CDVBackgroundGeoLocation start");
     enabled = YES;
-    
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    
+    NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
+
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
     }
@@ -173,9 +174,7 @@
     UIApplication *app = [UIApplication sharedApplication];
     
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self stopBackgroundTask];
-        });
+        [self stopBackgroundTask];
     }];
     
     [self.commandDelegate runInBackground:^{
