@@ -2,7 +2,6 @@
 //  CDVBackgroundGeoLocation
 //
 //  Created by Chris Scott <chris@transistorsoft.com> on 2013-06-15
-//  Largely based upon http://www.mindsizzlers.com/2011/07/ios-background-location/
 //
 #import "CDVLocation.h"
 #import "CDVBackgroundGeoLocation.h"
