@@ -21,23 +21,48 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 A full example could be:
 ```
-   var bgGeo = window.plugins.backgroundGeoLocation;
-   bgGeo.configure(successFn, failFn, {
-       auth_token: 'asdf23423kjslkfjasdf',
-       url: '/users/location.json'
-   });
+    var bgGeo = window.plugins.backgroundGeoLocation;
 
-   // Enable background geolocation
-   bgGeo.start();
+    var callback = function(location) {
+      // HTTP to your server.
+      $.post({
+        url: 'locations.json',
+        callback: function() {
+          // Must inform native plugin the task is complete so it can terminate background-thread and go back to sleep.
+          bgGeo.finish();
+        }
+      })
+    };
 
-   // Disable it
-   bgGeo.stop();
+    bgGeo.configure(callback, failFn, {
+      stationaryRadius: 50,  // meters
+      distanceFilter: 50     // meters
+    });
+
+    // Enable background geolocation
+    bgGeo.start();
+
+    // Disable it
+    bgGeo.stop();
 
 ```
 
 ## iOS
 
 The iOS implementation of background geolocation uses [CLLocationManager#startMonitoringSignificantLocationChanges](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges)
+
+When the app is suspended, the native plugin initiates [region-monitoring](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLRegion_class/Reference/Reference.html#//apple_ref/doc/c_ref/CLRegion), creating a circular-region of radius *#stationaryRadius* meters.  Once the monitored-region signals that the user has gone beyond this region, the native-plugin will initiate aggressive location-monitoring
+using [standard location services](https://developer.apple.com/library/mac/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html).  At this time, *#distanceFilter* is in effect, recording a location each time the user travels that distance.
+
+Both #distanceFilter and #stationaryRadius can be modified at run-time.  For example, a #distanceFilter of 50m works great for walking-speed, but is probably too low for a car at highway-speed (too many samples).  In the future, the native app could possibly intelligently monitor speed and vary #distanceFilter automatically.  For now, you must control this manually.
+
+```
+  
+  bgGeo.setStationaryRadius(100);
+  bgGeo.setDistanceFilter(500);
+
+```
+
 
 ## Android
 

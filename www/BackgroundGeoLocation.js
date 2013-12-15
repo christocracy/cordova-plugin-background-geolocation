@@ -25,10 +25,9 @@
 var exec = require("cordova/exec");
 module.exports = {
     configure: function(success, failure, config) {
-        if (!config.auth_token || !config.url) {
-            console.log("BackgroundGeoLocation requires an auth_token and url to report to the server");
-        }
-        var stationaryRadius    = config.stationaryRadius   || 50,    // meters
+        var authToken           = config.auth_token || 'BackgroundGeoLocation_auth_token',
+            url                 = config.url || 'BackgroundGeoLocation_url',
+            stationaryRadius    = config.stationaryRadius   || 50,    // meters
             distanceFilter      = config.distanceFilter     || 500,   // meters
             locationTimeout     = config.locationTimeout    || 60;    // seconds
                
@@ -36,7 +35,7 @@ module.exports = {
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [config.auth_token, config.url, stationaryRadius, distanceFilter, locationTimeout]);
+             [authToken, url, stationaryRadius, distanceFilter, locationTimeout]);
     },
     start: function(success, failure, config) {
         exec(success || function() {},
