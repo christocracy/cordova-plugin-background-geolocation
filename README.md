@@ -63,6 +63,7 @@ Both #distanceFilter and #stationaryRadius can be modified at run-time.  For exa
 
 ```
 
+With aggressive location-monitoring enabled, if the user stops for exactly 15 minutes, iOS will automatically send a signal to the native-plugin which will turn-off standard location services and once again begin region-monitoring (#stationaryRadius) using the iOS significant-changes api.
 
 ## Android
 
