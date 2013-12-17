@@ -26,6 +26,7 @@
     NSInteger stationaryRadius;
     NSInteger distanceFilter;
     NSInteger locationTimeout;
+    NSInteger desiredAccuracy;
 }
 
 - (void)pluginInitialize
@@ -45,6 +46,7 @@
  * @param {Number} stationaryRadius
  * @param {Number} distanceFilter
  * @param {Number} locationTimeout
+ * @param {Number} desiredAccuracy
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
@@ -56,12 +58,29 @@
     stationaryRadius = [[command.arguments objectAtIndex: 2] intValue];
     distanceFilter = [[command.arguments objectAtIndex: 3] intValue];
     locationTimeout = [[command.arguments objectAtIndex: 4] intValue];
+    desiredAccuracy = [[command.arguments objectAtIndex: 5] intValue];
+
     syncCallbackId = command.callbackId;
     
     // Set a movement threshold for new events.
     locationManager.activityType = CLActivityTypeOther;
     locationManager.pausesLocationUpdatesAutomatically = YES;
-    locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+
+    switch (desiredAccuracy) {
+        case 1000:
+            locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+            break;
+        case 100:
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+            break;
+        case 10:
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+            break;
+        case 0:
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+            break;
+    }
+    
     locationManager.distanceFilter = distanceFilter; // meters
     
     myRegion = nil;
@@ -72,6 +91,7 @@
     NSLog(@"  - distanceFilter: %ld", (long)distanceFilter);
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
+    NSLog(@"  - desiredAccuracy: %ld", (long)desiredAccuracy);
 }
 /**
  * Turn on background geolocation

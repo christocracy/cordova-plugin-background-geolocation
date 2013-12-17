@@ -29,13 +29,14 @@ module.exports = {
             url                 = config.url || 'BackgroundGeoLocation_url',
             stationaryRadius    = config.stationaryRadius   || 50,    // meters
             distanceFilter      = config.distanceFilter     || 500,   // meters
-            locationTimeout     = config.locationTimeout    || 60;    // seconds
+            locationTimeout     = config.locationTimeout    || 60,    // seconds
+            desiredAccuracy     = config.desiredAccuracy    || 100;   // meters
                
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [authToken, url, stationaryRadius, distanceFilter, locationTimeout]);
+             [authToken, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy]);
     },
     start: function(success, failure, config) {
         exec(success || function() {},
