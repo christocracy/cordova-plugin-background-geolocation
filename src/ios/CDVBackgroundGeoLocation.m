@@ -302,7 +302,7 @@
     
     locationManager.distanceFilter = distanceFilter; // meters
     
-    if (value == YES) {
+    if (isMoving) {
         [locationManager startUpdatingLocation];
     } else {
         [self startMonitoringStationaryRegion];
