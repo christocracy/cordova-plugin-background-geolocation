@@ -66,11 +66,31 @@ module.exports = {
             'onPaceChange',
             [isMoving]);   
     },
+    /**
+    * @param {Integer} stationaryRadius
+    * @param {Integer} desiredAccuracy
+    * @param {Integer} distanceFilter
+    * @param {Integer} timeout
+    */
+    setConfig: function(success, failure, config) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'setConfig',
+            [config]);
+    },
     setStationaryRadius: function(value, success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'setStationaryRadius',
+            [value]);
+    },
+    setDesiredAccuracy: function(value, success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'setDesiredAccuracy',
             [value]);
     },
     setDistanceFilter: function(value, success, failure) {

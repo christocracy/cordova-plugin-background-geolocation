@@ -19,14 +19,14 @@
     NSNumber *maxBackgroundHours;
     CLLocationManager *locationManager;
     CDVLocationData *locationData;
-
+    
     NSDate *suspendedAt;
     
     CLCircularRegion *myRegion;
     NSInteger stationaryRadius;
     NSInteger distanceFilter;
-    NSInteger locationTimeout;
     NSInteger desiredAccuracy;
+    NSInteger locationTimeout;
 }
 
 - (void)pluginInitialize
@@ -59,28 +59,12 @@
     distanceFilter = [[command.arguments objectAtIndex: 3] intValue];
     locationTimeout = [[command.arguments objectAtIndex: 4] intValue];
     desiredAccuracy = [[command.arguments objectAtIndex: 5] intValue];
-
+    
     syncCallbackId = command.callbackId;
     
     // Set a movement threshold for new events.
     locationManager.activityType = CLActivityTypeOther;
     locationManager.pausesLocationUpdatesAutomatically = YES;
-
-    switch (desiredAccuracy) {
-        case 1000:
-            locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
-            break;
-        case 100:
-            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
-            break;
-        case 10:
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-            break;
-        case 0:
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-            break;
-    }
-    
     locationManager.distanceFilter = distanceFilter; // meters
     
     myRegion = nil;
@@ -102,7 +86,7 @@
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     
     NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
-
+    
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
     }
@@ -126,7 +110,7 @@
 {
     isMoving = [[command.arguments objectAtIndex: 0] boolValue];
     NSLog(@"- CDVBackgroundGeoLocation onPaceChange %hhd", isMoving);
-
+    
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
@@ -140,6 +124,11 @@
     stationaryRadius = [[command.arguments objectAtIndex: 0] intValue];
     NSLog(@"- CDVBackgroundGeoLocation setStationaryRadius %d", stationaryRadius);
     
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (state == UIApplicationStateBackground) {
+        [self setPace:isMoving];
+    }
+    
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -152,11 +141,32 @@
     distanceFilter = [[command.arguments objectAtIndex: 0] intValue];
     NSLog(@"- CDVBackgroundGeoLocation setDistanceFilter %d", distanceFilter);
     
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (state == UIApplicationStateBackground) {
+        [self setPace:isMoving];
+    }
+    
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
-
+/**
+ * Change stationary radius
+ */
+- (void) setDesiredAccuracy:(CDVInvokedUrlCommand *)command
+{
+    desiredAccuracy = [[command.arguments objectAtIndex: 0] intValue];
+    NSLog(@"- CDVBackgroundGeoLocation setDesiredAccuracy %d", desiredAccuracy);
+    
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (state == UIApplicationStateBackground) {
+        [self setPace:isMoving];
+    }
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 /**
  * Called by js to signify the end of a background-geolocation event
  */
@@ -201,7 +211,7 @@
         NSLog(@" Abort:  found existing background-task");
         return;
     }
-
+    
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
         [self stopBackgroundTask];
     }];
@@ -218,7 +228,7 @@
 -(void) sync:(CLLocation *)location
 {
     // Fetch last recorded location
-
+    
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
     [returnInfo setObject:timestamp forKey:@"timestamp"];
@@ -235,7 +245,7 @@
     
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
     [result setKeepCallbackAsBool:YES];
-
+    
     [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
 }
 - (void) stopBackgroundTask
@@ -283,8 +293,30 @@
  */
 - (void)setPace:(BOOL)value
 {
-    NSLog(@"- CDVBackgroundGeoLocation setPace %d", value);
-    isMoving = value;
+    // When stationaryRadius is 0, don't use sig.changes -- keep GPS on constantly.
+    isMoving = (stationaryRadius == 0) ? YES : value;
+    
+    NSLog(@"- CDVBackgroundGeoLocation setPace");
+    NSLog(@"    isMoving %d", isMoving);
+    NSLog(@"    desiredAccuracy: %d", desiredAccuracy);
+    NSLog(@"    distanceFilter: %d", distanceFilter);
+    NSLog(@"    stationaryRadius: %d", stationaryRadius);
+    
+    switch (desiredAccuracy) {
+        case 1000:
+            locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+            break;
+        case 100:
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+            break;
+        case 10:
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+            break;
+        case 0:
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+            break;
+    }
+    
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
         myRegion = nil;
