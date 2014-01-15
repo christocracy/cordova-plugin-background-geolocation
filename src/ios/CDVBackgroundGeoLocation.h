@@ -13,9 +13,7 @@
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
 - (void) onPaceChange:(CDVInvokedUrlCommand*)command;
-- (void) setStationaryRadius:(CDVInvokedUrlCommand*)command;
-- (void) setDesiredAccuracy:(CDVInvokedUrlCommand*)command;
-- (void) setDistanceFilter:(CDVInvokedUrlCommand*)command;
+- (void) setConfig:(CDVInvokedUrlCommand*)command;
 
 - (void) sync:(CLLocation*)location;
 - (void) onSuspend:(NSNotification *)notification;
