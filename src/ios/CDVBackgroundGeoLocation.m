@@ -98,7 +98,12 @@
         locationTimeout = [config[@"timeout"] intValue];
         NSLog(@"    locationTimeout: %@", config[@"timeout"]);
     }
-
+    
+    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
+    if (enabled && state == UIApplicationStateBackground) {
+        [self setPace:isMoving];
+    }
+    
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
