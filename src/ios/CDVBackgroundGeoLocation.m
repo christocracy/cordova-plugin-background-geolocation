@@ -67,6 +67,7 @@
     locationManager.pausesLocationUpdatesAutomatically = YES;
     
     myRegion = nil;
+    isMoving = NO;
     
     NSLog(@"CDVBackgroundGeoLocation configure");
     NSLog(@"  - token: %@", token);
@@ -119,8 +120,12 @@
     NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
     
     if (state == UIApplicationStateBackground) {
-        [self setPace:isMoving];
+        [self setPace:NO];
     }
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 /**
  * Turn it off
@@ -129,9 +134,18 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation stop");
     enabled = NO;
+    
     [locationManager stopUpdatingLocation];
     [locationManager stopMonitoringSignificantLocationChanges];
-    
+
+    if (myRegion != nil) {
+        [locationManager stopMonitoringForRegion:myRegion];
+        myRegion = nil;
+    }
+
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 /**
  * Change pace to moving/stopped
@@ -245,7 +259,9 @@
 - (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
 {
     NSLog(@"- CDVBackgroundGeoLocation exit region");
-    [self setPace:YES];
+    if (enabled) {
+        [self setPace:YES];
+    }
 }
 /**
  * 1. turn off std location services
@@ -274,7 +290,7 @@
 - (void)setPace:(BOOL)value
 {
     // When stationaryRadius is 0, don't use sig.changes -- keep GPS on constantly.
-    isMoving = (stationaryRadius == 0) ? YES : value;
+    isMoving = value;
     
     NSLog(@"- CDVBackgroundGeoLocation setPace");
     NSLog(@"    isMoving %d", isMoving);
@@ -305,13 +321,13 @@
             break;
     }
     
-    locationManager.distanceFilter = distanceFilter; // meters
+    locationManager.distanceFilter = (distanceFilter > 0) ? distanceFilter : kCLDistanceFilterNone;
     
     if (isMoving) {
         [locationManager startUpdatingLocation];
     } else {
-        [self startMonitoringStationaryRegion];
         [locationManager startMonitoringSignificantLocationChanges];
+        [self startMonitoringStationaryRegion];
     }
 }
 /**
@@ -322,7 +338,9 @@
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
     }
-    myRegion = [[CLCircularRegion alloc] initWithCenter: [[locationManager location] coordinate] radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
+    NSInteger radius = (stationaryRadius>0) ? stationaryRadius : 1;
+    
+    myRegion = [[CLCircularRegion alloc] initWithCenter: [[locationManager location] coordinate] radius:radius identifier:@"BackgroundGeoLocation stationary region"];
     myRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:myRegion];
 }
