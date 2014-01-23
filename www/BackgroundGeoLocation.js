@@ -26,11 +26,11 @@ var exec = require("cordova/exec");
 module.exports = {
     configure: function(success, failure, config) {
         var authToken           = config.auth_token || 'BackgroundGeoLocation_auth_token',
-            url                 = config.url || 'BackgroundGeoLocation_url',
-            stationaryRadius    = config.stationaryRadius   || 50,    // meters
-            distanceFilter      = config.distanceFilter     || 500,   // meters
-            locationTimeout     = config.locationTimeout    || 60,    // seconds
-            desiredAccuracy     = config.desiredAccuracy    || 100;   // meters
+            url                 = config.url        || 'BackgroundGeoLocation_url',
+            stationaryRadius    = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50,    // meters
+            distanceFilter      = (config.distanceFilter >= 0) ? config.distanceFilter : 500,       // meters
+            locationTimeout     = (config.locationTimeout >= 0) ? config.locationTimeout : 60,                                  // seconds
+            desiredAccuracy     = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100;     // meters
                
         exec(success || function() {},
              failure || function() {},
@@ -80,6 +80,3 @@ module.exports = {
             [config]);
     }
 };
-
-
-
