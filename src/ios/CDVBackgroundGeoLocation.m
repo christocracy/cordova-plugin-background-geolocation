@@ -99,12 +99,7 @@
         locationTimeout = [config[@"timeout"] intValue];
         NSLog(@"    locationTimeout: %@", config[@"timeout"]);
     }
-    
-    UIApplicationState state = [[UIApplication sharedApplication] applicationState];
-    if (enabled && state == UIApplicationStateBackground) {
-        [self setPace:isMoving];
-    }
-    
+
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -175,7 +170,7 @@
  */
 -(void) onSuspend:(NSNotification *) notification
 {
-    NSLog(@"- CDVBackgroundGeoLocation suspend");
+    NSLog(@"- CDVBackgroundGeoLocation suspend (%hhd)", enabled);
     suspendedAt = [NSDate date];
     
     if (enabled) {
@@ -334,13 +329,16 @@
  * Creates a new circle around user and region-monitors it for exit
  */
 - (void) startMonitoringStationaryRegion {
-    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion");
+    NSInteger radius = (stationaryRadius>0) ? stationaryRadius : 1;
+    CLLocationCoordinate2D coord = [[locationManager location] coordinate];
+    
+    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion (%f, %f)", coord.latitude, coord.longitude);
+    
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
     }
-    NSInteger radius = (stationaryRadius>0) ? stationaryRadius : 1;
     
-    myRegion = [[CLCircularRegion alloc] initWithCenter: [[locationManager location] coordinate] radius:radius identifier:@"BackgroundGeoLocation stationary region"];
+    myRegion = [[CLCircularRegion alloc] initWithCenter:coord radius:radius identifier:@"BackgroundGeoLocation stationary region"];
     myRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:myRegion];
 }
