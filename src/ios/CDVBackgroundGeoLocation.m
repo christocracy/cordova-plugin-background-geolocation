@@ -19,19 +19,19 @@
     NSNumber *maxBackgroundHours;
     CLLocationManager *locationManager;
     CDVLocationData *locationData;
-    
+    NSMutableArray *locationCache;
     NSDate *suspendedAt;
     
     CLCircularRegion *myRegion;
     NSInteger stationaryRadius;
     NSInteger distanceFilter;
-    NSInteger desiredAccuracy;
     NSInteger locationTimeout;
 }
 
 - (void)pluginInitialize
 {
     // background location cache, for when no network is detected.
+    locationCache = [NSMutableArray array];
     locationManager = [[CLLocationManager alloc] init];
     locationManager.delegate = self;
     
@@ -46,7 +46,6 @@
  * @param {Number} stationaryRadius
  * @param {Number} distanceFilter
  * @param {Number} locationTimeout
- * @param {Number} desiredAccuracy
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
@@ -58,16 +57,15 @@
     stationaryRadius = [[command.arguments objectAtIndex: 2] intValue];
     distanceFilter = [[command.arguments objectAtIndex: 3] intValue];
     locationTimeout = [[command.arguments objectAtIndex: 4] intValue];
-    desiredAccuracy = [[command.arguments objectAtIndex: 5] intValue];
-    
     syncCallbackId = command.callbackId;
     
     // Set a movement threshold for new events.
     locationManager.activityType = CLActivityTypeOther;
     locationManager.pausesLocationUpdatesAutomatically = YES;
+    locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+    locationManager.distanceFilter = distanceFilter; // meters
     
     myRegion = nil;
-    isMoving = NO;
     
     NSLog(@"CDVBackgroundGeoLocation configure");
     NSLog(@"  - token: %@", token);
@@ -75,35 +73,16 @@
     NSLog(@"  - distanceFilter: %ld", (long)distanceFilter);
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
-    NSLog(@"  - desiredAccuracy: %ld", (long)desiredAccuracy);
 }
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"- CDVBackgroundGeoLocation setConfig");
     
-    NSDictionary *config = [command.arguments objectAtIndex:0];
-    
-    if (config[@"desiredAccuracy"]) {
-        desiredAccuracy = [config[@"desiredAccuracy"] intValue];
-        NSLog(@"    desiredAccuracy: %@", config[@"desiredAccuracy"]);
-    }
-    if (config[@"stationaryRadius"]) {
-        stationaryRadius = [config[@"stationaryRadius"] intValue];
-        NSLog(@"    stationaryRadius: %@", config[@"stationaryRadius"]);
-    }
-    if (config[@"distanceFilter"]) {
-        distanceFilter = [config[@"distanceFilter"] intValue];
-        NSLog(@"    distanceFilter: %@", config[@"distanceFilter"]);
-    }
-    if (config[@"timeout"]) {
-        locationTimeout = [config[@"timeout"] intValue];
-        NSLog(@"    locationTimeout: %@", config[@"timeout"]);
-    }
-
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
+
 /**
  * Turn on background geolocation
  */
@@ -115,12 +94,8 @@
     NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
     
     if (state == UIApplicationStateBackground) {
-        [self setPace:NO];
+        [self setPace:isMoving];
     }
-    
-    CDVPluginResult* result = nil;
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 /**
  * Turn it off
@@ -129,18 +104,9 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation stop");
     enabled = NO;
-    
     [locationManager stopUpdatingLocation];
     [locationManager stopMonitoringSignificantLocationChanges];
-
-    if (myRegion != nil) {
-        [locationManager stopMonitoringForRegion:myRegion];
-        myRegion = nil;
-    }
-
-    CDVPluginResult* result = nil;
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    
 }
 /**
  * Change pace to moving/stopped
@@ -170,7 +136,7 @@
  */
 -(void) onSuspend:(NSNotification *) notification
 {
-    NSLog(@"- CDVBackgroundGeoLocation suspend (%hhd)", enabled);
+    NSLog(@"- CDVBackgroundGeoLocation suspend");
     suspendedAt = [NSDate date];
     
     if (enabled) {
@@ -193,13 +159,13 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations");
     
-    UIApplication *app = [UIApplication sharedApplication];
+    // Handle location updates as normal, code omitted for brevity.
+    // The omitted code should determine whether to reject the location update for being too
+    // old, too close to the previous one, too inaccurate and so forth according to your own
+    // application design.
+    [locationCache addObjectsFromArray:locations];
     
-    // Bail out if there's already a background-task in-effect.
-    if (bgTask != UIBackgroundTaskInvalid) {
-        NSLog(@" Abort:  found existing background-task");
-        return;
-    }
+    UIApplication *app = [UIApplication sharedApplication];
     
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
         [self stopBackgroundTask];
@@ -214,10 +180,8 @@
  * We can't assume normal network access.
  * bgTask is defined as an instance variable of type UIBackgroundTaskIdentifier
  */
--(void) sync:(CLLocation *)location
+-(void) sync:(CLLocation*)location
 {
-    // Fetch last recorded location
-    
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
     [returnInfo setObject:timestamp forKey:@"timestamp"];
@@ -240,9 +204,9 @@
 - (void) stopBackgroundTask
 {
     UIApplication *app = [UIApplication sharedApplication];
+    NSLog(@"- CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
     if (bgTask != UIBackgroundTaskInvalid)
     {
-        NSLog(@"- CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
         [app endBackgroundTask:bgTask];
         bgTask = UIBackgroundTaskInvalid;
     }
@@ -254,9 +218,7 @@
 - (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
 {
     NSLog(@"- CDVBackgroundGeoLocation exit region");
-    if (enabled) {
-        [self setPace:YES];
-    }
+    [self setPace:YES];
 }
 /**
  * 1. turn off std location services
@@ -284,61 +246,30 @@
  */
 - (void)setPace:(BOOL)value
 {
-    // When stationaryRadius is 0, don't use sig.changes -- keep GPS on constantly.
+    NSLog(@"- CDVBackgroundGeoLocation setPace %d", value);
     isMoving = value;
-    
-    NSLog(@"- CDVBackgroundGeoLocation setPace");
-    NSLog(@"    isMoving %d", isMoving);
-    NSLog(@"    desiredAccuracy: %d", desiredAccuracy);
-    NSLog(@"    distanceFilter: %d", distanceFilter);
-    NSLog(@"    stationaryRadius: %d", stationaryRadius);
-    
-    // First turn off all monitoring.
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
         myRegion = nil;
     }
-    [locationManager stopMonitoringSignificantLocationChanges];
-    [locationManager stopUpdatingLocation];
-    
-    switch (desiredAccuracy) {
-        case 1000:
-            locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
-            break;
-        case 100:
-            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
-            break;
-        case 10:
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-            break;
-        case 0:
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-            break;
-    }
-    
-    locationManager.distanceFilter = (distanceFilter > 0) ? distanceFilter : kCLDistanceFilterNone;
-    
-    if (isMoving) {
+    if (value == YES) {
+        [locationManager stopMonitoringSignificantLocationChanges];
         [locationManager startUpdatingLocation];
     } else {
-        [locationManager startMonitoringSignificantLocationChanges];
+        [locationManager stopUpdatingLocation];
         [self startMonitoringStationaryRegion];
+        [locationManager startMonitoringSignificantLocationChanges];
     }
 }
 /**
  * Creates a new circle around user and region-monitors it for exit
  */
 - (void) startMonitoringStationaryRegion {
-    NSInteger radius = (stationaryRadius>0) ? stationaryRadius : 1;
-    CLLocationCoordinate2D coord = [[locationManager location] coordinate];
-    
-    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion (%f, %f)", coord.latitude, coord.longitude);
-    
+    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion");
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
     }
-    
-    myRegion = [[CLCircularRegion alloc] initWithCenter:coord radius:radius identifier:@"BackgroundGeoLocation stationary region"];
+    myRegion = [[CLCircularRegion alloc] initWithCenter: [[locationManager location] coordinate] radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     myRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:myRegion];
 }
