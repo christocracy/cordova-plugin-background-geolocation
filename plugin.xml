@@ -62,7 +62,7 @@
         </config-file>
 
         <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
-        <source-file src="src/ios/CDVBackgroundGeoLocation.h" />
+        <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
      </platform>          
 
 </plugin>
