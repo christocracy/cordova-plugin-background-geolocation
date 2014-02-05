@@ -167,6 +167,12 @@
     
     UIApplication *app = [UIApplication sharedApplication];
     
+    // Bail out if there's already a background-task in-effect.
+    if (bgTask != UIBackgroundTaskInvalid) {
+        NSLog(@" Abort:  found existing background-task");
+        return;
+    }
+
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
         [self stopBackgroundTask];
     }];
