@@ -26,6 +26,7 @@
     NSInteger stationaryRadius;
     NSInteger distanceFilter;
     NSInteger locationTimeout;
+    NSInteger desiredAccuracy;
 }
 
 - (void)pluginInitialize
@@ -57,13 +58,29 @@
     stationaryRadius = [[command.arguments objectAtIndex: 2] intValue];
     distanceFilter = [[command.arguments objectAtIndex: 3] intValue];
     locationTimeout = [[command.arguments objectAtIndex: 4] intValue];
+    desiredAccuracy = [[command.arguments objectAtIndex: 5] intValue];
+    
     syncCallbackId = command.callbackId;
     
     // Set a movement threshold for new events.
     locationManager.activityType = CLActivityTypeOther;
     locationManager.pausesLocationUpdatesAutomatically = YES;
-    locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
     locationManager.distanceFilter = distanceFilter; // meters
+    
+    switch (desiredAccuracy) {
+        case 1000:
+            locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+            break;
+        case 100:
+            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
+            break;
+        case 10:
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
+            break;
+        case 0:
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+            break;
+    }
     
     myRegion = nil;
     
@@ -73,6 +90,7 @@
     NSLog(@"  - distanceFilter: %ld", (long)distanceFilter);
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
+    NSLog(@"  - desiredAccuracy: %ld", (long)desiredAccuracy);
 }
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
@@ -136,7 +154,7 @@
  */
 -(void) onSuspend:(NSNotification *) notification
 {
-    NSLog(@"- CDVBackgroundGeoLocation suspend");
+    NSLog(@"- CDVBackgroundGeoLocation suspend (enabled? %hhdd", enabled);
     suspendedAt = [NSDate date];
     
     if (enabled) {
@@ -157,7 +175,7 @@
 
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations");
+    NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations (isMoving: %hhd)", isMoving);
     
     // Handle location updates as normal, code omitted for brevity.
     // The omitted code should determine whether to reject the location update for being too
@@ -188,6 +206,8 @@
  */
 -(void) sync:(CLLocation*)location
 {
+    NSLog(@" %f,%f", location.coordinate.latitude, location.coordinate.longitude);
+    
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
     [returnInfo setObject:timestamp forKey:@"timestamp"];
@@ -202,6 +222,11 @@
     // Build a resultset for javascript callback.
     CDVPluginResult* result = nil;
     
+    if (!isMoving) {
+        if (!myRegion) {
+            [self startMonitoringStationaryRegion:location];
+        }
+    }
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
     [result setKeepCallbackAsBool:YES];
     
@@ -263,19 +288,20 @@
         [locationManager startUpdatingLocation];
     } else {
         [locationManager stopUpdatingLocation];
-        [self startMonitoringStationaryRegion];
         [locationManager startMonitoringSignificantLocationChanges];
     }
 }
 /**
  * Creates a new circle around user and region-monitors it for exit
  */
-- (void) startMonitoringStationaryRegion {
-    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion");
+- (void) startMonitoringStationaryRegion:(CLLocation*)location {
+    CLLocationCoordinate2D coord = [location coordinate];
+    
+    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion (%f,%f)", coord.latitude, coord.longitude);
     if (myRegion != nil) {
         [locationManager stopMonitoringForRegion:myRegion];
     }
-    myRegion = [[CLCircularRegion alloc] initWithCenter: [[locationManager location] coordinate] radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
+    myRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     myRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:myRegion];
 }
