@@ -261,6 +261,7 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation paused location updates");
     [self setPace:NO];
+    [self startMonitoringStationaryRegion:[locationManager location]];
 }
 /**
  * 1. Turn off significantChanges ApI
