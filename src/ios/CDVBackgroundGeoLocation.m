@@ -138,6 +138,9 @@
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
+        if (!isMoving) {
+            [self startMonitoringStationaryRegion:[locationManager location]];
+        }
     }
 }
 /**
@@ -278,13 +281,13 @@
  */
 - (void)setPace:(BOOL)value
 {
-    NSLog(@"- CDVBackgroundGeoLocation setPace %d", value);
+    NSLog(@"- CDVBackgroundGeoLocation setPace %d, myRegion? %d", value, myRegion!=nil);
     isMoving = value;
-    if (myRegion != nil) {
-        [locationManager stopMonitoringForRegion:myRegion];
-        myRegion = nil;
-    }
     if (value == YES) {
+        if (myRegion != nil) {
+            [locationManager stopMonitoringForRegion:myRegion];
+            myRegion = nil;
+        }
         [locationManager stopMonitoringSignificantLocationChanges];
         [locationManager startUpdatingLocation];
     } else {
