@@ -24,7 +24,7 @@
     NSDate *suspendedAt;
     
     BOOL isAcquiringStationaryLocation;
-    CLLocation *bestStationaryLocation;
+    CLLocation *stationaryLocation;
     NSInteger stationaryLocationAttempts;
     CLCircularRegion *stationaryRegion;
     
@@ -43,7 +43,7 @@
     locationManager = [[CLLocationManager alloc] init];
     locationManager.delegate = self;
     
-    bestStationaryLocation = nil;
+    stationaryLocation = nil;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSuspend:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
@@ -153,6 +153,36 @@
     }
 }
 /**
+ * Fetches current stationaryLocation
+ */
+- (void) getStationaryLocation:(CDVInvokedUrlCommand *)command
+{
+    NSLog(@"- CDVBackgroundGeoLocation getStationaryLocation");
+    
+    NSMutableDictionary* returnInfo;
+    // Build a resultset for javascript callback.
+    CDVPluginResult* result = nil;
+    
+    if (stationaryLocation) {
+        returnInfo = [NSMutableDictionary dictionaryWithCapacity:9];
+        
+        NSNumber* timestamp = [NSNumber numberWithDouble:([stationaryLocation.timestamp timeIntervalSince1970] * 1000)];
+        [returnInfo setObject:timestamp forKey:@"timestamp"];
+        [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.speed] forKey:@"velocity"];
+        [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.verticalAccuracy] forKey:@"altitudeAccuracy"];
+        [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.horizontalAccuracy] forKey:@"accuracy"];
+        [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.course] forKey:@"heading"];
+        [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.altitude] forKey:@"altitude"];
+        [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.coordinate.latitude] forKey:@"latitude"];
+        [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.coordinate.longitude] forKey:@"longitude"];
+        
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
+    } else {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:NO];
+    }
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+/**
  * Called by js to signify the end of a background-geolocation event
  */
 -(void) finish:(CDVInvokedUrlCommand*)command
@@ -217,7 +247,7 @@
         [locationManager stopUpdatingLocation];
         isAcquiringStationaryLocation = NO;
         [locationManager startMonitoringSignificantLocationChanges];
-        [self startMonitoringStationaryRegion:bestStationaryLocation];
+        [self startMonitoringStationaryRegion:stationaryLocation];
     }
     
     // Bail out if there's already a background-task in-effect.
@@ -239,9 +269,9 @@
     if (stationaryLocationAttempts == 5) {
         return true;
     }
-    if (bestStationaryLocation == nil || bestStationaryLocation.horizontalAccuracy > location.horizontalAccuracy) {
+    if (stationaryLocation == nil || stationaryLocation.horizontalAccuracy > location.horizontalAccuracy) {
         // store the location as the "best effort"
-        bestStationaryLocation = location;
+        stationaryLocation = location;
         if (location.horizontalAccuracy <= 5.0) {
             return true;
         }
@@ -335,7 +365,7 @@
         [locationManager startUpdatingLocation];
     } else {
         // Crank up the GPS power temporarily to get a good fix on our current staionary location in order to set up region-monitoring.
-        bestStationaryLocation = nil;
+        stationaryLocation = nil;
         isAcquiringStationaryLocation = YES;
         stationaryLocationAttempts = 0;
         locationManager.distanceFilter = kCLDistanceFilterNone;

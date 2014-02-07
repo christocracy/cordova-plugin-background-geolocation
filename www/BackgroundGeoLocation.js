@@ -1,4 +1,4 @@
-/***
+cordova.define("org.transistorsoft.cordova.background-geolocation.BackgroundGeoLocation", function(require, exports, module) {/***
  * Custom Cordova Background GeoLocation plugin.  Uses iOS native API 
  * @author <chris@transistorsoft.com>
  * @author <brian@briansamson.com>
@@ -78,5 +78,15 @@ module.exports = {
             'BackgroundGeoLocation',
             'setConfig',
             [config]);
-    }
-};
+    },
+   /**
+    * Returns current stationaryLocation if available.  null if not
+    */
+   getStationaryLocation: function(success, failure) {
+       exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getStationaryLocation',
+            []);
+       }
+};});
