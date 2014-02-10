@@ -18,6 +18,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 ```
    phonegap plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
 ```
+3.  The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
 
 A full example could be:
 ```
@@ -28,22 +29,28 @@ A full example could be:
       $.post({
         url: 'locations.json',
         callback: function() {
-          // Must inform native plugin the task is complete so it can terminate background-thread and go back to sleep.
-          bgGeo.finish();
+          // N.B:  You MUST inform native plugin the task is complete so it can terminate background-thread and go back to sleep.
+          bgGeo.finish();  // <-- DO NOT FORGET TO DO THIS!!!!!!!!!!!!!!!!!!!!!!!
         }
       })
     };
 
     bgGeo.configure(callback, failFn, {
       stationaryRadius: 50,  // meters
-      distanceFilter: 50     // meters
+      distanceFilter: 50,    // meters
+      debug: true            // enables sounds for bg-tracking events for debugging.
     });
 
     // Enable background geolocation
     bgGeo.start();
 
-    // Disable it
-    bgGeo.stop();
+    .
+    .
+    .
+
+    // When you want to stop tracking the user in the background, simply execute
+    // bgGeo.stop();
+
 
 ```
 
@@ -55,13 +62,6 @@ When the app is suspended, the native plugin initiates [region-monitoring](https
 using [standard location services](https://developer.apple.com/library/mac/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html).  At this time, *#distanceFilter* is in effect, recording a location each time the user travels that distance.
 
 Both #distanceFilter and #stationaryRadius can be modified at run-time.  For example, a #distanceFilter of 50m works great for walking-speed, but is probably too low for a car at highway-speed (too many samples).  In the future, the native app could possibly intelligently monitor speed and vary #distanceFilter automatically.  For now, you must control this manually.
-
-```
-  
-  bgGeo.setStationaryRadius(100);
-  bgGeo.setDistanceFilter(500);
-
-```
 
 With aggressive location-monitoring enabled, if the user stops for exactly 15 minutes, iOS will automatically send a signal to the native-plugin which will turn-off standard location services and once again begin region-monitoring (#stationaryRadius) using the iOS significant-changes api.
 
