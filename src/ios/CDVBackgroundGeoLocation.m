@@ -410,7 +410,7 @@
     }
     stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     stationaryRegion.notifyOnExit = YES;
-    [locationManager startMonitoringForRegion:stationaryRegion desiredAccuracy:desiredAccuracy];
+    [locationManager startMonitoringForRegion:stationaryRegion];
 }
 
 // If you don't stopMonitorying when application terminates, the app will be awoken still when a
