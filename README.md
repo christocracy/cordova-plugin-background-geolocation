@@ -19,8 +19,6 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
    phonegap plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
 ```
 
-The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
-
 A full example could be:
 ```
     var bgGeo = window.plugins.backgroundGeoLocation;
@@ -54,6 +52,8 @@ A full example could be:
 
 
 ```
+
+NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
 
 ## iOS
 
