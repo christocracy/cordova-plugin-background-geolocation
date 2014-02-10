@@ -60,7 +60,7 @@
                 <param name="ios-package" value="CDVBackgroundGeoLocation"/>
             </feature>
         </config-file>
-
+        <framework src="AudioToolbox.framework" weak="true" />
         <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
         <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
      </platform>          

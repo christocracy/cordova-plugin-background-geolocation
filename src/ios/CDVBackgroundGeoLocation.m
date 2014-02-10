@@ -6,7 +6,6 @@
 #import "CDVLocation.h"
 #import "CDVBackgroundGeoLocation.h"
 #import <Cordova/CDVJSON.h>
-#import <AudioToolbox/AudioToolbox.h>
 
 // Debug sounds for bg-geolocation life-cycle events.
 // http://iphonedevwiki.net/index.php/AudioServices

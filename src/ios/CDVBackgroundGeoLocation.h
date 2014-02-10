@@ -6,6 +6,7 @@
 
 #import <Cordova/CDVPlugin.h>
 #import "CDVLocation.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 @interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
 - (void) configure:(CDVInvokedUrlCommand*)command;
