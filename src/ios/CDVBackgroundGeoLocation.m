@@ -134,6 +134,9 @@
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
     }
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 /**
  * Turn it off
@@ -144,6 +147,10 @@
     enabled = NO;
     [locationManager stopUpdatingLocation];
     [locationManager stopMonitoringSignificantLocationChanges];
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     
 }
 /**
