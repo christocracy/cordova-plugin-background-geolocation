@@ -286,6 +286,25 @@
     [self.commandDelegate runInBackground:^{
         [self sync:newLocation];
     }];
+    
+    // Adjust distanceFilter incrementally based upon current velocity
+    if (isMoving)
+    {
+        float newDistanceFilter = distanceFilter;
+        // sanity-check obvious high speed error.
+        if (newLocation.speed > 100) {
+            return;
+        }
+        if (newLocation.speed > 5.0) {
+            newDistanceFilter = [self calculateDistanceFilter:newLocation.speed];
+        }
+        if (newDistanceFilter != locationManager.distanceFilter) {
+            NSLog(@"- CDVBackgroundGeoLocation updated distanceFilter, new: %f, old: %f", newDistanceFilter, locationManager.distanceFilter);
+            [locationManager stopUpdatingLocation];
+            locationManager.distanceFilter = newDistanceFilter;
+            [locationManager startUpdatingLocation];
+        }
+    }
 }
 -(BOOL) isBestStationaryLocation:(CLLocation*)location {
     stationaryLocationAttempts++;
@@ -308,7 +327,7 @@
  */
 -(void) sync:(CLLocation*)location
 {
-    NSLog(@" %f,%f", location.coordinate.latitude, location.coordinate.longitude);
+    NSLog(@" position: %f,%f, speed: %f", location.coordinate.latitude, location.coordinate.longitude, location.speed);
     if (isDebugging) {
         AudioServicesPlaySystemSound (locationSyncSound);
     }
@@ -332,6 +351,14 @@
     
     [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
 }
+/**
+ * Calculates distanceFilter by rounding speed to nearest 5 and multiplying by 10.
+ */
+-(float) calculateDistanceFilter:(float)velocity
+{
+    return (5.0 * floorf(velocity / 5.0 + 0.5f)) * 10;
+}
+
 - (void) stopBackgroundTask
 {
     UIApplication *app = [UIApplication sharedApplication];
