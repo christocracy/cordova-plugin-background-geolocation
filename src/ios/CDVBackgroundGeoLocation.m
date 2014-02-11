@@ -235,11 +235,12 @@
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations (isMoving: %hhd)", isMoving);
+    CLLocation *newLocation = [locations lastObject];
+    
     if (!isMoving && !isAcquiringStationaryLocation && !stationaryLocation) {
         // Perhaps our GPS signal was interupted, re-acquire a stationaryLocation now.
         [self setPace: NO];
     }
-    CLLocation *newLocation = [locations lastObject];
     
     // Handle location updates as normal, code omitted for brevity.
     // The omitted code should determine whether to reject the location update for being too
@@ -362,10 +363,12 @@
 {
     float newDistanceFilter = distanceFilter;
     
-    if (velocity > 5.0 && velocity < 100) {
-        newDistanceFilter = (5.0 * floorf(velocity / 5.0 + 0.5f)) * 10;
+    if (velocity > 3.0 && velocity < 100) {
+        // (rounded-velocity-to-nearest-5) / 2)^2
+        // eg 5.2 becomes (5/2)^2
+        newDistanceFilter = pow((5.0 * floorf(velocity / 5.0 + 0.5f)), 2) + distanceFilter;
     }
-    return newDistanceFilter;
+    return (newDistanceFilter < 1000) ? newDistanceFilter : 1000;
 }
 
 - (void) stopBackgroundTask
