@@ -290,14 +290,7 @@
     // Adjust distanceFilter incrementally based upon current velocity
     if (isMoving)
     {
-        float newDistanceFilter = distanceFilter;
-        // sanity-check obvious high speed error.
-        if (newLocation.speed > 100) {
-            return;
-        }
-        if (newLocation.speed > 5.0) {
-            newDistanceFilter = [self calculateDistanceFilter:newLocation.speed];
-        }
+        float newDistanceFilter = [self calculateDistanceFilter:newLocation.speed];
         if (newDistanceFilter != locationManager.distanceFilter) {
             NSLog(@"- CDVBackgroundGeoLocation updated distanceFilter, new: %f, old: %f", newDistanceFilter, locationManager.distanceFilter);
             [locationManager stopUpdatingLocation];
@@ -367,7 +360,12 @@
  */
 -(float) calculateDistanceFilter:(float)velocity
 {
-    return (5.0 * floorf(velocity / 5.0 + 0.5f)) * 10;
+    float newDistanceFilter = distanceFilter;
+    
+    if (velocity > 5.0 && velocity < 100) {
+        newDistanceFilter = (5.0 * floorf(velocity / 5.0 + 0.5f)) * 10;
+    }
+    return newDistanceFilter;
 }
 
 - (void) stopBackgroundTask
