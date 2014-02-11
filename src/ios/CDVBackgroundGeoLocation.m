@@ -308,7 +308,7 @@
 }
 -(BOOL) isBestStationaryLocation:(CLLocation*)location {
     stationaryLocationAttempts++;
-    if (stationaryLocationAttempts == 7) {
+    if (stationaryLocationAttempts == 4) {
         return true;
     }
     if (stationaryLocation == nil || stationaryLocation.horizontalAccuracy > location.horizontalAccuracy) {
