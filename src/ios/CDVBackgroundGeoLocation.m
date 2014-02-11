@@ -235,7 +235,10 @@
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations (isMoving: %hhd)", isMoving);
-    
+    if (!isMoving && !isAcquiringStationaryLocation && !stationaryLocation) {
+        // Perhaps our GPS signal was interupted, re-acquire a stationaryLocation now.
+        [self setPace: NO];
+    }
     CLLocation *newLocation = [locations lastObject];
     
     // Handle location updates as normal, code omitted for brevity.
@@ -267,9 +270,6 @@
         if (isDebugging) {
             AudioServicesPlaySystemSound (acquiredLocationSound);
         }
-        [locationManager stopUpdatingLocation];
-        isAcquiringStationaryLocation = NO;
-        [locationManager startMonitoringSignificantLocationChanges];
         [self startMonitoringStationaryRegion:stationaryLocation];
     }
     
@@ -305,6 +305,17 @@
             [locationManager startUpdatingLocation];
         }
     }
+}
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+    NSLog(@"- CDVBackgroundGeoLocation locationManager failed:  %@", error);
+    [locationManager stopUpdatingLocation];
+    
+    isMoving = NO;
+    isAcquiringStationaryLocation = NO;
+    stationaryLocation = nil;
+    
+    [locationManager startMonitoringSignificantLocationChanges];
 }
 -(BOOL) isBestStationaryLocation:(CLLocation*)location {
     stationaryLocationAttempts++;
@@ -391,7 +402,6 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation paused location updates");
     [self setPace:NO];
-    [self startMonitoringStationaryRegion:[locationManager location]];
 }
 /**
  * 1. Turn off significantChanges ApI
@@ -413,7 +423,7 @@
     if (isDebugging) {
         AudioServicesPlaySystemSound (isMoving ? paceChangeYesSound : paceChangeNoSound);
     }
-    if (value == YES) {
+    if (isMoving) {
         if (stationaryRegion != nil) {
             [locationManager stopMonitoringForRegion:stationaryRegion];
             stationaryRegion = nil;
@@ -439,9 +449,17 @@
     CLLocationCoordinate2D coord = [location coordinate];
     
     NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion (%f,%f)", coord.latitude, coord.longitude);
+    
     if (stationaryRegion != nil) {
         [locationManager stopMonitoringForRegion:stationaryRegion];
     }
+
+    isAcquiringStationaryLocation = NO;
+    [locationManager stopUpdatingLocation];
+    locationManager.distanceFilter = distanceFilter;
+    locationManager.desiredAccuracy = desiredAccuracy;
+    [locationManager startMonitoringSignificantLocationChanges];
+    
     stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     stationaryRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:stationaryRegion];
