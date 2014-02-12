@@ -52,6 +52,7 @@
     locationManager.delegate = self;
     
     stationaryLocation = nil;
+    stationaryRegion = nil;
     isDebugging = NO;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSuspend:) name:UIApplicationDidEnterBackgroundNotification object:nil];
@@ -76,7 +77,7 @@
     stationaryRadius    = [[command.arguments objectAtIndex: 2] intValue];
     distanceFilter      = [[command.arguments objectAtIndex: 3] intValue];
     locationTimeout     = [[command.arguments objectAtIndex: 4] intValue];
-    desiredAccuracy     = [[command.arguments objectAtIndex: 5] intValue];
+    desiredAccuracy     = [self translateDesiredAccuracy:[[command.arguments objectAtIndex: 5] intValue]];
     isDebugging         = [[command.arguments objectAtIndex: 6] boolValue];
     
     syncCallbackId = command.callbackId;
@@ -85,23 +86,7 @@
     locationManager.activityType = CLActivityTypeOther;
     locationManager.pausesLocationUpdatesAutomatically = YES;
     locationManager.distanceFilter = distanceFilter; // meters
-    
-    switch (desiredAccuracy) {
-        case 1000:
-            locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
-            break;
-        case 100:
-            locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
-            break;
-        case 10:
-            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters;
-            break;
-        case 0:
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-            break;
-    }
-    
-    stationaryRegion = nil;
+    locationManager.desiredAccuracy = desiredAccuracy;
     
     NSLog(@"CDVBackgroundGeoLocation configure");
     NSLog(@"  - token: %@", token);
@@ -115,10 +100,49 @@
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
     NSLog(@"- CDVBackgroundGeoLocation setConfig");
+    NSDictionary *config = [command.arguments objectAtIndex:0];
+    
+    if (config[@"desiredAccuracy"]) {
+        desiredAccuracy = [self translateDesiredAccuracy:[config[@"desiredAccuracy"] intValue]];
+        NSLog(@"    desiredAccuracy: %@", config[@"desiredAccuracy"]);
+    }
+    if (config[@"stationaryRadius"]) {
+        stationaryRadius = [config[@"stationaryRadius"] intValue];
+        NSLog(@"    stationaryRadius: %@", config[@"stationaryRadius"]);
+    }
+    if (config[@"distanceFilter"]) {
+        distanceFilter = [config[@"distanceFilter"] intValue];
+        NSLog(@"    distanceFilter: %@", config[@"distanceFilter"]);
+    }
+    if (config[@"timeout"]) {
+        locationTimeout = [config[@"timeout"] intValue];
+        NSLog(@"    locationTimeout: %@", config[@"timeout"]);
+    }
     
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+-(NSInteger)translateDesiredAccuracy:(NSInteger)accuracy
+{
+    switch (accuracy) {
+        case 1000:
+            accuracy = kCLLocationAccuracyKilometer;
+            break;
+        case 100:
+            accuracy = kCLLocationAccuracyHundredMeters;
+            break;
+        case 10:
+            accuracy = kCLLocationAccuracyNearestTenMeters;
+            break;
+        case 0:
+            accuracy = kCLLocationAccuracyBest;
+            break;
+        default:
+            accuracy = kCLLocationAccuracyHundredMeters;
+    }
+    return accuracy;
 }
 
 /**
