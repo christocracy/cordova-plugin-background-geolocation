@@ -36,7 +36,12 @@
     BOOL isAcquiringStationaryLocation;
     CLLocation *stationaryLocation;
     NSInteger stationaryLocationAttempts;
+    NSInteger maxStationaryLocationAttempts;
     CLCircularRegion *stationaryRegion;
+    
+    BOOL isAcquiringSpeed;
+    NSInteger speedAcquisitionAttempts;
+    NSInteger maxSpeedAcquistionAttempts;
     
     NSInteger stationaryRadius;
     NSInteger distanceFilter;
@@ -54,6 +59,9 @@
     stationaryLocation = nil;
     stationaryRegion = nil;
     isDebugging = NO;
+    
+    maxStationaryLocationAttempts   = 4;
+    maxSpeedAcquistionAttempts      = 3;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSuspend:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     
@@ -312,7 +320,7 @@
         [self sync:newLocation];
     }];
     
-    // Adjust distanceFilter incrementally based upon current velocity
+    // Adjust distanceFilter incrementally based upon current speed
     if (isMoving)
     {
         float newDistanceFilter = [self calculateDistanceFilter:newLocation.speed];
@@ -337,7 +345,7 @@
 }
 -(BOOL) isBestStationaryLocation:(CLLocation*)location {
     stationaryLocationAttempts++;
-    if (stationaryLocationAttempts == 4) {
+    if (stationaryLocationAttempts == maxStationaryLocationAttempts) {
         return true;
     }
     if (stationaryLocation == nil || stationaryLocation.horizontalAccuracy > location.horizontalAccuracy) {
@@ -349,6 +357,33 @@
     }
     return false;
 }
+
+/**
+ * Calculates distanceFilter by rounding speed to nearest 5 and multiplying by 10.
+ */
+-(float) calculateDistanceFilter:(float)speed
+{
+    float newDistanceFilter = distanceFilter;
+    if (isAcquiringSpeed) {
+        if (++speedAcquisitionAttempts == maxSpeedAcquistionAttempts) {
+            // We should have a good sample for speed now, power down our GPS as configured by user.
+            isAcquiringSpeed = NO;
+            [locationManager stopUpdatingLocation];
+            locationManager.desiredAccuracy = desiredAccuracy;
+            [locationManager startUpdatingLocation];
+        } else {
+            return newDistanceFilter;
+        }
+    }
+    if (speed > 3.0 && speed < 100) {
+        // (rounded-speed-to-nearest-5) / 2)^2
+        // eg 5.2 becomes (5/2)^2
+        newDistanceFilter = pow((5.0 * floorf(speed / 5.0 + 0.5f)), 2) + distanceFilter;
+    }
+    return (newDistanceFilter < 1000) ? newDistanceFilter : 1000;
+}
+
+
 /**
  * We are running in the background if this is being executed.
  * We can't assume normal network access.
@@ -379,20 +414,6 @@
     [result setKeepCallbackAsBool:YES];
     
     [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
-}
-/**
- * Calculates distanceFilter by rounding speed to nearest 5 and multiplying by 10.
- */
--(float) calculateDistanceFilter:(float)velocity
-{
-    float newDistanceFilter = distanceFilter;
-    
-    if (velocity > 3.0 && velocity < 100) {
-        // (rounded-velocity-to-nearest-5) / 2)^2
-        // eg 5.2 becomes (5/2)^2
-        newDistanceFilter = pow((5.0 * floorf(velocity / 5.0 + 0.5f)), 2) + distanceFilter;
-    }
-    return (newDistanceFilter < 1000) ? newDistanceFilter : 1000;
 }
 
 - (void) stopBackgroundTask
@@ -453,15 +474,20 @@
             [locationManager stopMonitoringForRegion:stationaryRegion];
             stationaryRegion = nil;
         }
+        isAcquiringSpeed = YES;
+        speedAcquisitionAttempts = 0;
+        
         [locationManager stopMonitoringSignificantLocationChanges];
         locationManager.distanceFilter = distanceFilter;
-        locationManager.desiredAccuracy = desiredAccuracy;
+        // Power-up the GPS temporarily until we get a good speed sample.
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
         [locationManager startUpdatingLocation];
     } else {
         // Crank up the GPS power temporarily to get a good fix on our current staionary location in order to set up region-monitoring.
         stationaryLocation = nil;
         isAcquiringStationaryLocation = YES;
         stationaryLocationAttempts = 0;
+        
         locationManager.distanceFilter = kCLDistanceFilterNone;
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
         [locationManager startUpdatingLocation];
