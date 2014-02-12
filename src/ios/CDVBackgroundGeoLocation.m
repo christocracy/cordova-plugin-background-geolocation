@@ -196,9 +196,6 @@
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
-        if (!isMoving) {
-            [self startMonitoringStationaryRegion:[locationManager location]];
-        }
     }
 }
 /**
