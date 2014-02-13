@@ -97,11 +97,11 @@ With aggressive location-monitoring enabled, if the user stops for exactly 15 mi
 
 Use the following config-parameters with the #configure method:
 
-#### `@param {Integer} [0, 10, 100, 1000] desiredAccuracy in meters`
+  `@param {Integer} [0, 10, 100, 1000] desiredAccuracy in meters`
 
 The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings.  1000 results in lowest power drain and least accurate readings.
 
-#### @param {Integer} distanceFilter
+  `@param {Integer} distanceFilter`
 
 ## Android
 
