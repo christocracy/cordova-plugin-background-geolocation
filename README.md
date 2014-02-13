@@ -21,34 +21,61 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 A full example could be:
 ```
-    var bgGeo = window.plugins.backgroundGeoLocation;
+    //
+    //
+    // after deviceready
+    //
+    //
 
-    var callback = function(location) {
-      // HTTP to your server.
-      $.post({
-        url: 'locations.json',
-        callback: function() {
-          // N.B:  You MUST inform native plugin the task is complete so it can terminate background-thread and go back to sleep.
-          bgGeo.finish();  // <-- DO NOT FORGET TO DO THIS!!!!!!!!!!!!!!!!!!!!!!!
-        }
-      })
-    };
-
-    bgGeo.configure(callback, failFn, {
-      stationaryRadius: 50,  // meters
-      distanceFilter: 50,    // meters
-      debug: true            // enables sounds for bg-tracking events for debugging.
+    // Your app must execute AT LEAST ONE call for the current position via standard Cordova geolocation,
+    //  in order to prompt the user for Location permission.
+    window.navigator.geolocation.getCurrentPosition(function(location) {
+        console.log('Location from Phonegap');
     });
 
-    // Enable background geolocation
+    var bgGeo = window.plugins.backgroundGeoLocation;
+
+    /**
+    * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
+    */
+    var yourAjaxCallback = function(response) {
+        ////
+        // IMPORTANT:  You must execute the #finish method here to inform the native plugin that you're finished,
+        //  and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+        // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+        //
+        //
+        bgGeo.finish();
+    };
+
+    /**
+    * This callback will be executed every time a geolocation is recorded in the background.
+    */
+    var callbackFn = function(location) {
+        console.log('[js] BackgroundGeoLocation callback:  ' + location.latitudue + ',' + location.longitude);
+        // Do your HTTP request here to POST location to your server.
+        //
+        //
+        yourAjaxCallback.call(this);
+    };
+
+    var failureFn = function(error) {
+        console.log('BackgroundGeoLocation error');
+    }
+    
+    // BackgroundGeoLocation is highly configurable.
+    bgGeo.configure(callbackFn, failureFn, {
+        desiredAccuracy: 10,
+        stationaryRadius: 20,
+        distanceFilter: 30,
+        debug: true // <-- enable this hear sounds for background-geolocation life-cycle.
+    });
+
+    // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
     bgGeo.start();
 
-    .
-    .
-    .
-
-    // When you want to stop tracking the user in the background, simply execute
-    // bgGeo.stop();
+    // If you wish to turn OFF background-tracking, call the #stop method.
+    // bgGeo.stop()
 
 
 ```
@@ -57,7 +84,7 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 
 ## iOS
 
-The iOS implementation of background geolocation uses [CLLocationManager#startMonitoringSignificantLocationChanges](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges)
+Unfortunately, this plugin is really geared towards use with iOS;  The Android implementation is only very basic.  The iOS implementation of background geolocation uses [CLLocationManager#startMonitoringSignificantLocationChanges](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges)
 
 When the app is suspended, the native plugin initiates [region-monitoring](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLRegion_class/Reference/Reference.html#//apple_ref/doc/c_ref/CLRegion), creating a circular-region of radius *#stationaryRadius* meters.  Once the monitored-region signals that the user has gone beyond this region, the native-plugin will initiate aggressive location-monitoring
 using [standard location services](https://developer.apple.com/library/mac/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html).  At this time, *#distanceFilter* is in effect, recording a location each time the user travels that distance.
@@ -65,6 +92,12 @@ using [standard location services](https://developer.apple.com/library/mac/docum
 Both #distanceFilter and #stationaryRadius can be modified at run-time.  For example, a #distanceFilter of 50m works great for walking-speed, but is probably too low for a car at highway-speed (too many samples).  In the future, the native app could possibly intelligently monitor speed and vary #distanceFilter automatically.  For now, you must control this manually.
 
 With aggressive location-monitoring enabled, if the user stops for exactly 15 minutes, iOS will automatically send a signal to the native-plugin which will turn-off standard location services and once again begin region-monitoring (#stationaryRadius) using the iOS significant-changes api.
+
+### iOS Config
+
+#### @param {Integer} desiredAccuracy
+
+#### @param {Integer} distanceFilter
 
 ## Android
 
