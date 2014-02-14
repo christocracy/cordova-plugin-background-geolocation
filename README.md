@@ -109,29 +109,37 @@ The lower the number, the more power devoted to GeoLocation resulting in higher 
 
   `@param {Integer} distanceFilter`
 
-  The minimum distance (measured in meters) a device must move horizontally before an update event is generated.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).  However, #distanceFilter is elastically auto-calculated by the plugin:  When speed increases, #distanceFilter increases;  when speed decreases, so does distanceFilter.
+The minimum distance (measured in meters) a device must move horizontally before an update event is generated.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).  However, #distanceFilter is elastically auto-calculated by the plugin:  When speed increases, #distanceFilter increases;  when speed decreases, so does distanceFilter.
 
-  #distanceFilter is calculated as the square of speed-rounded-to-nearest-5 and adding configured #distanceFilter.
+#distanceFilter is calculated as the square of speed-rounded-to-nearest-5 and adding configured #distanceFilter.
 
-    `(round(speed, 5))^2 + distanceFilter`
+  `(round(speed, 5))^2 + distanceFilter`
 
-  For example, at biking speed of 7.7 m/s with a configured distanceFilter of 30m:
+For example, at biking speed of 7.7 m/s with a configured distanceFilter of 30m:
 
-    => round(7.7, 5)^2 + 30
-    => (10)^2 + 30
-    => 100 + 30
-    => 130
+  => round(7.7, 5)^2 + 30
+  => (10)^2 + 30
+  => 100 + 30
+  => 130
 
-  A gps location will be recorded each time the device moves 130m.
+A gps location will be recorded each time the device moves 130m.
 
-  At highway speed of 30 m/s with distanceFilter: 30,
+At highway speed of 30 m/s with distanceFilter: 30,
 
-    => round(30, 5)^2 + 30
-    => (30)^2 + 30
-    => 900 + 30
-    => 930
+  => round(30, 5)^2 + 30
+  => (30)^2 + 30
+  => 900 + 30
+  => 930
 
-  A gps location will be recorded every 930m
+A gps location will be recorded every 930m
+
+Note the following real example of background-geolocation on highway 101 towards San Francisco as the driver slows down as he runs into slower traffic (geolocations become compressed as distanceFilter decreases)
+
+![distanceFilter at highway speed](/distance-filter-highway.png "distanceFilter at highway speed")
+
+Compare now background-geolocation in the scope of a city.  In this image, the left-hand track is from a cab-ride, while the right-hand track is walking speed.
+
+![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
   `@param {Integer} stationaryRadius (meters)`
 
@@ -148,7 +156,7 @@ When enabled, the plugin will emit sounds for life-cycle events of background-ge
 - Acquiring stationary location sound:  "tick" sound
 - Stationary location acquired sound:  "bloom" sound
 
-![Alt text](/enable-background-audio.png "Optional title")
+![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
 
 ## Android
 
