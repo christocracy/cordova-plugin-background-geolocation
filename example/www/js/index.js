@@ -36,7 +36,7 @@ var app = {
         app.receivedEvent('deviceready');
 
         if (window.plugins.backgroundGeoLocation) {
-            this.configureBackgroundGeoLocation();
+            app.configureBackgroundGeoLocation();
         }
 
     },
