@@ -113,7 +113,7 @@ The minimum distance (measured in meters) a device must move horizontally before
 
 distanceFilter is calculated as the square of speed-rounded-to-nearest-5 and adding configured #distanceFilter.
 
-  (round(speed, 5))^2 + distanceFilter
+  `(round(speed, 5))^2 + distanceFilter`
 
 For example, at biking speed of 7.7 m/s with a configured distanceFilter of 30m:
 
