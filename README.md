@@ -126,10 +126,10 @@ A gps location will be recorded each time the device moves 130m.
 
 At highway speed of 30 m/s with distanceFilter: 30,
 
-  => round(30, 5)^2 + 30
-  => (30)^2 + 30
-  => 900 + 30
-  => 930
+  `=> round(30, 5)^2 + 30`
+  `=> (30)^2 + 30`
+  `=> 900 + 30`
+  `=> 930`
 
 A gps location will be recorded every 930m
 
