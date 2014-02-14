@@ -111,16 +111,16 @@ The lower the number, the more power devoted to GeoLocation resulting in higher 
 
 The minimum distance (measured in meters) a device must move horizontally before an update event is generated.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).  However, #distanceFilter is elastically auto-calculated by the plugin:  When speed increases, #distanceFilter increases;  when speed decreases, so does distanceFilter.
 
-#distanceFilter is calculated as the square of speed-rounded-to-nearest-5 and adding configured #distanceFilter.
+distanceFilter is calculated as the square of speed-rounded-to-nearest-5 and adding configured #distanceFilter.
 
-  `(round(speed, 5))^2 + distanceFilter`
+  (round(speed, 5))^2 + distanceFilter
 
 For example, at biking speed of 7.7 m/s with a configured distanceFilter of 30m:
 
-  => round(7.7, 5)^2 + 30
-  => (10)^2 + 30
-  => 100 + 30
-  => 130
+  `=> round(7.7, 5)^2 + 30`
+  `=> (10)^2 + 30`
+  `=> 100 + 30`
+  `=> 130`
 
 A gps location will be recorded each time the device moves 130m.
 
