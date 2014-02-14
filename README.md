@@ -18,9 +18,6 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 ## Installing the plugin ##
 
-1. Download the repo using GIT or just a ZIP from Github.
-2. Add the plugin to your project (from the root of your project):
-
 ```
    phonegap plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
 ```
