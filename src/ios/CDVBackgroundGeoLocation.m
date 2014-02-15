@@ -111,7 +111,7 @@
     NSDictionary *config = [command.arguments objectAtIndex:0];
     
     if (config[@"desiredAccuracy"]) {
-        desiredAccuracy = [self translateDesiredAccuracy:[config[@"desiredAccuracy"] intValue]];
+        desiredAccuracy = [self translateDesiredAccuracy:[config[@"desiredAccuracy"] floatValue]];
         NSLog(@"    desiredAccuracy: %@", config[@"desiredAccuracy"]);
     }
     if (config[@"stationaryRadius"]) {
@@ -179,7 +179,10 @@
     enabled = NO;
     [locationManager stopUpdatingLocation];
     [locationManager stopMonitoringSignificantLocationChanges];
-    
+    if (stationaryRegion != nil) {
+        [locationManager stopMonitoringForRegion:stationaryRegion];
+        stationaryRegion = nil;
+    }
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
