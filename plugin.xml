@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-           id="org.transistorsoft.cordova.background-geolocation"
-      version="0.1.0">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="org.transistorsoft.cordova.background-geolocation"
+    version="0.1.0">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
     <license>MIT</license>
@@ -32,7 +33,7 @@
         <source-file src="src/android/android-support-v4.jar" target-dir="libs" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <service android:enabled="true" android:name="com.tenforwardconsulting.cordova.bgloc.LocationUpdateService" android:process=":remote" />
+            <service android:name="com.tenforwardconsulting.cordova.bgloc.LocationUpdateService" android:enabled="true" android:process=":remote" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
