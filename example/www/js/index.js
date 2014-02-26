@@ -90,6 +90,8 @@ var app = {
         
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
+            url: 'http://only.for.android.com/update_location.json', // <-- only required for Android; ios allows javascript callbacks for your http
+            authToken: 'user_secret_auth_token',    // <-- only required for Android; ios allows javascript callbacks for your http
             desiredAccuracy: 10,
             stationaryRadius: 20,
             distanceFilter: 30,
