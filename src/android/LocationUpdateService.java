@@ -1,6 +1,5 @@
 package com.tenforwardconsulting.cordova.bgloc;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -12,20 +11,22 @@ import org.json.JSONObject;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
+import android.annotation.TargetApi;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.telephony.CellLocation;
 
 import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.support.v4.app.NotificationCompat;
+
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
 import android.location.Location;
@@ -58,7 +59,6 @@ public class LocationUpdateService extends Service implements LocationListener {
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
     private long lastUpdateTime = 0l;
-    private BusyTask looper;
 
     private String authToken = "HypVBMmDxbh76pHpwots";
     private String url = "http://192.168.2.15:3000/users/current_location.json";
@@ -83,8 +83,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private Boolean isMoving = false;
 
-    public static TelephonyManager p_TelephonyManager = null;
-    public static BackgroundPhoneStateListener p_myPhoneStateListener = null;
+    public static TelephonyManager telephonyManager = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -148,17 +147,13 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         Toast.makeText(this, "Background location tracking started", Toast.LENGTH_SHORT).show();
 
-        notification = buildNotification();
-        notificationManager.notify(NOTIFICATION_ID, notification);
-
         this.setPace(false);
 
         /**
          * Experimental cell-location-change handler
          *
-        p_myPhoneStateListener = new BackgroundPhoneStateListener(this);
-        p_TelephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        p_TelephonyManager.listen(p_myPhoneStateListener, LISTEN_CELL_LOCATION);
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
         *
         */
 
@@ -359,6 +354,14 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     };
 
+    private PhoneStateListener phoneStateListener = new PhoneStateListener() {
+        @Override
+        public void onCellLocationChanged(CellLocation location)
+        {
+            onCellLocationChanged(location);
+        }
+    };
+
     public void onExitStationaryRegion() {
         if (isDebugging) {
             toneGenerator.startTone(ToneGenerator.TONE_CDMA_CONFIRM);
@@ -453,38 +456,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
 
-    private Notification buildNotification() {
-        PackageManager pm = this.getPackageManager();
-        Intent notificationIntent = pm.getLaunchIntentForPackage(this.getPackageName());
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        Application application = this.getApplication();
-        int backgroundIconId = 0;
-        for (String s: Arrays.asList("ic_launcher", "icon", "notification") ) {
-            backgroundIconId = application.getResources().getIdentifier(s, "drawable", application.getPackageName());
-            if (backgroundIconId != 0) {
-                break;
-            }
-        }
-
-        int appNameId = application.getResources().getIdentifier("app_name", "string", application.getPackageName());
-
-        PendingIntent contentIntent = getActivity(this, 0, notificationIntent, 0);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(backgroundIconId)
-                .setContentTitle(this.getString(appNameId))
-                .setOngoing(true)
-                .setContentIntent(contentIntent)
-                .setWhen(System.currentTimeMillis());
-        if (lastLocation != null) {
-            builder.setContentText("Last location: " + lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
-        } else {
-            builder.setContentText("Tracking your GPS position");
-        }
-
-        return builder.build();
-    }
-
     @Override
     public void onDestroy() {
         Log.w(TAG, "------------------------------------------ Destroyed Location update Service");
@@ -501,38 +472,13 @@ public class LocationUpdateService extends Service implements LocationListener {
 
         notificationManager.cancel(NOTIFICATION_ID);
         wakeLock.release();
-        if (looper != null) {
-            looper.stop = true;
-        }
     }
 
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         this.stopSelf();
         super.onTaskRemoved(rootIntent);
-    }
-
-    private class BusyTask extends AsyncTask<String, Integer, Boolean>{
-        public boolean stop = false;
-
-        @Override
-        protected Boolean doInBackground(String...params) {
-            while(!stop) {
-                Log.d(TAG, "#timestamp " + System.currentTimeMillis());
-                if (lastUpdateTime + 5*60*1000 < SystemClock.elapsedRealtime()) {
-                    Log.d(TAG, "5 minutes, forcing update with last location");
-                    postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(
-                            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)));
-                }
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            return true;
-        }
     }
 
     private class PostLocationTask extends AsyncTask<Object, Integer, Boolean> {
@@ -552,8 +498,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         @Override
         protected void onPostExecute(Boolean result) {
             Log.d(TAG, "PostLocationTask#onPostExecture");
-            notification = buildNotification();
-            notificationManager.notify(NOTIFICATION_ID, notification);
         }
     }
 }
