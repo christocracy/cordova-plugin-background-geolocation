@@ -116,34 +116,24 @@ public class LocationUpdateService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
         if (intent != null) {
-            this.authToken = intent.getStringExtra("authToken");
-            this.url = intent.getStringExtra("url");
-            this.stationaryRadius = Float.parseFloat(intent.getStringExtra("stationaryRadius"));
-
+            authToken = intent.getStringExtra("authToken");
+            url = intent.getStringExtra("url");
+            stationaryRadius = Float.parseFloat(intent.getStringExtra("stationaryRadius"));
             distanceFilter = Integer.parseInt(intent.getStringExtra("distanceFilter"));
-            if (distanceFilter == null) {
-                distanceFilter = 30;
-            }
-            this.desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
-            if (desiredAccuracy == null) {
-                desiredAccuracy = 100;
-            }
-            this.locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
-            if (locationTimeout == null) {
-                locationTimeout = 60;
-            }
-            this.isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
-            if (this.isDebugging == null) {
-                this.isDebugging = false;
-            }
-            if (this.isDebugging) {
+            desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
+            locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
+            isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
+
+            if (isDebugging) {
                 toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
             }
-            Log.i(TAG, "- stationaryRadius: " + stationaryRadius);
-            Log.i(TAG, "- distanceFilter: " + distanceFilter);
-            Log.i(TAG, "- desiredAccuracy: " + desiredAccuracy);
-            Log.i(TAG, "- locationTimeout: " + locationTimeout);
-            Log.i(TAG, "- isDebugging: " + isDebugging);
+            Log.i(TAG, "- url: " + url);
+            Log.i(TAG, "- token: " + authToken);
+            Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
+            Log.i(TAG, "- distanceFilter: "     + distanceFilter);
+            Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
+            Log.i(TAG, "- locationTimeout: "    + locationTimeout);
+            Log.i(TAG, "- isDebugging: "        + isDebugging);
         }
         Toast.makeText(this, "Background location tracking started", Toast.LENGTH_SHORT).show();
 
@@ -301,11 +291,11 @@ public class LocationUpdateService extends Service implements LocationListener {
 
         // test the measurement to see if it is more accurate than the previous measurement
 
-        //persistLocation(location);
+        persistLocation(location);
 
         if (this.isNetworkConnected()) {
             Log.d(TAG, "Scheduling location network post");
-            //schedulePostLocations();
+            schedulePostLocations();
         } else {
             Log.d(TAG, "Network unavailable, waiting for now");
         }
