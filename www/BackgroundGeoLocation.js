@@ -1,7 +1,7 @@
 var exec = require("cordova/exec");
 module.exports = {
     configure: function(success, failure, config) {
-        var authToken           = config.auth_token || 'BackgroundGeoLocation_auth_token',
+        var authToken           = config.authToken || 'BackgroundGeoLocation_auth_token',
             url                 = config.url        || 'BackgroundGeoLocation_url',
             stationaryRadius    = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50,    // meters
             distanceFilter      = (config.distanceFilter >= 0) ? config.distanceFilter : 500,       // meters
