@@ -140,7 +140,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         Toast.makeText(this, "Background location tracking started", Toast.LENGTH_SHORT).show();
 
-        this.setPace(true);
+        this.setPace(false);
 
         /**
          * Experimental cell-location-change handler
