@@ -12,6 +12,7 @@ import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.telephony.PhoneStateListener;
@@ -48,8 +49,9 @@ import static java.lang.Math.*;
 public class LocationUpdateService extends Service implements LocationListener {
     private static final String TAG = "LocationUpdateService";
     private static final String STATIONARY_REGION_ACTION  = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
+    private static final String STATIONARY_ALARM_ACTION  = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
-    private static long STATIONARY_TIMEOUT = 60 * 1000 * 10;
+    private static long STATIONARY_TIMEOUT = 60 * 1000 * 1;
 
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
@@ -60,6 +62,8 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private float stationaryRadius;
     private Location stationaryLocation;
+    private PendingIntent stationaryAlarmPI;
+
     private Integer desiredAccuracy;
     private Integer distanceFilter;
     private Integer scaledDistanceFilter;
@@ -71,6 +75,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private PendingIntent proximityPI;
 
     private LocationManager locationManager;
+    private AlarmManager alarmManager;
     private ConnectivityManager connectivityManager;
 
     private Criteria criteria;
@@ -94,6 +99,9 @@ public class LocationUpdateService extends Service implements LocationListener {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 
         locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        alarmManager    = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        stationaryAlarmPI = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
+        registerReceiver(stationaryAlarmReceiver, new IntentFilter(STATIONARY_ALARM_ACTION));
 
         connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -132,15 +140,15 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         Toast.makeText(this, "Background location tracking started", Toast.LENGTH_SHORT).show();
 
-        this.setPace(false);
+        this.setPace(true);
 
         /**
          * Experimental cell-location-change handler
          *
-        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
-        *
-        */
+         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+         telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
+         *
+         */
 
         //We want this service to continue running until it is explicitly
         // stopped, so return sticky.
@@ -195,6 +203,15 @@ public class LocationUpdateService extends Service implements LocationListener {
             criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
             criteria.setPowerRequirement(Criteria.POWER_HIGH);
             locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
+
+            // Configure stationary alarm timout.  If no location update within configured timeout, tone-down tracking.
+            /*
+            if (stationaryAlarmPI != null) {
+                alarmManager.cancel(stationaryAlarmPI);
+                stationaryAlarmPI = null;
+            }
+            */
+            resetStationaryAlarm();
         } else {
             stationaryLocation = null;
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -206,6 +223,10 @@ public class LocationUpdateService extends Service implements LocationListener {
                 this.startMonitoringStationaryRegion(location);
             }
         }
+    }
+
+    public void resetStationaryAlarm() {
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + STATIONARY_TIMEOUT, stationaryAlarmPI); // Millisec * Second * Minute
     }
 
     /**
@@ -257,20 +278,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             // If user hasn't moved beyond the stationaryRadius within time of STATIONARY_TIMEOUT
             //  assume they've stopped.
             if (lastLocation != null) {
-                Float stationaryDistance = (location.getAccuracy() < stationaryRadius) ? stationaryRadius : location.getAccuracy();
-                Log.i(TAG, "- has lastLocation " + lastLocation.distanceTo(location) + "<" + stationaryDistance);
-                if (lastLocation.distanceTo(location) < stationaryDistance) {
-                    Log.i(TAG, "- lastLocation is within stationaryRadius");
-                    if (stationaryLocation == null) {
-                        stationaryLocation = lastLocation;
-                    }
-                    long timeDelta = location.getTime() - stationaryLocation.getTime();
-                    Log.i(TAG, "- timeDelta: " + timeDelta + ">" + STATIONARY_TIMEOUT);
-                    if (timeDelta > STATIONARY_TIMEOUT) {
-                        setPace(false);
-                    }
-                } else {
-                    stationaryLocation = null;
+                if (lastLocation.distanceTo(location) > stationaryRadius) {
+                    resetStationaryAlarm();
                     Integer newDistanceFilter = calculateDistanceFilter(location.getSpeed());
                     if (newDistanceFilter != scaledDistanceFilter) {
                         Log.i(TAG, "- updated distanceFilter, new: " + newDistanceFilter + ", old: " + scaledDistanceFilter);
@@ -324,16 +333,26 @@ public class LocationUpdateService extends Service implements LocationListener {
         proximityPI = PendingIntent.getBroadcast(this, 0, intent, 0);
 
         locationManager.addProximityAlert(
-            location.getLatitude(),
-            location.getLongitude(),
-            stationaryRadius,
-            -1,
-            proximityPI
+                location.getLatitude(),
+                location.getLongitude(),
+                stationaryRadius,
+                -1,
+                proximityPI
         );
 
         IntentFilter filter = new IntentFilter(STATIONARY_REGION_ACTION);
         registerReceiver(stationaryRegionReceiver, filter);
     }
+
+    private BroadcastReceiver stationaryAlarmReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            // Put here YOUR code.
+            Log.i(TAG, "- stationaryAlarm fired");
+            setPace(false);
+        }
+    };
 
     private BroadcastReceiver stationaryRegionReceiver = new BroadcastReceiver() {
         @Override
