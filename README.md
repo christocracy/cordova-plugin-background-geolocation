@@ -98,7 +98,7 @@ When the plugin detects your user has moved beyond his stationary-region, it eng
 
 ## iOS and Android
 
-The plugin works best with iOS than Android, but Android is currently under heavy development and coming along well with features being ported from iOS.
+The plugin works best with iOS but Android is currently under heavy development and coming along well with features being ported from iOS.  Those are the only two supported platforms but I foresee a Windows Phone version once I get a client who desires that.
 
 ### Config
 
