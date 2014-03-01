@@ -104,7 +104,7 @@ The plugin works best with iOS but Android is currently under heavy development 
 
 Use the following config-parameters with the #configure method:
 
-  #### `@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
+  #### @param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters
 
 The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings.  1000 results in lowest power drain and least accurate readings.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy)
 
