@@ -19,6 +19,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 ## Installing the plugin ##
 
 ```
+
    phonegap plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
 ```
 
@@ -87,26 +88,44 @@ A full example could be:
 
 NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
 
-## iOS
+## Behaviour
 
-Unfortunately, this plugin is currently most fully-featured for iOS;  The Android implementation is only very basic.  The iOS implementation of background geolocation uses [CLLocationManager#startMonitoringSignificantLocationChanges](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges)
+The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses [LocationManager#addProximityAlert](http://developer.android.com/reference/android/location/LocationManager.html).
 
-When the app is suspended, the native plugin initiates [region-monitoring](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLRegion_class/Reference/Reference.html#//apple_ref/doc/c_ref/CLRegion), creating a circular-region of radius *#stationaryRadius* meters.  Once the monitored-region signals that the user has gone beyond this region, the native-plugin will initiate aggressive location-monitoring
-using [standard location services](https://developer.apple.com/library/mac/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html).  At this time, *#distanceFilter* is in effect, recording a location each time the user travels that distance.
+When the plugin detects your user has moved beyond his stationary-region, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter` and `#locationTimeout`.  The plugin attempts to intelligently scale `#distanceFilter` based upon the current reported speed.  Each time `#distanceFilter` is determined to have changed by 5m/s, it recalculates it by squaring the speed rounded-to-nearest-five and adding #distanceFilter (I arbitrarily came up with that formula.  Better ideas?).
 
-Both #distanceFilter and #stationaryRadius can be modified at run-time.  For example, a #distanceFilter of 50m works great for walking-speed, but is probably too low for a car at highway-speed (too many samples).  In the future, the native app could possibly intelligently monitor speed and vary #distanceFilter automatically.  For now, you must control this manually.
+  `(round(speed, 5))^2 + distanceFilter`
 
-With aggressive location-monitoring enabled, if the user stops for exactly 15 minutes, iOS will automatically send a signal to the native-plugin which will turn-off standard location services and once again begin region-monitoring (#stationaryRadius) using the iOS significant-changes api.
+## iOS and Android
 
-### iOS Config
+The plugin works best with iOS but Android is currently under heavy development and coming along well with features being ported from iOS.  Those are the only two supported platforms but I foresee a Windows Phone version once I get a client who desires that.
+
+### Config
 
 Use the following config-parameters with the #configure method:
 
-  *`@param {Integer} [0, 10, 100, 1000] desiredAccuracy in meters`*
+#####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
 
 The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings.  1000 results in lowest power drain and least accurate readings.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy)
 
-  `@param {Integer} distanceFilter`
+#####`@param {Integer} stationaryRadius (meters)`
+
+When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
+
+#####`@param {Boolean} debug`
+
+When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
+
+- Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
+- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep
+- Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
+- Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
+- Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
+- Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
+
+![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
+
+#####`@param {Integer} distanceFilter`
 
 The minimum distance (measured in meters) a device must move horizontally before an update event is generated.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).  However, #distanceFilter is elastically auto-calculated by the plugin:  When speed increases, #distanceFilter increases;  when speed decreases, so does distanceFilter.
 
@@ -140,26 +159,7 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
-  `@param {Integer} stationaryRadius (meters)`
 
-When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
-
-  `@param {Boolean} debug`
-
-When enabled, the plugin will emit sounds for life-cycle events of background-geolocation.  NOTE:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
-
-- Exit stationary region:  Calendar event notification sound
-- GeoLocation recorded:  SMS sent sound
-- Aggressive geolocation engaged:  SIRI listening sound
-- Passive geolocation engaged:  SIRI stop listening sound
-- Acquiring stationary location sound:  "tick" sound
-- Stationary location acquired sound:  "bloom" sound
-
-![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
-
-## Android
-
-** TODO Brian ##
 
 ## Licence ##
 
