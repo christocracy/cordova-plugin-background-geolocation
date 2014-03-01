@@ -94,12 +94,17 @@ The plugin has features allowing you to control the behaviour of background-trac
 
 When the plugin detects your user has moved beyond his stationary-region, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter` and `#locationTimeout`.  The plugin attempts to intelligently scale `#distanceFilter` based upon the current reported speed.  Each time `#distanceFilter` is determined to have changed by 5m/s, it recalculates `#distanceFilter` by squaring the speed rounded-to-nearest-five and adding #distanceFilter (I arbitrarily came up with that formula.  Better ideas?).
 
+  `(round(speed, 5))^2 + distanceFilter`
+
+## iOS and Android
+
+The plugin works best with iOS than Android, but Android is currently under heavy development and coming along well with features being ported from iOS.
 
 ### Config
 
 Use the following config-parameters with the #configure method:
 
-  *`@param {Integer} [0, 10, 100, 1000] desiredAccuracy in meters`*
+  *`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`*
 
 The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings.  1000 results in lowest power drain and least accurate readings.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy)
 
@@ -143,20 +148,16 @@ When stopped, the minimum distance the device must move beyond the stationary lo
 
   `@param {Boolean} debug`
 
-When enabled, the plugin will emit sounds for life-cycle events of background-geolocation.  NOTE:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
+When enabled, the plugin will emit sounds for life-cycle events of background-geolocation.  *NOTE iOS*:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
 
-- Exit stationary region:  Calendar event notification sound
-- GeoLocation recorded:  SMS sent sound
-- Aggressive geolocation engaged:  SIRI listening sound
-- Passive geolocation engaged:  SIRI stop listening sound
-- Acquiring stationary location sound:  "tick" sound
-- Stationary location acquired sound:  "bloom" sound
+- Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
+- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep
+- Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
+- Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
+- Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
+- Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
 
 ![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
-
-## Android
-
-** TODO Brian ##
 
 ## Licence ##
 
