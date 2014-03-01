@@ -108,6 +108,23 @@ Use the following config-parameters with the #configure method:
 
 The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings.  1000 results in lowest power drain and least accurate readings.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy)
 
+#####`@param {Integer} stationaryRadius (meters)`
+
+When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
+
+#####`@param {Boolean} debug`
+
+When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
+
+- Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
+- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep
+- Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
+- Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
+- Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
+- Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
+
+![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
+
 #####`@param {Integer} distanceFilter`
 
 The minimum distance (measured in meters) a device must move horizontally before an update event is generated.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).  However, #distanceFilter is elastically auto-calculated by the plugin:  When speed increases, #distanceFilter increases;  when speed decreases, so does distanceFilter.
@@ -142,22 +159,7 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
-#####`@param {Integer} stationaryRadius (meters)`
 
-When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
-
-#####`@param {Boolean} debug`
-
-When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
-
-- Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
-- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep
-- Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
-- Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
-- Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
-- Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
-
-![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
 
 ## Licence ##
 
