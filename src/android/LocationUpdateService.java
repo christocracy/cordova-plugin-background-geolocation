@@ -196,24 +196,14 @@ public class LocationUpdateService extends Service implements LocationListener {
         isMoving = value;
 
         locationManager.removeUpdates(this);
-
+        stationaryLocation = null;
         if (isMoving) {
-            stationaryLocation = null;
+            resetStationaryAlarm();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
             criteria.setPowerRequirement(Criteria.POWER_HIGH);
             locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
-
-            // Configure stationary alarm timout.  If no location update within configured timeout, tone-down tracking.
-            /*
-            if (stationaryAlarmPI != null) {
-                alarmManager.cancel(stationaryAlarmPI);
-                stationaryAlarmPI = null;
-            }
-            */
-            resetStationaryAlarm();
         } else {
-            stationaryLocation = null;
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
             criteria.setHorizontalAccuracy(Criteria.ACCURACY_LOW);
             criteria.setPowerRequirement(Criteria.POWER_LOW);
@@ -369,7 +359,16 @@ public class LocationUpdateService extends Service implements LocationListener {
             }
             else {
                 Log.d(TAG, "- EXIT");
-                onExitStationaryRegion();
+                Location location = getLastBestLocation((int) stationaryRadius, locationTimeout * 1000);
+                // Filter-out false alarms on EXIT region.  Location must have speed and be a greater distance away from
+                //  #stationaryLocation than #stationaryRadius
+                if (location != null) {
+                    float distance = location.distanceTo(stationaryLocation);
+                    Log.d(TAG, "- lastBestLocation: " + location.getLatitude() + "," + location.getLongitude() + ", accuracy: " + location.getAccuracy() + ", speed: " + location.getSpeed() + ", distance: " + distance);
+                    if (location.getSpeed() >= 1 && distance > stationaryRadius) {
+                        onExitStationaryRegion();
+                    }
+                }
             }
         }
     };
