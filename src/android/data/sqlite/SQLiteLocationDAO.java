@@ -78,6 +78,8 @@ public class SQLiteLocationDAO implements LocationDAO {
 		l.setRecordedAt(stringToDate(c.getString(c.getColumnIndex("recordedAt"))));
 		l.setLatitude(c.getString(c.getColumnIndex("latitude")));
 		l.setLongitude(c.getString(c.getColumnIndex("longitude")));
+		l.setAccuracy(c.getString(c.getColumnIndex("accuracy")));
+		l.setSpeed(c.getString(c.getColumnIndex("speed")));
 		
 		return l;
 	}
@@ -87,7 +89,8 @@ public class SQLiteLocationDAO implements LocationDAO {
 		values.put("latitude", location.getLatitude());
 		values.put("longitude", location.getLongitude());
 		values.put("recordedAt", dateToString(location.getRecordedAt()));	
-		
+		values.put("accuracy",  location.getAccuracy());
+		values.put("speed", location.getSpeed());
 		return values;
 	}
 	
