@@ -42,7 +42,6 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
-import static android.app.PendingIntent.*;
 import static android.telephony.PhoneStateListener.*;
 import static java.lang.Math.*;
 
@@ -52,7 +51,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String STATIONARY_ALARM_ACTION  = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static long STATIONARY_TIMEOUT = 60 * 1000 * 1;
-
+    private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
+    
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
     private long lastUpdateTime = 0l;
@@ -63,7 +63,10 @@ public class LocationUpdateService extends Service implements LocationListener {
     private float stationaryRadius;
     private Location stationaryLocation;
     private PendingIntent stationaryAlarmPI;
-
+    private PendingIntent singleUpdatePI;
+    private Integer stationaryLocationAttempts = 0;
+    private Boolean isAcquiringStationaryLocation = false;
+    
     private Integer desiredAccuracy;
     private Integer distanceFilter;
     private Integer scaledDistanceFilter;
@@ -100,9 +103,17 @@ public class LocationUpdateService extends Service implements LocationListener {
 
         locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         alarmManager    = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+        
+        // Stationary region PendingIntent
         stationaryAlarmPI = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
         registerReceiver(stationaryAlarmReceiver, new IntentFilter(STATIONARY_ALARM_ACTION));
-
+        
+        // Construct the Pending Intent that will be broadcast by the oneshot
+        // location update.  
+        singleUpdatePI = PendingIntent.getBroadcast(this, 0, new Intent(SINGLE_LOCATION_UPDATE_ACTION), PendingIntent.FLAG_UPDATE_CURRENT);
+        registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
+        
         connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         wakeLock.acquire();
@@ -126,10 +137,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
             locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
-
-            if (isDebugging) {
-                toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-            }
+            
             Log.i(TAG, "- url: " + url);
             Log.i(TAG, "- token: " + authToken);
             Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
@@ -138,7 +146,6 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.i(TAG, "- locationTimeout: "    + locationTimeout);
             Log.i(TAG, "- isDebugging: "        + isDebugging);
         }
-        Toast.makeText(this, "Background location tracking started", Toast.LENGTH_SHORT).show();
 
         this.setPace(false);
 
@@ -157,7 +164,6 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     public void onCellLocationChanged(CellLocation cellLocation) {
         Log.i(TAG, "- onCellLocationChanged");
-        Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         Location location = getLastBestLocation((int) stationaryRadius, locationTimeout * 1000);
         if (location != null) {
             Log.i(TAG, "location: " + location.getLatitude() + "," + location.getLongitude() + ", accuracy: " + location.getAccuracy());
@@ -196,14 +202,17 @@ public class LocationUpdateService extends Service implements LocationListener {
         isMoving = value;
 
         locationManager.removeUpdates(this);
-        stationaryLocation = null;
+
         if (isMoving) {
-            resetStationaryAlarm();
+            stationaryLocation = null;
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
             criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
             criteria.setPowerRequirement(Criteria.POWER_HIGH);
             locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
+
+            resetStationaryAlarm();
         } else {
+            stationaryLocation = null;
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
             criteria.setHorizontalAccuracy(Criteria.ACCURACY_LOW);
             criteria.setPowerRequirement(Criteria.POWER_LOW);
@@ -211,6 +220,14 @@ public class LocationUpdateService extends Service implements LocationListener {
             Location location = this.getLastBestLocation((int) stationaryRadius, locationTimeout * 1000);
             if (location != null) {
                 this.startMonitoringStationaryRegion(location);
+            } else {
+                isAcquiringStationaryLocation = true;
+                stationaryLocationAttempts = 0;
+                criteria.setAccuracy(Criteria.ACCURACY_FINE);
+                criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
+                criteria.setPowerRequirement(Criteria.POWER_HIGH);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, this);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, this);
             }
         }
     }
@@ -255,6 +272,15 @@ public class LocationUpdateService extends Service implements LocationListener {
                 }
             }
         }
+        // If the best result is beyond the allowed time limit, or the accuracy of the
+        // best result is wider than the acceptable maximum distance, request a single update.
+        // This check simply implements the same conditions we set when requesting regular
+        // location updates every [minTime] and [minDistance]. 
+        bestAccuracy = 1000;
+        
+        if ((bestTime < minTime || bestAccuracy > minDistance)) {
+            bestResult = null;
+        }
         return bestResult;
     }
 
@@ -278,15 +304,19 @@ public class LocationUpdateService extends Service implements LocationListener {
                     }
                 }
             }
-        } else if (stationaryLocation == null) {
-            this.startMonitoringStationaryRegion(location);
         }
         lastLocation = location;
-
-        Log.d(TAG, "-------- persistLocation DISABLED");
-
-        // test the measurement to see if it is more accurate than the previous measurement
-
+        Toast.makeText(this, "mv:"+isMoving+",acy:"+location.getAccuracy()+",v:"+location.getSpeed()+",df:"+scaledDistanceFilter, Toast.LENGTH_LONG).show();
+        
+        if (isAcquiringStationaryLocation) {
+            if (isBestStationaryLocation(location)) {
+                locationManager.removeUpdates(this);
+                startMonitoringStationaryRegion(stationaryLocation);
+            } else {
+                return;
+            }
+        }
+        
         persistLocation(location);
 
         if (this.isNetworkConnected()) {
@@ -296,7 +326,23 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.d(TAG, "Network unavailable, waiting for now");
         }
     }
+    
+    private Boolean isBestStationaryLocation(Location location) {
+        stationaryLocationAttempts++;
+        if (stationaryLocationAttempts == MAX_STATIONARY_ACQUISITION_ATTEMPTS) {
+            return true;
+        }
+        if (stationaryLocation == null || stationaryLocation.getAccuracy() > location.getAccuracy()) {
+            // store the location as the "best effort"
+            stationaryLocation = location;
+            if (location.getAccuracy() <= stationaryRadius) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    
     private Integer calculateDistanceFilter(Float speed) {
         Double newDistanceFilter = (double) distanceFilter;
         if (speed > 3 && speed < 100) {
@@ -308,8 +354,9 @@ public class LocationUpdateService extends Service implements LocationListener {
 
 
     private void startMonitoringStationaryRegion(Location location) {
-        Log.i(TAG, "- startMonitoringStationaryRegion (" + location.getLatitude() + "," + location.getLongitude() + ")");
+        Log.i(TAG, "- startMonitoringStationaryRegion (" + location.getLatitude() + "," + location.getLongitude() + "), accuracy:" + location.getAccuracy());
         stationaryLocation = location;
+        isAcquiringStationaryLocation = false;
 
         if (isDebugging) {
             toneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT);
@@ -325,7 +372,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         locationManager.addProximityAlert(
                 location.getLatitude(),
                 location.getLongitude(),
-                stationaryRadius,
+                (location.getAccuracy() < stationaryRadius) ? stationaryRadius : location.getAccuracy(),
                 -1,
                 proximityPI
         );
@@ -333,7 +380,19 @@ public class LocationUpdateService extends Service implements LocationListener {
         IntentFilter filter = new IntentFilter(STATIONARY_REGION_ACTION);
         registerReceiver(stationaryRegionReceiver, filter);
     }
-
+    
+    private BroadcastReceiver singleUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            unregisterReceiver(singleUpdateReceiver);
+            String key = LocationManager.KEY_LOCATION_CHANGED;
+            Location location = (Location)intent.getExtras().get(key);
+            if (location != null)
+                onLocationChanged(location);
+            locationManager.removeUpdates(singleUpdatePI);
+        }
+    };
+    
     private BroadcastReceiver stationaryAlarmReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent)
@@ -359,16 +418,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             }
             else {
                 Log.d(TAG, "- EXIT");
-                Location location = getLastBestLocation((int) stationaryRadius, locationTimeout * 1000);
-                // Filter-out false alarms on EXIT region.  Location must have speed and be a greater distance away from
-                //  #stationaryLocation than #stationaryRadius
-                if (location != null) {
-                    float distance = location.distanceTo(stationaryLocation);
-                    Log.d(TAG, "- lastBestLocation: " + location.getLatitude() + "," + location.getLongitude() + ", accuracy: " + location.getAccuracy() + ", speed: " + location.getSpeed() + ", distance: " + distance);
-                    if (location.getSpeed() >= 1 && distance > stationaryRadius) {
-                        onExitStationaryRegion();
-                    }
-                }
+                onExitStationaryRegion();
             }
         }
     };
@@ -388,6 +438,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         if (proximityPI != null) {
             Log.i(TAG, "- proximityPI: " + proximityPI.toString());
             locationManager.removeProximityAlert(proximityPI);
+            proximityPI = null;
         }
         this.setPace(true);
     }
@@ -431,6 +482,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             JSONObject location = new JSONObject();
             location.put("latitude", l.getLatitude());
             location.put("longitude", l.getLongitude());
+            location.put("accuracy", l.getAccuracy());
+            location.put("speed", l.getSpeed());
             location.put("recorded_at", l.getRecordedAt());
             params.put("location", location);
 
