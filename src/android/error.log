@@ -1,0 +1,120 @@
+E/Sensors (  234): type : 0, deley : 66667000 
+
+
+
+
+E/Sensors (  234): type : 0, deley : 66667000 
+E/Sensors (  234): type : 0, deley : 20000000 
+E/Sensors (  234): type : 0, deley : 66667000 
+E/Sensors (  234): type : 0, deley : 66667000 
+E/Sensors (  234): type : 0, deley : 20000000 
+E/Sensors (  234): type : 0, deley : 66667000 
+E/Sensors (  234): type : 0, deley : 66667000 
+E/Sensors (  234): type : 0, deley : 20000000 
+E/Sensors (  234): type : 0, deley : 66667000 
+E/Sensors (  234): type : 0, deley : 66667000 
+E/Sensors (  234): type : 0, deley : 20000000 
+E/Sensors (  234): type : 0, deley : 66667000 
+E/AudioHardwareMSM7X30(  137): updateDeviceInfo: E rx_device 6 and tx_device 11
+E/AudioHardwareMSM7X30(  137): updateDeviceInfo: X cur_rx 6 cur_tx 11
+E/InputDispatcher(  234): channel '40e3da38 com.disastersolutions.virtualbadge/com.disastersolutions.virtualbadge.VirtualBadge (server)' ~ Channel is unrecoverably broken and will be disposed!
+E/        ( 5380): Can't open file for reading
+E/        ( 5380): Can't open file for reading
+E/        (11174): Can't open file for reading
+E/        (11174): Can't open file for reading
+E/AudioHardwareMSM7X30(  137): updateDeviceInfo: E rx_device 6 and tx_device 11
+E/AudioHardwareMSM7X30(  137): updateDeviceInfo: X cur_rx 6 cur_tx 11
+I/LocationUpdateService(11209): OnCreate
+I/LocationUpdateService(11209): Received start id 1: Intent { cmp=com.disastersolutions.virtualbadge/com.tenforwardconsulting.cordova.bgloc.LocationUpdateService (has extras) }
+I/LocationUpdateService(11209): - url: http://dev.virtualbadge.com/users/current_location.json
+I/LocationUpdateService(11209): - token: hsy86ZMjFqu4z41N2Lz5
+I/LocationUpdateService(11209): - stationaryRadius: 25.0
+I/LocationUpdateService(11209): - distanceFilter: 30
+I/LocationUpdateService(11209): - desiredAccuracy: 100
+I/LocationUpdateService(11209): - locationTimeout: 30
+I/LocationUpdateService(11209): - isDebugging: true
+I/LocationUpdateService(11209): setPace: false
+I/LocationUpdateService(11209): - fetching last best location
+I/LocationUpdateService(11209): - startMonitoringStationaryRegion (45.5193325,-73.6170416), accuracy:22.0
+E/AudioHardwareMSM7X30(  137): updateDeviceInfo: E rx_device 6 and tx_device 11
+E/AudioHardwareMSM7X30(  137): updateDeviceInfo: X cur_rx 6 cur_tx 11
+E/NetdConnector(  234): Communications error
+E/NetdConnector(  234): java.io.IOException: Connection refused
+E/NetdConnector(  234):     at android.net.LocalSocketImpl.connectLocal(Native Method)
+E/NetdConnector(  234):     at android.net.LocalSocketImpl.connect(LocalSocketImpl.java:238)
+E/NetdConnector(  234):     at android.net.LocalSocket.connect(LocalSocket.java:98)
+E/NetdConnector(  234):     at com.android.server.NativeDaemonConnector.listenToSocket(NativeDaemonConnector.java:119)
+E/NetdConnector(  234):     at com.android.server.NativeDaemonConnector.run(NativeDaemonConnector.java:88)
+E/NetdConnector(  234):     at java.lang.Thread.run(Thread.java:856)
+E/NetdConnector(  234): Error in NativeDaemonConnector
+E/NetdConnector(  234): java.io.IOException: Connection refused
+E/NetdConnector(  234):     at android.net.LocalSocketImpl.connectLocal(Native Method)
+E/NetdConnector(  234):     at android.net.LocalSocketImpl.connect(LocalSocketImpl.java:238)
+E/NetdConnector(  234):     at android.net.LocalSocket.connect(LocalSocket.java:98)
+E/NetdConnector(  234):     at com.android.server.NativeDaemonConnector.listenToSocket(NativeDaemonConnector.java:119)
+E/NetdConnector(  234):     at com.android.server.NativeDaemonConnector.run(NativeDaemonConnector.java:88)
+E/NetdConnector(  234):     at java.lang.Thread.run(Thread.java:856)
+I/LocationUpdateService(11209): stationaryRegionReceiver
+D/LocationUpdateService(11209): - ENTER
+W/LocationUpdateService(11209): ------------------------------------------ Destroyed Location update Service
+E/ActivityThread(11209): Service com.tenforwardconsulting.cordova.bgloc.LocationUpdateService has leaked IntentReceiver com.tenforwardconsulting.cordova.bgloc.LocationUpdateService$3@40d7fdc0 that was originally registered here. Are you missing a call to unregisterReceiver()?
+E/ActivityThread(11209): android.app.IntentReceiverLeaked: Service com.tenforwardconsulting.cordova.bgloc.LocationUpdateService has leaked IntentReceiver com.tenforwardconsulting.cordova.bgloc.LocationUpdateService$3@40d7fdc0 that was originally registered here. Are you missing a call to unregisterReceiver()?
+E/ActivityThread(11209):    at android.app.LoadedApk$ReceiverDispatcher.<init>(LoadedApk.java:763)
+E/ActivityThread(11209):    at android.app.LoadedApk.getReceiverDispatcher(LoadedApk.java:567)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiverInternal(ContextImpl.java:1075)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiver(ContextImpl.java:1062)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiver(ContextImpl.java:1056)
+E/ActivityThread(11209):    at android.content.ContextWrapper.registerReceiver(ContextWrapper.java:341)
+E/ActivityThread(11209):    at com.tenforwardconsulting.cordova.bgloc.LocationUpdateService.onCreate(LocationUpdateService.java:111)
+E/ActivityThread(11209):    at android.app.ActivityThread.handleCreateService(ActivityThread.java:2376)
+E/ActivityThread(11209):    at android.app.ActivityThread.access$1600(ActivityThread.java:132)
+E/ActivityThread(11209):    at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1211)
+E/ActivityThread(11209):    at android.os.Handler.dispatchMessage(Handler.java:99)
+E/ActivityThread(11209):    at android.os.Looper.loop(Looper.java:137)
+E/ActivityThread(11209):    at android.app.ActivityThread.main(ActivityThread.java:4575)
+E/ActivityThread(11209):    at java.lang.reflect.Method.invokeNative(Native Method)
+E/ActivityThread(11209):    at java.lang.reflect.Method.invoke(Method.java:511)
+E/ActivityThread(11209):    at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:789)
+E/ActivityThread(11209):    at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:556)
+E/ActivityThread(11209):    at dalvik.system.NativeStart.main(Native Method)
+E/ActivityThread(11209): Service com.tenforwardconsulting.cordova.bgloc.LocationUpdateService has leaked IntentReceiver com.tenforwardconsulting.cordova.bgloc.LocationUpdateService$2@40d7fab0 that was originally registered here. Are you missing a call to unregisterReceiver()?
+E/ActivityThread(11209): android.app.IntentReceiverLeaked: Service com.tenforwardconsulting.cordova.bgloc.LocationUpdateService has leaked IntentReceiver com.tenforwardconsulting.cordova.bgloc.LocationUpdateService$2@40d7fab0 that was originally registered here. Are you missing a call to unregisterReceiver()?
+E/ActivityThread(11209):    at android.app.LoadedApk$ReceiverDispatcher.<init>(LoadedApk.java:763)
+E/ActivityThread(11209):    at android.app.LoadedApk.getReceiverDispatcher(LoadedApk.java:567)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiverInternal(ContextImpl.java:1075)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiver(ContextImpl.java:1062)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiver(ContextImpl.java:1056)
+E/ActivityThread(11209):    at android.content.ContextWrapper.registerReceiver(ContextWrapper.java:341)
+E/ActivityThread(11209):    at com.tenforwardconsulting.cordova.bgloc.LocationUpdateService.onCreate(LocationUpdateService.java:110)
+E/ActivityThread(11209):    at android.app.ActivityThread.handleCreateService(ActivityThread.java:2376)
+E/ActivityThread(11209):    at android.app.ActivityThread.access$1600(ActivityThread.java:132)
+E/ActivityThread(11209):    at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1211)
+E/ActivityThread(11209):    at android.os.Handler.dispatchMessage(Handler.java:99)
+E/ActivityThread(11209):    at android.os.Looper.loop(Looper.java:137)
+E/ActivityThread(11209):    at android.app.ActivityThread.main(ActivityThread.java:4575)
+E/ActivityThread(11209):    at java.lang.reflect.Method.invokeNative(Native Method)
+E/ActivityThread(11209):    at java.lang.reflect.Method.invoke(Method.java:511)
+E/ActivityThread(11209):    at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:789)
+E/ActivityThread(11209):    at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:556)
+E/ActivityThread(11209):    at dalvik.system.NativeStart.main(Native Method)
+E/ActivityThread(11209): Service com.tenforwardconsulting.cordova.bgloc.LocationUpdateService has leaked IntentReceiver com.tenforwardconsulting.cordova.bgloc.LocationUpdateService$1@40d7f7a0 that was originally registered here. Are you missing a call to unregisterReceiver()?
+E/ActivityThread(11209): android.app.IntentReceiverLeaked: Service com.tenforwardconsulting.cordova.bgloc.LocationUpdateService has leaked IntentReceiver com.tenforwardconsulting.cordova.bgloc.LocationUpdateService$1@40d7f7a0 that was originally registered here. Are you missing a call to unregisterReceiver()?
+E/ActivityThread(11209):    at android.app.LoadedApk$ReceiverDispatcher.<init>(LoadedApk.java:763)
+E/ActivityThread(11209):    at android.app.LoadedApk.getReceiverDispatcher(LoadedApk.java:567)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiverInternal(ContextImpl.java:1075)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiver(ContextImpl.java:1062)
+E/ActivityThread(11209):    at android.app.ContextImpl.registerReceiver(ContextImpl.java:1056)
+E/ActivityThread(11209):    at android.content.ContextWrapper.registerReceiver(ContextWrapper.java:341)
+E/ActivityThread(11209):    at com.tenforwardconsulting.cordova.bgloc.LocationUpdateService.onCreate(LocationUpdateService.java:116)
+E/ActivityThread(11209):    at android.app.ActivityThread.handleCreateService(ActivityThread.java:2376)
+E/ActivityThread(11209):    at android.app.ActivityThread.access$1600(ActivityThread.java:132)
+E/ActivityThread(11209):    at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1211)
+E/ActivityThread(11209):    at android.os.Handler.dispatchMessage(Handler.java:99)
+E/ActivityThread(11209):    at android.os.Looper.loop(Looper.java:137)
+E/ActivityThread(11209):    at android.app.ActivityThread.main(ActivityThread.java:4575)
+E/ActivityThread(11209):    at java.lang.reflect.Method.invokeNative(Native Method)
+E/ActivityThread(11209):    at java.lang.reflect.Method.invoke(Method.java:511)
+E/ActivityThread(11209):    at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:789)
+E/ActivityThread(11209):    at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:556)
+E/ActivityThread(11209):    at dalvik.system.NativeStart.main(Native Method)
+

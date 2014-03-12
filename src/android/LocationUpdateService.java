@@ -50,8 +50,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String STATIONARY_REGION_ACTION  = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
     private static final String STATIONARY_ALARM_ACTION  = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
-    private static long STATIONARY_TIMEOUT = 60 * 1000 * 5;
-    private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
+    private static long STATIONARY_TIMEOUT = 60 * 1000 * 2;
+    private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 3;
+    private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
     
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
@@ -66,6 +67,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private PendingIntent singleUpdatePI;
     private Integer stationaryLocationAttempts = 0;
     private Boolean isAcquiringStationaryLocation = false;
+    private Boolean isAcquiringSpeed = false;
+    private Integer speedAcquisitionAttempts = 0;
     
     private Integer desiredAccuracy;
     private Integer distanceFilter;
@@ -200,37 +203,35 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private void setPace(Boolean value) {
         Log.i(TAG, "setPace: " + value);
-        isMoving = value;
+        
+        Boolean wasMoving   = isMoving;
+        isMoving            = value;
         isAcquiringStationaryLocation = false;
-        
-        stationaryLocation = null;
-        
+        isAcquiringSpeed    = false;
+        stationaryLocation  = null;
         
         locationManager.removeUpdates(this);
-
+        
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
+        criteria.setPowerRequirement(Criteria.POWER_HIGH);
+        
         if (isMoving) {
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
-            criteria.setPowerRequirement(Criteria.POWER_HIGH);
-            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
-            resetStationaryAlarm();
-        } else {
-            criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-            criteria.setHorizontalAccuracy(Criteria.ACCURACY_LOW);
-            criteria.setPowerRequirement(Criteria.POWER_LOW);
-
-            Location location = this.getLastBestLocation((int) stationaryRadius, locationTimeout * 1000);
-            if (location != null && (location.getAccuracy() <= stationaryRadius)) {
-                this.startMonitoringStationaryRegion(location);
-            } else {
-                isAcquiringStationaryLocation = true;
-                stationaryLocationAttempts = 0;
-                criteria.setAccuracy(Criteria.ACCURACY_FINE);
-                criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
-                criteria.setPowerRequirement(Criteria.POWER_HIGH);
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            // setPace can be called while moving, after distanceFilter has been recalculated.  We don't want to re-acquire velocity in this case.
+            if (!wasMoving) {
+                isAcquiringSpeed = true;
+                speedAcquisitionAttempts = 0;
             }
+        } else {
+            isAcquiringStationaryLocation = true;
+            stationaryLocationAttempts = 0;
+        }
+        // Temporarily turn on super-aggressive geolocation on all providers when acquiring velocity or stationary location.
+        if (isAcquiringSpeed || isAcquiringStationaryLocation) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        } else {
+            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
         }
     }
 
@@ -297,11 +298,22 @@ public class LocationUpdateService extends Service implements LocationListener {
             } else {
                 return;
             }
-          
+        } else if (isAcquiringSpeed) {
+            if (++speedAcquisitionAttempts == MAX_SPEED_ACQUISITION_ATTEMPTS) {
+                if (isDebugging) {
+                    toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE);
+                }
+                isAcquiringSpeed = false;
+                scaledDistanceFilter = calculateDistanceFilter(location.getSpeed());
+                setPace(true);
+            } else {
+                return;
+            }
         } else if (isMoving) {
-            resetStationaryAlarm();
-            
-            // Re-calculate distanceFilter.
+            // Only reset stationaryAlarm when speed is detected, prevents spurious locations from resetting when stopped.
+            if (location.getSpeed() > 0) {
+                resetStationaryAlarm();
+            }
             Integer newDistanceFilter = calculateDistanceFilter(location.getSpeed());
             if (newDistanceFilter != scaledDistanceFilter) {
                 Log.i(TAG, "- updated distanceFilter, new: " + newDistanceFilter + ", old: " + scaledDistanceFilter);
@@ -344,8 +356,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             float roundedDistanceFilter = (round(speed / 5) * 5);
             newDistanceFilter = pow(roundedDistanceFilter, 2) + (double) distanceFilter;
         }
-        return distanceFilter;
-        //return (newDistanceFilter.intValue() < 1000) ? newDistanceFilter.intValue() : 1000;
+        return (newDistanceFilter.intValue() < 1000) ? newDistanceFilter.intValue() : 1000;
     }
 
     private void startMonitoringStationaryRegion(Location location) {
@@ -433,11 +444,16 @@ public class LocationUpdateService extends Service implements LocationListener {
             locationManager.removeProximityAlert(proximityPI);
             proximityPI = null;
         }
-        this.setPace(true);
         Location location = getLastBestLocation((int) stationaryRadius, locationTimeout * 1000);
         if (location != null) {
-            onLocationChanged(location);
+            // Filter-out spurious region-exits.
+            if (location.getSpeed() < 0.75) {
+                return;
+            }
+        } else {
+            Log.i(TAG, "- exit stationary region receiver was triggered but could not fetch the last-best location!");
         }
+        this.setPace(true);
     }
 
     public void onProviderDisabled(String provider) {
