@@ -20,7 +20,9 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     public static final String ACTION_SET_CONFIG = "setConfig";
 
     private Intent updateServiceIntent;
-
+    
+    private Boolean isEnabled = false;
+    
     private String authToken;
     private String url;
     private String stationaryRadius = "30";
@@ -28,12 +30,13 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     private String distanceFilter = "30";
     private String locationTimeout = "60";
     private String isDebugging = "false";
-
+    
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
         Boolean result = false;
         updateServiceIntent = new Intent(activity, LocationUpdateService.class);
-        if (ACTION_START.equalsIgnoreCase(action)) {
+        
+        if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result = true;
             if (authToken == null || url == null) {
                 callbackContext.error("Call configure before calling start");
@@ -49,8 +52,10 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 updateServiceIntent.putExtra("isDebugging", isDebugging);
 
                 activity.startService(updateServiceIntent);
+                isEnabled = true;
             }
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
+            isEnabled = false;
             result = true;
             activity.stopService(updateServiceIntent);
             callbackContext.success();
