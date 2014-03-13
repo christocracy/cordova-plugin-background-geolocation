@@ -64,7 +64,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private float stationaryRadius;
     private Location stationaryLocation;
     private PendingIntent stationaryAlarmPI;
-    private PendingIntent proximityPI;
+    private PendingIntent stationaryRegionPI;
     private PendingIntent singleUpdatePI;
     
     private Boolean isMoving = false;
@@ -99,27 +99,29 @@ public class LocationUpdateService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "OnCreate");
-       
-        locationManager = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-        alarmManager    = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         
-        // Stationary region PendingIntent
-        stationaryAlarmPI = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
+        locationManager         = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        alarmManager            = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        toneGenerator           = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+        connectivityManager     = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        
+        // Stop-detection PI
+        stationaryAlarmPI   = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
         registerReceiver(stationaryAlarmReceiver, new IntentFilter(STATIONARY_ALARM_ACTION));
+        
+        // Stationary region PI
+        stationaryRegionPI  = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_REGION_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
         registerReceiver(stationaryRegionReceiver, new IntentFilter(STATIONARY_REGION_ACTION));
         
-        // Construct the Pending Intent that will be broadcast by the oneshot
-        // location update.  
+        // One-shot PI (TODO currently unused)  
         singleUpdatePI = PendingIntent.getBroadcast(this, 0, new Intent(SINGLE_LOCATION_UPDATE_ACTION), PendingIntent.FLAG_UPDATE_CURRENT);
         registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
         
-        connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-
+        PowerManager pm         = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         wakeLock.acquire();
-
+        
+        // Location criteria
         criteria = new Criteria();
         criteria.setAltitudeRequired(false);
         criteria.setBearingRequired(false);
@@ -150,28 +152,30 @@ public class LocationUpdateService extends Service implements LocationListener {
             
             this.setPace(false);
         }
-
         /**
-         * Experimental cell-location-change handler
+         * Experimental cell-location-change handler.  Hoping to implement something like ios Significant Changes system
          *
          telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
          telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
          *
          */
 
-        //We want this service to continue running until it is explicitly
-        // stopped, so return sticky.
+        //We want this service to continue running until it is explicitly stopped
         return START_STICKY;
     }
 
     @Override
     public boolean stopService(Intent intent) {
-        Log.i(TAG, "Received stop: " + intent);
+        Log.i(TAG, "- Received stop: " + intent);
         cleanUp();
         Toast.makeText(this, "Background location tracking stopped", Toast.LENGTH_SHORT).show();
         return super.stopService(intent);
     }
-
+    
+    /**
+     * 
+     * @param value set true to engage "aggressive", battery-consuming tracking, false for stationary-region tracking
+     */
     private void setPace(Boolean value) {
         Log.i(TAG, "setPace: " + value);
         
@@ -288,18 +292,21 @@ public class LocationUpdateService extends Service implements LocationListener {
                 stationaryLocation = location;
             }
             if (stationaryLocationAttempts++ == MAX_STATIONARY_ACQUISITION_ATTEMPTS || (stationaryLocation.getAccuracy() <= stationaryRadius) ) {
+                isAcquiringStationaryLocation = false;
                 startMonitoringStationaryRegion(stationaryLocation);
             } else {
+                // Unacceptable stationary-location: bail-out and wait for another.
                 return;
             }
         } else if (isAcquiringSpeed) {
-            // Make *tick* sound, acquiring speed.
+            // Make *hoo* sound, acquiring speed.
             if (isDebugging) {
                 toneGenerator.startTone(ToneGenerator.TONE_SUP_RADIO_ACK);
             }
             if (speedAcquisitionAttempts++ == MAX_SPEED_ACQUISITION_ATTEMPTS) {
                 // Got enough samples, assume we're confident in reported speed now.  Play "woohoo" sound.
                 if (isDebugging) {
+                    // @sound doodly-doo
                     toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE);
                 }
                 isAcquiringSpeed = false;
@@ -321,6 +328,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 setPace(true);
             }
         }
+        // Go ahead and cache, push to server
         lastLocation = location;
         persistLocation(location);
 
@@ -349,27 +357,22 @@ public class LocationUpdateService extends Service implements LocationListener {
     private void startMonitoringStationaryRegion(Location location) {
         Log.i(TAG, "- startMonitoringStationaryRegion (" + location.getLatitude() + "," + location.getLongitude() + "), accuracy:" + location.getAccuracy());
         if (isDebugging) {
+            // @sound "beeeeeeeeeeeeeeeeep"
             toneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT);
         }
-        
         stationaryLocation = location;
-        isAcquiringStationaryLocation = false;
         locationManager.removeUpdates(this);
         
-        // Sanity check:  ensure removed previous proximity-detector
-        if (proximityPI != null) {
-            locationManager.removeProximityAlert(proximityPI);
-            proximityPI = null;
-        }
-        Intent intent = new Intent(STATIONARY_REGION_ACTION);
-        proximityPI = PendingIntent.getBroadcast(this, 0, intent, 0);
+        // Remove previous stationaryRegionPI just in case.
+        locationManager.removeProximityAlert(stationaryRegionPI);
         
+        // Here be the execution of the stationary region monitor
         locationManager.addProximityAlert(
                 location.getLatitude(),
                 location.getLongitude(),
                 (location.getAccuracy() < stationaryRadius) ? stationaryRadius : location.getAccuracy(),
                 -1,
-                proximityPI
+                stationaryRegionPI
         );
     }
     
@@ -380,27 +383,25 @@ public class LocationUpdateService extends Service implements LocationListener {
         if (isDebugging) {
             new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100).startTone(ToneGenerator.TONE_CDMA_CONFIRM);
         }
-        // Destroy the stationary-region detector that caused this event to be caught.
-        if (proximityPI != null) {
-            Log.i(TAG, "- proximityPI: " + proximityPI.toString());
-            locationManager.removeProximityAlert(proximityPI);
-            proximityPI = null;
-        }
         // There MUST be a valid, recent location if this event-handler was called.
         Location location = getLastBestLocation((int) stationaryRadius, locationTimeout * 1000);
-        
+
         if (location != null) {
-            // Filter-out spurious region-exits.
+            // Filter-out spurious region-exits:  must have at least a little speed to move out of stationary-region.
             if (location.getSpeed() < 0.75) {
                 return;
             }
         } else {
             Log.i(TAG, "- exit stationary region receiver was triggered but could not fetch the last-best location!");
         }
+        // Kill the current region-monitor we just walked out of.
+        locationManager.removeProximityAlert(stationaryRegionPI);
+        // Engage aggressive tracking.
         this.setPace(true);
     }
+    
     /**
-    * TODO Experimental cell-tower change system
+    * TODO Experimental cell-tower change system; something like ios significant changes.
     */
     public void onCellLocationChanged(CellLocation cellLocation) {
         Log.i(TAG, "- onCellLocationChanged");
@@ -563,12 +564,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
     private void cleanUp() {
         locationManager.removeUpdates(this);
-        
-        // Stationary-region proximity-detector.
-        if (proximityPI != null) {
-            locationManager.removeProximityAlert(proximityPI);
-            proximityPI = null;
-        }
+        locationManager.removeProximityAlert(stationaryRegionPI);
         alarmManager.cancel(stationaryAlarmPI);
         unregisterReceiver(stationaryAlarmReceiver);
         unregisterReceiver(stationaryRegionReceiver);   
