@@ -322,7 +322,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             }
             // Calculate latest distanceFilter, if it changed by 5 m/s, we'll reconfigure our pace.
             Integer newDistanceFilter = calculateDistanceFilter(location.getSpeed());
-            if (newDistanceFilter != scaledDistanceFilter) {
+            if (newDistanceFilter != scaledDistanceFilter.intValue()) {
                 Log.i(TAG, "- updated distanceFilter, new: " + newDistanceFilter + ", old: " + scaledDistanceFilter);
                 scaledDistanceFilter = newDistanceFilter;
                 setPace(true);
