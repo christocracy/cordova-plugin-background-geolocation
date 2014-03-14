@@ -471,16 +471,16 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     public void onProviderDisabled(String provider) {
         // TODO Auto-generated method stub
-
+        Log.d(TAG, "- onProviderDisabled: " + provider);
     }
     public void onProviderEnabled(String provider) {
         // TODO Auto-generated method stub
-
+        Log.d(TAG, "- onProviderEnabled: " + provider);
     }
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
+        Log.d(TAG, "- onStatusChanged: " + provider + ", status: " + status);
     }
-
     private void schedulePostLocations() {
         PostLocationTask task = new LocationUpdateService.PostLocationTask();
         Log.d(TAG, "beforeexecute " +  task.getStatus());
