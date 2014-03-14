@@ -363,9 +363,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         stationaryLocation = location;
         locationManager.removeUpdates(this);
         
-        // Remove previous stationaryRegionPI just in case.
-        locationManager.removeProximityAlert(stationaryRegionPI);
-        
         // Here be the execution of the stationary region monitor
         locationManager.addProximityAlert(
                 location.getLatitude(),
@@ -564,11 +561,18 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
     private void cleanUp() {
         locationManager.removeUpdates(this);
-        locationManager.removeProximityAlert(stationaryRegionPI);
         alarmManager.cancel(stationaryAlarmPI);
         unregisterReceiver(stationaryAlarmReceiver);
         unregisterReceiver(stationaryRegionReceiver);   
         unregisterReceiver(singleUpdateReceiver);
+        
+        if (stationaryLocation != null && !isMoving) {
+            try {
+                locationManager.removeProximityAlert(stationaryRegionPI);
+            } catch (Throwable e) {
+                Log.w(TAG, "- Something bad happened while removing proximity-alert");
+            }
+        }
         
         wakeLock.release();
     }
