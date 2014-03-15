@@ -58,7 +58,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Location lastLocation;
     private long lastUpdateTime = 0l;
 
-    private String authToken = "HypVBMmDxbh76pHpwots";
+    private String authToken = "FAKE_TOKEN";
     private String url = "http://192.168.2.15:3000/users/current_location.json";
 
     private float stationaryRadius;
@@ -73,10 +73,10 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Integer stationaryLocationAttempts = 0;
     private Integer speedAcquisitionAttempts = 0;
     
-    private Integer desiredAccuracy;
-    private Integer distanceFilter;
+    private Integer desiredAccuracy = 100;
+    private Integer distanceFilter = 30;
     private Integer scaledDistanceFilter;
-    private Integer locationTimeout;
+    private Integer locationTimeout = 30;
     private Boolean isDebugging;
 
     private ToneGenerator toneGenerator;
@@ -141,17 +141,16 @@ public class LocationUpdateService extends Service implements LocationListener {
             desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
             locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
-            
-            Log.i(TAG, "- url: " + url);
-            Log.i(TAG, "- token: " + authToken);
-            Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
-            Log.i(TAG, "- distanceFilter: "     + distanceFilter);
-            Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
-            Log.i(TAG, "- locationTimeout: "    + locationTimeout);
-            Log.i(TAG, "- isDebugging: "        + isDebugging);
-            
-            this.setPace(false);
         }
+        Log.i(TAG, "- url: " + url);
+        Log.i(TAG, "- token: " + authToken);
+        Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
+        Log.i(TAG, "- distanceFilter: "     + distanceFilter);
+        Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
+        Log.i(TAG, "- locationTimeout: "    + locationTimeout);
+        Log.i(TAG, "- isDebugging: "        + isDebugging);
+        
+        this.setPace(false);
         /**
          * Experimental cell-location-change handler.  Hoping to implement something like ios Significant Changes system
          *
@@ -161,7 +160,7 @@ public class LocationUpdateService extends Service implements LocationListener {
          */
 
         //We want this service to continue running until it is explicitly stopped
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     @Override
@@ -347,7 +346,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private Integer calculateDistanceFilter(Float speed) {
         Double newDistanceFilter = (double) distanceFilter;
-        if (speed > 3 && speed < 100) {
+        if (speed < 100) {
             float roundedDistanceFilter = (round(speed / 5) * 5);
             newDistanceFilter = pow(roundedDistanceFilter, 2) + (double) distanceFilter;
         }
