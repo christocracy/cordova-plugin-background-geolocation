@@ -11,41 +11,45 @@ import org.json.JSONObject;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.AlarmManager;
+
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import static android.telephony.PhoneStateListener.*;
 import android.telephony.CellLocation;
 
+import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+
 import android.content.Context;
 import android.content.Intent;
-
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
+
 import android.location.Location;
 import android.location.Criteria;
-
 import android.location.LocationListener;
 import android.location.LocationManager;
+
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
+
 import android.util.Log;
 import android.widget.Toast;
 
-import static android.telephony.PhoneStateListener.*;
 import static java.lang.Math.*;
 
 public class LocationUpdateService extends Service implements LocationListener {
@@ -161,16 +165,19 @@ public class LocationUpdateService extends Service implements LocationListener {
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
             main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
-            
-            Notification notification = new Notification.Builder(this)
-            .setContentTitle("Tracking ON")
-            .setContentText("Content Text")
-            .setSmallIcon(android.R.drawable.ic_menu_mylocation)
-            .setContentIntent(pendingIntent)
-            .build();
-            
+
+            Notification.Builder builder = new Notification.Builder(this);
+            builder.setContentTitle("Background tracking");
+            builder.setContentText("ENABLED");
+            builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+            builder.setContentIntent(pendingIntent);
+            Notification notification;
+            if (android.os.Build.VERSION.SDK_INT >= 16) {
+                notification = buildForegroundNotification(builder);
+            } else {
+                notification = buildForegroundNotificationCompat(builder);
+            }
             notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
-            
             startForeground(startId, notification);
         }
         Log.i(TAG, "- url: " + url);
@@ -185,6 +192,17 @@ public class LocationUpdateService extends Service implements LocationListener {
 
         //We want this service to continue running until it is explicitly stopped
         return START_REDELIVER_INTENT;
+    }
+    
+    @TargetApi(16)
+    private Notification buildForegroundNotification(Notification.Builder builder) {
+        return builder.build();
+    }
+    
+    @SuppressWarnings("deprecation")
+    @TargetApi(15)
+    private Notification buildForegroundNotificationCompat(Notification.Builder builder) {
+        return builder.getNotification();
     }
 
     @Override
