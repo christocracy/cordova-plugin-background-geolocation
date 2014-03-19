@@ -23,8 +23,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     
     private Boolean isEnabled = false;
     
-    private String authToken;
     private String url;
+    private String params;
     private String stationaryRadius = "30";
     private String desiredAccuracy = "100";
     private String distanceFilter = "30";
@@ -38,12 +38,12 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
         
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result = true;
-            if (authToken == null || url == null) {
+            if (params == null || url == null) {
                 callbackContext.error("Call configure before calling start");
             } else {
                 callbackContext.success();
-                updateServiceIntent.putExtra("authToken", authToken);
                 updateServiceIntent.putExtra("url", url);
+                updateServiceIntent.putExtra("params", params);
                 updateServiceIntent.putExtra("stationaryRadius", stationaryRadius);
                 updateServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
                 updateServiceIntent.putExtra("distanceFilter", distanceFilter);
@@ -62,9 +62,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = true;
             try {
-                // [authToken, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug]);
-
-                this.authToken = data.getString(0);
+                // [params, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug]);
+                this.params = data.getString(0);
                 this.url = data.getString(1);
                 this.stationaryRadius = data.getString(2);
                 this.distanceFilter = data.getString(3);

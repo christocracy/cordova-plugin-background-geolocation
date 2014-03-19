@@ -6,6 +6,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
@@ -65,8 +66,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
     private long lastUpdateTime = 0l;
-
-    private String authToken = "FAKE_TOKEN";
+    
+    private JSONObject params;
     private String url = "http://192.168.2.15:3000/users/current_location.json";
 
     private float stationaryRadius;
@@ -151,8 +152,13 @@ public class LocationUpdateService extends Service implements LocationListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
-        if (intent != null) {
-            authToken = intent.getStringExtra("authToken");
+        if (intent != null) { 
+            try {
+                params = new JSONObject(intent.getStringExtra("params"));
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             url = intent.getStringExtra("url");
             stationaryRadius = Float.parseFloat(intent.getStringExtra("stationaryRadius"));
             distanceFilter = Integer.parseInt(intent.getStringExtra("distanceFilter"));
@@ -181,7 +187,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             startForeground(startId, notification);
         }
         Log.i(TAG, "- url: " + url);
-        Log.i(TAG, "- token: " + authToken);
+        Log.i(TAG, "- params: " + params.toString());
         Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
         Log.i(TAG, "- distanceFilter: "     + distanceFilter);
         Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
@@ -582,8 +588,6 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.i(TAG, "Posting  native location update: " + l);
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
-            JSONObject params = new JSONObject();
-            params.put("auth_token", authToken);
 
             JSONObject location = new JSONObject();
             location.put("latitude", l.getLatitude());
