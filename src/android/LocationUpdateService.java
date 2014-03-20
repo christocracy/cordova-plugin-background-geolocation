@@ -60,7 +60,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
     private static final long STATIONARY_TIMEOUT                        = 5 * 1000 * 60;    // 5 minutes.
-    private static final long STATIONARY_MONITOR_POLL_INTERVAL      = 1 * 1000 * 30;//3 * 1000 * 60;    // 3 minutes.  
+    private static final long STATIONARY_MONITOR_POLL_INTERVAL          = 3 * 1000 * 60;//3 * 1000 * 60;    // 3 minutes.  
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
     
@@ -398,16 +398,6 @@ public class LocationUpdateService extends Service implements LocationListener {
                 return;
             }
         } else if (stationaryLocation != null) {
-            float distance = location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy();
-            Toast.makeText(this, "DISTANCE: " + distance, Toast.LENGTH_LONG).show();
-            
-            Log.i(TAG, "- distance from stationary location: " + distance);
-            if (distance > stationaryRadius) {
-                if (isDebugging) {
-                    Toast.makeText(this, "MANUAL STATIONARY EXIT: " + distance, Toast.LENGTH_LONG).show();
-                }
-                onExitStationaryRegion(location);
-            }
             return;
         }
         // Go ahead and cache, push to server
@@ -529,8 +519,15 @@ public class LocationUpdateService extends Service implements LocationListener {
             String key = LocationManager.KEY_LOCATION_CHANGED;
             Location location = (Location)intent.getExtras().get(key);
             if (location != null) {
+                startTone("beep");
                 Log.d(TAG, "- singleUpdateReciever" + location.toString());
-                onLocationChanged(location);
+                float distance = location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy();
+                // TODO http://www.cse.buffalo.edu/~demirbas/publications/proximity.pdf
+                // determine if we're almost out of stationary-distance and increase monitoring-rate.
+                Log.i(TAG, "- distance from stationary location: " + distance);
+                if (distance > stationaryRadius) {
+                    onExitStationaryRegion(location);
+                }
             }
         }
     };
