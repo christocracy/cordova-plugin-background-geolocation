@@ -55,12 +55,13 @@ import static java.lang.Math.*;
 
 public class LocationUpdateService extends Service implements LocationListener {
     private static final String TAG = "LocationUpdateService";
-    private static final String STATIONARY_REGION_ACTION  = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
-    private static final String STATIONARY_ALARM_ACTION  = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
+    private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
+    private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
-    private static long STATIONARY_TIMEOUT = 60 * 1000 * 2;
-    private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 3;
+    private static final long STATIONARY_TIMEOUT                        = 5 * 1000 * 60;    // 5 minutes.
+    private static final long STATIONARY_MONITOR_POLL_INTERVAL      = 1 * 1000 * 30;//3 * 1000 * 60;    // 3 minutes.  
+    private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
     
     private PowerManager.WakeLock wakeLock;
@@ -80,8 +81,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Boolean isMoving = false;
     private Boolean isAcquiringStationaryLocation = false;
     private Boolean isAcquiringSpeed = false;
-    private Integer stationaryLocationAttempts = 0;
-    private Integer speedAcquisitionAttempts = 0;
+    private Integer locationAcquisitionAttempts = 0;
     
     private Integer desiredAccuracy = 100;
     private Integer distanceFilter = 30;
@@ -134,11 +134,15 @@ public class LocationUpdateService extends Service implements LocationListener {
         singleUpdatePI = PendingIntent.getBroadcast(this, 0, new Intent(SINGLE_LOCATION_UPDATE_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
         registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
         
+        ////
+        // DISABLED
         // Listen to Cell-tower switches (NOTE does not operate while suspended)
-        telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
+        //telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
+        //
         
         PowerManager pm         = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+
         wakeLock.acquire();
         
         // Location criteria
@@ -195,7 +199,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "- isDebugging: "        + isDebugging);
         
         this.setPace(false);
-
+        
         //We want this service to continue running until it is explicitly stopped
         return START_REDELIVER_INTENT;
     }
@@ -242,17 +246,21 @@ public class LocationUpdateService extends Service implements LocationListener {
             // setPace can be called while moving, after distanceFilter has been recalculated.  We don't want to re-acquire velocity in this case.
             if (!wasMoving) {
                 isAcquiringSpeed = true;
-                speedAcquisitionAttempts = 0;
             }
         } else {
             isAcquiringStationaryLocation = true;
-            stationaryLocationAttempts = 0;
         }
 
         // Temporarily turn on super-aggressive geolocation on all providers when acquiring velocity or stationary location.
         if (isAcquiringSpeed || isAcquiringStationaryLocation) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+            locationAcquisitionAttempts = 0;
+            // Turn on each provider aggressively for a short period of time
+            List<String> matchingProviders = locationManager.getAllProviders();
+            for (String provider: matchingProviders) {
+                if (provider != LocationManager.PASSIVE_PROVIDER) { 
+                    locationManager.requestLocationUpdates(provider, 0, 0, this);
+                }
+            }
         } else {
             locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
         }
@@ -292,7 +300,10 @@ public class LocationUpdateService extends Service implements LocationListener {
      * @param minTime Minimum time required between location updates.
      * @return The most accurate and / or timely previously detected location.
      */
-    public Location getLastBestLocation(int minDistance, long minTime) {
+    public Location getLastBestLocation() {
+        int minDistance = (int) stationaryRadius;
+        long minTime    = System.currentTimeMillis() - (locationTimeout * 1000);
+        
         Log.i(TAG, "- fetching last best location " + minDistance + "," + minTime);
         Location bestResult = null;
         float bestAccuracy = Float.MAX_VALUE;
@@ -335,37 +346,43 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.d(TAG, "- onLocationChanged: " + location.getLatitude() + "," + location.getLongitude() + ", accuracy: " + location.getAccuracy() + ", isMoving: " + isMoving + ", speed: " + location.getSpeed());
         if (isDebugging) {
             Toast.makeText(this, "mv:"+isMoving+",acy:"+location.getAccuracy()+",v:"+location.getSpeed()+",df:"+scaledDistanceFilter, Toast.LENGTH_LONG).show();
-            toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
         }
         if (isAcquiringStationaryLocation) {
             if (stationaryLocation == null || stationaryLocation.getAccuracy() > location.getAccuracy()) {
                 stationaryLocation = location;
             }
-            if (stationaryLocationAttempts++ == MAX_STATIONARY_ACQUISITION_ATTEMPTS || (stationaryLocation.getAccuracy() <= stationaryRadius) ) {
+            if (++locationAcquisitionAttempts == MAX_STATIONARY_ACQUISITION_ATTEMPTS) {
                 isAcquiringStationaryLocation = false;
                 startMonitoringStationaryRegion(stationaryLocation);
+                if (isDebugging) {
+                    startTone("long_beep");
+                }
             } else {
                 // Unacceptable stationary-location: bail-out and wait for another.
+                if (isDebugging) {
+                    startTone("beep");
+                }
                 return;
             }
         } else if (isAcquiringSpeed) {
-            // Make *hoo* sound, acquiring speed.
-            if (isDebugging) {
-                toneGenerator.startTone(ToneGenerator.TONE_SUP_RADIO_ACK);
-            }
-            if (speedAcquisitionAttempts++ == MAX_SPEED_ACQUISITION_ATTEMPTS) {
+            if (++locationAcquisitionAttempts == MAX_SPEED_ACQUISITION_ATTEMPTS) {
                 // Got enough samples, assume we're confident in reported speed now.  Play "woohoo" sound.
                 if (isDebugging) {
-                    // @sound doodly-doo
-                    toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE);
+                    startTone("doodly_doo");
                 }
                 isAcquiringSpeed = false;
                 scaledDistanceFilter = calculateDistanceFilter(location.getSpeed());
                 setPace(true);
             } else {
+                if (isDebugging) {
+                    startTone("beep");
+                }
                 return;
             }
         } else if (isMoving) {
+            if (isDebugging) {
+                startTone("beep");
+            }
             // Only reset stationaryAlarm when speed is detected, prevents spurious locations from resetting when stopped.
             if (location.getSpeed() > 0) {
                 resetStationaryAlarm();
@@ -377,7 +394,20 @@ public class LocationUpdateService extends Service implements LocationListener {
                 scaledDistanceFilter = newDistanceFilter;
                 setPace(true);
             }
+            if (location.distanceTo(lastLocation) < distanceFilter) {
+                return;
+            }
         } else if (stationaryLocation != null) {
+            float distance = location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy();
+            Toast.makeText(this, "DISTANCE: " + distance, Toast.LENGTH_LONG).show();
+            
+            Log.i(TAG, "- distance from stationary location: " + distance);
+            if (distance > stationaryRadius) {
+                if (isDebugging) {
+                    Toast.makeText(this, "MANUAL STATIONARY EXIT: " + distance, Toast.LENGTH_LONG).show();
+                }
+                onExitStationaryRegion(location);
+            }
             return;
         }
         // Go ahead and cache, push to server
@@ -391,7 +421,31 @@ public class LocationUpdateService extends Service implements LocationListener {
             Log.d(TAG, "Network unavailable, waiting for now");
         }
     }
-
+    
+    /**
+     * Plays debug sound
+     * @param name
+     */
+    private void startTone(String name) {
+        int tone = 0;
+        int duration = 1000;
+        
+        if (name.equals("beep")) {
+            tone = ToneGenerator.TONE_PROP_BEEP;
+        } else if (name.equals("beep_beep_beep")) {
+            tone = ToneGenerator.TONE_CDMA_CONFIRM;
+        } else if (name.equals("long_beep")) {
+            tone = ToneGenerator.TONE_CDMA_ABBR_ALERT;
+        } else if (name.equals("doodly_doo")) {
+            tone = ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE;
+        } else if (name.equals("chirp_chirp_chirp")) {
+            tone = ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD;
+        } else if (name.equals("hoo")) {
+            tone = ToneGenerator.TONE_SUP_RINGTONE;
+        }
+        toneGenerator.startTone(tone, duration);
+    }
+    
     public void resetStationaryAlarm() {
         alarmManager.cancel(stationaryAlarmPI);
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + STATIONARY_TIMEOUT, stationaryAlarmPI); // Millisec * Second * Minute
@@ -407,14 +461,11 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     private void startMonitoringStationaryRegion(Location location) {
-        Log.i(TAG, "- startMonitoringStationaryRegion (" + location.getLatitude() + "," + location.getLongitude() + "), accuracy:" + location.getAccuracy());
-        if (isDebugging) {
-            // @sound "beeeeeeeeeeeeeeeeep"
-            toneGenerator.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT);
-        }
-        stationaryLocation = location;
         locationManager.removeUpdates(this);
+        stationaryLocation = location;
         
+        Log.i(TAG, "- startMonitoringStationaryRegion (" + location.getLatitude() + "," + location.getLongitude() + "), accuracy:" + location.getAccuracy());
+
         // Here be the execution of the stationary region monitor
         locationManager.addProximityAlert(
                 location.getLatitude(),
@@ -426,31 +477,22 @@ public class LocationUpdateService extends Service implements LocationListener {
         
         // proximity-alerts don't seem to work while suspended in latest Android 4.42 (works in 4.03).  Have to use AlarmManager to sample
         //  location at regular intervals with a one-shot.
-        long interval   = (long) locationTimeout * 1000;
-        long start      = System.currentTimeMillis() + interval; 
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, start, interval, stationaryLocationMonitorPI);
+        long start = System.currentTimeMillis() + (60 * 1000);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, start, STATIONARY_MONITOR_POLL_INTERVAL, stationaryLocationMonitorPI);
     }
     
     /**
     * User has exit his stationary region!  Initiate aggressive geolocation!
     */
-    public void onExitStationaryRegion() {
-        if (isDebugging) {
-            new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100).startTone(ToneGenerator.TONE_CDMA_CONFIRM);
-        }
-
-        // There MUST be a valid, recent location if this event-handler was called.
-        Location location = getLastBestLocation((int) stationaryRadius, System.currentTimeMillis()-(locationTimeout * 1000));
-
-        if (location != null) {
-            // Filter-out spurious region-exits:  must have at least a little speed to move out of stationary-region.
-            if (location.getSpeed() < 0.75) {
-                return;
-            }
-        } else {
-            Log.i(TAG, "- exit stationary region receiver was triggered but could not fetch the last-best location!");
+    public void onExitStationaryRegion(Location location) {
+        // Filter-out spurious region-exits:  must have at least a little speed to move out of stationary-region
+        if (location.getSpeed() < 0.75) {
+            return;
         }
         
+        if (isDebugging) {
+            startTone("beep_beep_beep");
+        }
         // Cancel the periodic stationary location monitor alarm.
         alarmManager.cancel(stationaryLocationMonitorPI);
         
@@ -468,8 +510,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "- onCellLocationChange" + cellLocation.toString());
         if (isDebugging) {
             Toast.makeText(this, "Cellular location change", Toast.LENGTH_LONG).show();
-            // @sound High-pitch beep-beep-beep
-            toneGenerator.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD);
+            startTone("chirp_chirp_chirp");
         }
         if (!isMoving && stationaryLocation != null) {
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -491,7 +532,6 @@ public class LocationUpdateService extends Service implements LocationListener {
                 Log.d(TAG, "- singleUpdateReciever" + location.toString());
                 onLocationChanged(location);
             }
-            locationManager.removeUpdates(singleUpdatePI);
         }
     };
     
@@ -516,6 +556,9 @@ public class LocationUpdateService extends Service implements LocationListener {
          public void onReceive(Context context, Intent intent)
          {
              Log.i(TAG, "- stationaryLocationMonitorReceiver fired");
+             if (isDebugging) {
+                 startTone("hoo");
+             }
              criteria.setAccuracy(Criteria.ACCURACY_FINE);
              criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
              criteria.setPowerRequirement(Criteria.POWER_HIGH);
@@ -540,7 +583,11 @@ public class LocationUpdateService extends Service implements LocationListener {
             }
             else {
                 Log.d(TAG, "- EXIT");
-                onExitStationaryRegion();
+                // There MUST be a valid, recent location if this event-handler was called.
+                Location location = getLastBestLocation();
+                if (location != null) {
+                    onExitStationaryRegion(location);
+                }
             }
         }
     };
@@ -646,6 +693,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private void cleanUp() {
         locationManager.removeUpdates(this);
         alarmManager.cancel(stationaryAlarmPI);
+        alarmManager.cancel(stationaryLocationMonitorPI);
+        toneGenerator.release();
         
         unregisterReceiver(stationaryAlarmReceiver);
         unregisterReceiver(singleUpdateReceiver);
