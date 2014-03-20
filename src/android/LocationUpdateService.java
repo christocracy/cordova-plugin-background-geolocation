@@ -383,8 +383,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             if (isDebugging) {
                 startTone("beep");
             }
-            // Only reset stationaryAlarm when speed is detected, prevents spurious locations from resetting when stopped.
-            if (location.getSpeed() > 0) {
+            // Only reset stationaryAlarm when accurate speed is detected, prevents spurious locations from resetting when stopped.
+            if ( (location.getSpeed() >= 1) && (location.getAccuracy() <= stationaryRadius) ) {
                 resetStationaryAlarm();
             }
             // Calculate latest distanceFilter, if it changed by 5 m/s, we'll reconfigure our pace.
@@ -440,7 +440,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             tone = ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE;
         } else if (name.equals("chirp_chirp_chirp")) {
             tone = ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD;
-        } else if (name.equals("hoo")) {
+        } else if (name.equals("dialtone")) {
             tone = ToneGenerator.TONE_SUP_RINGTONE;
         }
         toneGenerator.startTone(tone, duration);
@@ -557,7 +557,7 @@ public class LocationUpdateService extends Service implements LocationListener {
          {
              Log.i(TAG, "- stationaryLocationMonitorReceiver fired");
              if (isDebugging) {
-                 startTone("hoo");
+                 startTone("dialtone");
              }
              criteria.setAccuracy(Criteria.ACCURACY_FINE);
              criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
