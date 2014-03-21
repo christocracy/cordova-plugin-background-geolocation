@@ -318,8 +318,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         for (String provider: matchingProviders) {
             Log.d(TAG, "- provider: " + provider);
             Location location = locationManager.getLastKnownLocation(provider);
-            Log.d(TAG, location.toString());
             if (location != null) {
+                Log.d(TAG, " location: " + location.getLatitude() + "," + location.getLongitude() + "," + location.getAccuracy() + "," + location.getSpeed() + "m/s");
                 float accuracy = location.getAccuracy();
                 long time = location.getTime();
                 Log.d(TAG, "time>minTime: " + (time > minTime) + ", accuracy<bestAccuracy: " + (accuracy < bestAccuracy));
@@ -328,24 +328,19 @@ public class LocationUpdateService extends Service implements LocationListener {
                     bestAccuracy = accuracy;
                     bestTime = time;
                 }
-                else if (time < minTime && bestAccuracy == Float.MAX_VALUE && time > bestTime) {
-                    bestResult = location;
-                    bestTime = time;
-                }
             }
-        }
-        // If the best result is beyond the allowed time limit, or the accuracy of the
-        // best result is wider than the acceptable maximum distance, request a single update.
-        // This check simply implements the same conditions we set when requesting regular
-        // location updates every [minTime] and [minDistance].         
-        if ((bestTime < minTime || bestAccuracy > minDistance)) {
-            bestResult = null;
         }
         return bestResult;
     }
 
     public void onLocationChanged(Location location) {
         Log.d(TAG, "- onLocationChanged: " + location.getLatitude() + "," + location.getLongitude() + ", accuracy: " + location.getAccuracy() + ", isMoving: " + isMoving + ", speed: " + location.getSpeed());
+        
+        if (!isMoving && !isAcquiringStationaryLocation && stationaryLocation==null) {
+            // Perhaps our GPS signal was interupted, re-acquire a stationaryLocation now.
+            setPace(false);
+        }
+        
         if (isDebugging) {
             Toast.makeText(this, "mv:"+isMoving+",acy:"+location.getAccuracy()+",v:"+location.getSpeed()+",df:"+scaledDistanceFilter, Toast.LENGTH_LONG).show();
         }
@@ -500,10 +495,6 @@ public class LocationUpdateService extends Service implements LocationListener {
     */
     public void onExitStationaryRegion(Location location) {
         // Filter-out spurious region-exits:  must have at least a little speed to move out of stationary-region
-        if (location.getSpeed() < 0.75) {
-            return;
-        }
-        
         if (isDebugging) {
             startTone("beep_beep_beep");
         }
