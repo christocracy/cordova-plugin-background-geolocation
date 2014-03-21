@@ -475,6 +475,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
     
     public void onPollStationaryLocation(Location location) {
+        if (isMoving) {
+            return;
+        }
         startTone("beep");
         float distance = location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy();
         Toast.makeText(this, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
