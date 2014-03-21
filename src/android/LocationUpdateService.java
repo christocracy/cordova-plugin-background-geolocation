@@ -59,8 +59,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
-    private static final long STATIONARY_TIMEOUT                        = 5 * 1000 * 60;    // 5 minutes.
-    private static final long STATIONARY_MONITOR_POLL_INTERVAL          = 3 * 1000 * 60;//3 * 1000 * 60;    // 3 minutes.  
+    private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
+    private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.  
+    private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
     
@@ -74,7 +75,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private float stationaryRadius;
     private Location stationaryLocation;
     private PendingIntent stationaryAlarmPI;
-    private PendingIntent stationaryLocationMonitorPI;
+    private PendingIntent stationaryLocationPollingPI;
+    private long stationaryLocationPollingInterval;
     private PendingIntent stationaryRegionPI;
     private PendingIntent singleUpdatePI;
     
@@ -127,7 +129,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         registerReceiver(stationaryRegionReceiver, new IntentFilter(STATIONARY_REGION_ACTION));
         
         // Stationary location monitor PI
-        stationaryLocationMonitorPI = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_LOCATION_MONITOR_ACTION), 0);
+        stationaryLocationPollingPI = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_LOCATION_MONITOR_ACTION), 0);
         registerReceiver(stationaryLocationMonitorReceiver, new IntentFilter(STATIONARY_LOCATION_MONITOR_ACTION));
         
         // One-shot PI (TODO currently unused)  
@@ -465,12 +467,34 @@ public class LocationUpdateService extends Service implements LocationListener {
                 stationaryRegionPI
         );
         
-        // proximity-alerts don't seem to work while suspended in latest Android 4.42 (works in 4.03).  Have to use AlarmManager to sample
-        //  location at regular intervals with a one-shot.
-        long start = System.currentTimeMillis() + (60 * 1000);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, start, STATIONARY_MONITOR_POLL_INTERVAL, stationaryLocationMonitorPI);
+        startPollingStationaryLocation(STATIONARY_LOCATION_POLLING_INTERVAL_LAZY);
     }
     
+    public void startPollingStationaryLocation(long interval) {
+        // proximity-alerts don't seem to work while suspended in latest Android 4.42 (works in 4.03).  Have to use AlarmManager to sample
+        //  location at regular intervals with a one-shot.
+        stationaryLocationPollingInterval = interval;
+        alarmManager.cancel(stationaryLocationPollingPI);
+        long start = System.currentTimeMillis() + (60 * 1000);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, start, interval, stationaryLocationPollingPI);
+    }
+    
+    public void onPollStationaryLocation(Location location) {
+        startTone("beep");
+        float distance = location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy();
+        Toast.makeText(this, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
+        
+        // TODO http://www.cse.buffalo.edu/~demirbas/publications/proximity.pdf
+        // determine if we're almost out of stationary-distance and increase monitoring-rate.
+        Log.i(TAG, "- distance from stationary location: " + distance);
+        if (distance > stationaryRadius) {
+            onExitStationaryRegion(location);
+        } else if (distance > 0) {
+            startPollingStationaryLocation(STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE);
+        } else if (stationaryLocationPollingInterval != STATIONARY_LOCATION_POLLING_INTERVAL_LAZY) {
+            startPollingStationaryLocation(STATIONARY_LOCATION_POLLING_INTERVAL_LAZY);
+        }
+    }
     /**
     * User has exit his stationary region!  Initiate aggressive geolocation!
     */
@@ -484,7 +508,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             startTone("beep_beep_beep");
         }
         // Cancel the periodic stationary location monitor alarm.
-        alarmManager.cancel(stationaryLocationMonitorPI);
+        alarmManager.cancel(stationaryLocationPollingPI);
         
         // Kill the current region-monitor we just walked out of.
         locationManager.removeProximityAlert(stationaryRegionPI);
@@ -519,15 +543,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             String key = LocationManager.KEY_LOCATION_CHANGED;
             Location location = (Location)intent.getExtras().get(key);
             if (location != null) {
-                startTone("beep");
                 Log.d(TAG, "- singleUpdateReciever" + location.toString());
-                float distance = location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy();
-                // TODO http://www.cse.buffalo.edu/~demirbas/publications/proximity.pdf
-                // determine if we're almost out of stationary-distance and increase monitoring-rate.
-                Log.i(TAG, "- distance from stationary location: " + distance);
-                if (distance > stationaryRadius) {
-                    onExitStationaryRegion(location);
-                }
+                onPollStationaryLocation(location);
             }
         }
     };
@@ -690,7 +707,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private void cleanUp() {
         locationManager.removeUpdates(this);
         alarmManager.cancel(stationaryAlarmPI);
-        alarmManager.cancel(stationaryLocationMonitorPI);
+        alarmManager.cancel(stationaryLocationPollingPI);
         toneGenerator.release();
         
         unregisterReceiver(stationaryAlarmReceiver);
