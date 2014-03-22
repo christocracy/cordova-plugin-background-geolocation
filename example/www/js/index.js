@@ -98,7 +98,8 @@ var app = {
             desiredAccuracy: 10,
             stationaryRadius: 20,
             distanceFilter: 30,
-            debug: true // <-- enable this hear sounds for background-geolocation life-cycle.
+            activityType: "AutomotiveNavigation",   // <-- iOS-only
+            debug: true     // <-- enable this hear sounds for background-geolocation life-cycle.
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

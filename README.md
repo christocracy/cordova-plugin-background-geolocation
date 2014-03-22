@@ -77,6 +77,7 @@ A full example could be:
         desiredAccuracy: 10,
         stationaryRadius: 20,
         distanceFilter: 30,
+        activityType: "AutomotiveNavigation",
         debug: true // <-- enable this hear sounds for background-geolocation life-cycle.
     });
 
@@ -162,6 +163,17 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
+### iOS-only Config
+
+#####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
+
+Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
+
+### Android-only Config
+
+#####`@param {Integer} locationTimeout 
+
+The minimum time interval between location updates, in seconds.  See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) for more information.
 
 ## Licence ##
 

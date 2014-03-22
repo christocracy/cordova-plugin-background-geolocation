@@ -7,13 +7,14 @@ module.exports = {
             distanceFilter      = (config.distanceFilter >= 0) ? config.distanceFilter : 500,       // meters
             locationTimeout     = (config.locationTimeout >= 0) ? config.locationTimeout : 60,      // seconds
             desiredAccuracy     = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100;     // meters
-            debug               = config.debug || false;
+            debug               = config.debug || false,
+            activityType        = config.activityType || "OTHER";
 
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [params, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug]);
+             [params, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, activityType]);
     },
     start: function(success, failure, config) {
         exec(success || function() {},
