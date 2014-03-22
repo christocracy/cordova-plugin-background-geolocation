@@ -1,7 +1,7 @@
 BackgroundGeoLocation
 ==============================
 
-Cross-platform background geolocation for Cordova / PhoneGap.
+Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
@@ -20,7 +20,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 ```
 
-   phonegap plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
+   cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
 ```
 
 A full example could be:
@@ -70,7 +70,10 @@ A full example could be:
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
         url: 'http://only.for.android.com/update_location.json', // <-- only required for Android; ios allows javascript callbacks for your http
-        authToken: 'user_secret_auth_token',    // <-- only required for Android; ios allows javascript callbacks for your http
+        params: {                                               // HTTP POST params sent to your server when persisting locations.
+            auth_token: 'user_secret_auth_token'
+            foo: 'bar'
+        },
         desiredAccuracy: 10,
         stationaryRadius: 20,
         distanceFilter: 30,
@@ -98,7 +101,7 @@ When the plugin detects your user has moved beyond his stationary-region, it eng
 
 ## iOS and Android
 
-The plugin works best with iOS but Android is currently under heavy development and coming along well with features being ported from iOS.  Those are the only two supported platforms but I foresee a Windows Phone version once I get a client who desires that.
+The plugin works with iOS and Android
 
 ### Config
 
@@ -158,7 +161,6 @@ Note the following real example of background-geolocation on highway 101 towards
 Compare now background-geolocation in the scope of a city.  In this image, the left-hand track is from a cab-ride, while the right-hand track is walking speed.
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
-
 
 
 ## Licence ##
