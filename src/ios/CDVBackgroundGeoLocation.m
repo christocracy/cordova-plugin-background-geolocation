@@ -206,6 +206,7 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     
 }
+
 /**
  * Change pace to moving/stopped
  * @param {Boolean} isMoving
@@ -370,13 +371,13 @@
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
     NSLog(@"- CDVBackgroundGeoLocation locationManager failed:  %@", error);
-    [locationManager stopUpdatingLocation];
     
     isMoving = NO;
     isAcquiringStationaryLocation = NO;
     stationaryLocation = nil;
-    
+
     [locationManager startMonitoringSignificantLocationChanges];
+    [locationManager stopUpdatingLocation];
 }
 
 /**
@@ -480,8 +481,6 @@
     isAcquiringSpeed                = NO;
     locationAcquisitionAttempts     = 0;
     
-    [locationManager stopUpdatingLocation];
-    
     // Kill the current stationary-region.
     if (stationaryRegion != nil) {
         [locationManager stopMonitoringForRegion:stationaryRegion];
@@ -494,10 +493,11 @@
     if (isMoving) {
         isAcquiringSpeed = YES;
     } else {
-        // Crank up the GPS power temporarily to get a good fix on our current staionary location in order to set up region-monitoring.
         isAcquiringStationaryLocation   = YES;
     }
     if (isAcquiringSpeed || isAcquiringStationaryLocation) {
+        // Crank up the GPS power temporarily to get a good fix on our current location
+        [locationManager stopUpdatingLocation];
         locationManager.distanceFilter = kCLDistanceFilterNone;
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
         [locationManager startUpdatingLocation];
@@ -513,14 +513,15 @@
     if (stationaryRegion != nil) {
         [locationManager stopMonitoringForRegion:stationaryRegion];
     }
-    [locationManager stopUpdatingLocation];
-    locationManager.distanceFilter = distanceFilter;
-    locationManager.desiredAccuracy = desiredAccuracy;
     [locationManager startMonitoringSignificantLocationChanges];
     
     stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     stationaryRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:stationaryRegion];
+    
+    locationManager.distanceFilter = distanceFilter;
+    locationManager.desiredAccuracy = desiredAccuracy;
+    [locationManager stopUpdatingLocation];
 }
 
 // If you don't stopMonitorying when application terminates, the app will be awoken still when a
