@@ -221,7 +221,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     public boolean stopService(Intent intent) {
         Log.i(TAG, "- Received stop: " + intent);
         cleanUp();
-        Toast.makeText(this, "Background location tracking stopped", Toast.LENGTH_SHORT).show();
+        if (isDebugging) {
+            Toast.makeText(this, "Background location tracking stopped", Toast.LENGTH_SHORT).show();
+        }
         return super.stopService(intent);
     }
     
@@ -478,9 +480,14 @@ public class LocationUpdateService extends Service implements LocationListener {
         if (isMoving) {
             return;
         }
-        startTone("beep");
+        if (isDebugging) {
+            startTone("beep");
+        }
         float distance = location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy();
-        Toast.makeText(this, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
+        
+        if (isDebugging) {
+            Toast.makeText(this, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
+        }
         
         // TODO http://www.cse.buffalo.edu/~demirbas/publications/proximity.pdf
         // determine if we're almost out of stationary-distance and increase monitoring-rate.
