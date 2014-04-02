@@ -179,8 +179,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
 
             Notification.Builder builder = new Notification.Builder(this);
-            builder.setContentTitle("Eato Driver App");
-            builder.setContentText("Ready");
+            builder.setContentTitle("Background tracking");
+            builder.setContentText("ENABLED");
             builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
             builder.setContentIntent(pendingIntent);
             Notification notification;
