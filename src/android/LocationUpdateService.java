@@ -25,6 +25,7 @@ import android.telephony.CellLocation;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.Notification;
+import android.support.v4.app.NotificationCompat;
 import android.app.PendingIntent;
 import android.app.Service;
 
@@ -177,17 +178,22 @@ public class LocationUpdateService extends Service implements LocationListener {
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
             main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
-
-            Notification.Builder builder = new Notification.Builder(this);
-            builder.setContentTitle("Background tracking");
-            builder.setContentText("ENABLED");
-            builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
-            builder.setContentIntent(pendingIntent);
-            Notification notification;
-            if (android.os.Build.VERSION.SDK_INT >= 16) {
-                notification = buildForegroundNotification(builder);
+            
+			Notification notification;
+            if (android.os.Build.VERSION.SDK_INT >= 11) {
+				Notification.Builder builder = new Notification.Builder(this);
+				builder.setContentTitle("Background tracking");
+				builder.setContentText("ENABLED");
+				builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+				builder.setContentIntent(pendingIntent);
+				notification = buildForegroundNotification(builder);
             } else {
-                notification = buildForegroundNotificationCompat(builder);
+				NotificationCompat.Builder builder = new Notification.Builder(this);
+				builder.setContentTitle("Background tracking");
+				builder.setContentText("ENABLED");
+				builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+				builder.setContentIntent(pendingIntent);
+				notification = buildForegroundNotificationCompat(builder);
             }
             notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
             startForeground(startId, notification);
@@ -213,7 +219,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     
     @SuppressWarnings("deprecation")
     @TargetApi(15)
-    private Notification buildForegroundNotificationCompat(Notification.Builder builder) {
+    private Notification buildForegroundNotificationCompat(NotificationCompat.Builder builder) {
         return builder.getNotification();
     }
 
