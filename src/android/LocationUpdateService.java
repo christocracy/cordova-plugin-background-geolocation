@@ -668,7 +668,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             	//request.setHeader("Accept", "application/json");
             	//request.setHeader("Content-type", "application/json");
             	Log.d(TAG, "Adding Header: " + headkey + " : " + headers.get(headkey));
-            	request.setHeader(headkey, headers.get(headkey);
+            	request.setHeader(headkey, headers.get(headkey));
 	    }
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);
