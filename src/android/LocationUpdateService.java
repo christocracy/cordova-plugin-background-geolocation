@@ -1,6 +1,7 @@
 package com.tenforwardconsulting.cordova.bgloc;
 
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -664,11 +665,14 @@ public class LocationUpdateService extends Service implements LocationListener {
 
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
-            for (String headkey: headers.keys()) {
-            	//request.setHeader("Accept", "application/json");
-            	//request.setHeader("Content-type", "application/json");
-            	Log.d(TAG, "Adding Header: " + headkey + " : " + headers.get(headkey));
-            	request.setHeader(headkey, headers.get(headkey));
+
+            Iterator<String> headkeys = headers.keys();
+            while( headkeys.hasNext() ){
+		if(headkeys.next() != null) {
+                	String headkey = (String)headkeys.next();
+            		Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
+            		request.setHeader(headkey, (String)headers.getString(headkey));
+		}
 	    }
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);

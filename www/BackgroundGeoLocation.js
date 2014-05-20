@@ -14,7 +14,7 @@ module.exports = {
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [params, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug]);
+             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug]);
     },
     start: function(success, failure, config) {
         exec(success || function() {},
