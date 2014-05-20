@@ -70,6 +70,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private long lastUpdateTime = 0l;
     
     private JSONObject params;
+    private JSONObject headers;
     private String url = "http://192.168.2.15:3000/users/current_location.json";
 
     private float stationaryRadius;
@@ -161,6 +162,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         if (intent != null) { 
             try {
                 params = new JSONObject(intent.getStringExtra("params"));
+		headers = new JSONObject(intent.getStringExtra("headers"));
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -194,6 +196,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         Log.i(TAG, "- url: " + url);
         Log.i(TAG, "- params: " + params.toString());
+	Log.i(TAG, "- headers: " + headers.toString());
         Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
         Log.i(TAG, "- distanceFilter: "     + distanceFilter);
         Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
@@ -661,8 +664,12 @@ public class LocationUpdateService extends Service implements LocationListener {
 
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
-            request.setHeader("Accept", "application/json");
-            request.setHeader("Content-type", "application/json");
+            for (String headkey: headers.keys()) {
+            	//request.setHeader("Accept", "application/json");
+            	//request.setHeader("Content-type", "application/json");
+            	Log.d(TAG, "Adding Header: " + headkey + " : " + headers.get(headkey));
+            	request.setHeader(headkey, headers.get(headkey);
+	    }
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);
             Log.i(TAG, "Response received: " + response.getStatusLine());
