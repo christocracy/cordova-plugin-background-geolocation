@@ -665,11 +665,13 @@ public class LocationUpdateService extends Service implements LocationListener {
 
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
+	    request.setHeader("Accept", "application/json");
+	    request.setHeader("Content-type", "application/json");
 
             Iterator<String> headkeys = headers.keys();
             while( headkeys.hasNext() ){
-		if(headkeys.next() != null) {
-                	String headkey = (String)headkeys.next();
+		String headkey = headkeys.next();
+		if(headkey != null) {
             		Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
             		request.setHeader(headkey, (String)headers.getString(headkey));
 		}
