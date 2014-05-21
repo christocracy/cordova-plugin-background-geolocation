@@ -197,7 +197,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         Log.i(TAG, "- url: " + url);
         Log.i(TAG, "- params: " + params.toString());
-	Log.i(TAG, "- headers: " + headers.toString());
+        Log.i(TAG, "- headers: " + headers.toString());
         Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
         Log.i(TAG, "- distanceFilter: "     + distanceFilter);
         Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
