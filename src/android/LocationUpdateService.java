@@ -163,7 +163,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         if (intent != null) { 
             try {
                 params = new JSONObject(intent.getStringExtra("params"));
-		headers = new JSONObject(intent.getStringExtra("headers"));
+                headers = new JSONObject(intent.getStringExtra("headers"));
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
