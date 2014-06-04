@@ -71,7 +71,7 @@ A full example could be:
     bgGeo.configure(callbackFn, failureFn, {
         url: 'http://only.for.android.com/update_location.json', // <-- only required for Android; ios allows javascript callbacks for your http
         params: {                                               // HTTP POST params sent to your server when persisting locations.
-            auth_token: 'user_secret_auth_token'
+            auth_token: 'user_secret_auth_token',
             foo: 'bar'
         },
         desiredAccuracy: 10,
