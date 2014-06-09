@@ -77,7 +77,9 @@ A full example could be:
         desiredAccuracy: 10,
         stationaryRadius: 20,
         distanceFilter: 30,
-        debug: true // <-- enable this hear sounds for background-geolocation life-cycle.
+        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+        notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
+        notificationText: 'ENABLED' // <-- android only, customize the text of the notification
     });
 
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -162,6 +164,9 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
+#####`@param {String} notificationText/Title`
+
+On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
 
 ## Licence ##
 

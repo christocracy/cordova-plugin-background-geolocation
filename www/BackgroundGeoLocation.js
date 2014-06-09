@@ -8,7 +8,7 @@ module.exports = {
             locationTimeout     = (config.locationTimeout >= 0) ? config.locationTimeout : 60,      // seconds
             desiredAccuracy     = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100,     // meters
             debug               = config.debug || false,
-            notificationTitle   = config.notificationTitle || "Background checking",
+            notificationTitle   = config.notificationTitle || "Background tracking",
             notificationText    = config.notificationText || "ENABLED";
 
         exec(success || function() {},
