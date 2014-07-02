@@ -56,7 +56,7 @@ A full example could be:
     * This callback will be executed every time a geolocation is recorded in the background.
     */
     var callbackFn = function(location) {
-        console.log('[js] BackgroundGeoLocation callback:  ' + location.latitudue + ',' + location.longitude);
+        console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
         // Do your HTTP request here to POST location to your server.
         //
         //
