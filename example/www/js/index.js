@@ -98,7 +98,9 @@ var app = {
             desiredAccuracy: 10,
             stationaryRadius: 20,
             distanceFilter: 30,
-            debug: true // <-- enable this hear sounds for background-geolocation life-cycle.
+            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+            notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
+            notificationText: 'ENABLED' // <-- android only, customize the text of the notification
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

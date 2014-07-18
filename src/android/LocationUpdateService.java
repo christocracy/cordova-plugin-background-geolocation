@@ -90,6 +90,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Integer scaledDistanceFilter;
     private Integer locationTimeout = 30;
     private Boolean isDebugging;
+    private String notificationTitle = "Background checking";
+    private String notificationText = "ENABLED";
 
     private ToneGenerator toneGenerator;
     
@@ -172,15 +174,17 @@ public class LocationUpdateService extends Service implements LocationListener {
             desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
             locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
-            
+            notificationTitle = intent.getStringExtra("notificationTitle");
+            notificationText = intent.getStringExtra("notificationText");
+
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
             main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
 
             Notification.Builder builder = new Notification.Builder(this);
-            builder.setContentTitle("Background tracking");
-            builder.setContentText("ENABLED");
+            builder.setContentTitle(notificationTitle);
+            builder.setContentText(notificationText);
             builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
             builder.setContentIntent(pendingIntent);
             Notification notification;
@@ -199,7 +203,9 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
         Log.i(TAG, "- locationTimeout: "    + locationTimeout);
         Log.i(TAG, "- isDebugging: "        + isDebugging);
-        
+        Log.i(TAG, "- notificationTitle: "  + notificationTitle);
+        Log.i(TAG, "- notificationText: "   + notificationText);
+
         this.setPace(false);
         
         //We want this service to continue running until it is explicitly stopped

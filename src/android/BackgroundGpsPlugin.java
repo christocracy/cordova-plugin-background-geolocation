@@ -30,6 +30,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     private String distanceFilter = "30";
     private String locationTimeout = "60";
     private String isDebugging = "false";
+    private String notificationTitle = "Background tracking";
+    private String notificationText = "ENABLED";
     
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
@@ -50,6 +52,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 updateServiceIntent.putExtra("locationTimeout", locationTimeout);
                 updateServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
                 updateServiceIntent.putExtra("isDebugging", isDebugging);
+                updateServiceIntent.putExtra("notificationTitle", notificationTitle);
+                updateServiceIntent.putExtra("notificationText", notificationText);
 
                 activity.startService(updateServiceIntent);
                 isEnabled = true;
@@ -70,6 +74,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 this.locationTimeout = data.getString(4);
                 this.desiredAccuracy = data.getString(5);
                 this.isDebugging = data.getString(6);
+                this.notificationTitle = data.getString(7);
+                this.notificationText = data.getString(8);
 
             } catch (JSONException e) {
                 callbackContext.error("authToken/url required as parameters: " + e.getMessage());
