@@ -116,18 +116,6 @@ The plugin works with iOS and Android, however both platforms differ significant
 
 Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manages sync-ing GeoLocations to your server automatically, using the configured ```url```, ```params``` and ```headers```.  Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.  This is why the Android plugin cannot execute the Javascript ```callbackFn```, since your app is not guaranteed to keep running -- syncing locations to the server must be handled by the plugin.
 
-#####`@param {String} url`
-
-The url which the Android plugin will persist background geolocation to
-
-#####`@param {Object} params`
-
-Optional HTTP params POSTed to your server when persisting locations (eg:  auth_token)
-
-#####`@param {Object} headers`
-
-Optional HTTP headers POSTed to your server when persisting locations
-
 ### Config
 
 Use the following config-parameters with the #configure method:
