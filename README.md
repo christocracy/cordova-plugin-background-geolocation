@@ -187,6 +187,20 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
+### Android Config
+
+#####`@param {String} url`
+
+The url which the Android plugin will persist background geolocation to
+
+#####`@param {Object} params`
+
+Optional HTTP params POSTed to your server when persisting locations (eg:  auth_token)
+
+#####`@param {Object} headers`
+
+Optional HTTP headers POSTed to your server when persisting locations
+
 #####`@param {String} notificationText/Title`
 
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
