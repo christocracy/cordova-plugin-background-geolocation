@@ -103,7 +103,15 @@ When the plugin detects your user has moved beyond his stationary-region, it eng
 
 ## iOS and Android
 
-The plugin works with iOS and Android
+The plugin works with iOS and Android, however both platforms differ significantly in their interaction with server.
+
+### iOS
+
+*Only* on iOS will the plugin execute your configured ```callbackFn```.  You may manually POST the received ```GeoLocation``` to your server using standard XHR.
+
+### Android
+
+Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manages sync-ing GeoLocations to your server automatically, using the configured ```url```, ```params``` and ```headers```.  Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.  This is why the Android plugin cannot execute the Javascript ```callbackFn```, since your app is not guaranteed to keep running -- syncing locations to the server must be handled by the plugin.
 
 ### Config
 
