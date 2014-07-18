@@ -82,11 +82,11 @@
     url = [command.arguments objectAtIndex: 1];
     
     // Params.
-    stationaryRadius    = [[command.arguments objectAtIndex: 2] intValue];
-    distanceFilter      = [[command.arguments objectAtIndex: 3] intValue];
-    locationTimeout     = [[command.arguments objectAtIndex: 4] intValue];
-    desiredAccuracy     = [self translateDesiredAccuracy:[[command.arguments objectAtIndex: 5] intValue]];
-    isDebugging         = [[command.arguments objectAtIndex: 6] boolValue];
+    stationaryRadius    = [[command.arguments objectAtIndex: 3] intValue];
+    distanceFilter      = [[command.arguments objectAtIndex: 4] intValue];
+    locationTimeout     = [[command.arguments objectAtIndex: 5] intValue];
+    desiredAccuracy     = [self translateDesiredAccuracy:[[command.arguments objectAtIndex: 6] intValue]];
+    isDebugging         = [[command.arguments objectAtIndex: 7] boolValue];
     
     syncCallbackId = command.callbackId;
     
