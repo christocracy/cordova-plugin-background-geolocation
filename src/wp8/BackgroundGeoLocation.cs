@@ -39,10 +39,8 @@ namespace Cordova.Extension.Commands
             RunningInBackground = false;
 
             BackgroundGeoLocationOptions = this.ParseBackgroundGeoLocationOptions(args);
-            if (!BackgroundGeoLocationOptions.ParsingSucceeded) return;
 
-            // DispatchMessage(PluginResult.Status.OK, "init", true, ConfigureCallbackToken);
-            this.IsConfigured = true;
+            this.IsConfigured = BackgroundGeoLocationOptions.ParsingSucceeded;
             this.IsConfiguring = false;
         }
 
