@@ -69,4 +69,27 @@
         <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
      </platform>          
 
+  <!-- wp8 -->
+  <platform name="wp">
+    <config-file target="config.xml" parent="/*">
+      <feature name="BackgroundGeoLocation">
+        <param name="wp-package" value="BackgroundGeoLocation" onload="true" />
+        <param name="onload" value="true" />
+      </feature>
+    </config-file>
+
+    <!-- The app is able to run in background through location-tracking mode -->
+    <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Tasks/DefaultTask">
+      <BackgroundExecution>
+        <ExecutionType Name="LocationTracking" />
+      </BackgroundExecution>
+    </config-file>
+
+    <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+      <Capability Name="ID_CAP_LOCATION" />
+    </config-file>
+	<source-file src="src/wp8/Newtonsoft.Json.dll" />
+    <source-file src="src/wp8/BackgroundGeoLocation.cs" />
+  </platform>
+
 </plugin>

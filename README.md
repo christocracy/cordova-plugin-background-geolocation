@@ -70,16 +70,17 @@ A full example could be:
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
         url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to 
-        params: {                                               //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-            auth_token: 'user_secret_auth_token',
-            foo: 'bar'
+        params: {
+            auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
+            foo: 'bar',                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
+			desiredAccuracy                          //  <-- WP8 ONLY:  Takes 'default' or 'high' as an optional override of the 'desiredAccuracy' config which only accepts meters 
         },
-        headers: {                                              // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
+        headers: {                                   // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
             "X-Foo": "BAR"
         },
         desiredAccuracy: 10,
         stationaryRadius: 20,
-        distanceFilter: 30,
+        distanceFilter: 30, 
         notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
         notificationText: 'ENABLED', // <-- android only, customize the text of the notification
         activityType: 'AutomotiveNavigation',
@@ -99,7 +100,7 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 
 ## Behaviour
 
-The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses [LocationManager#addProximityAlert](http://developer.android.com/reference/android/location/LocationManager.html).
+The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses [LocationManager#addProximityAlert](http://developer.android.com/reference/android/location/LocationManager.html). Windows Phone does not have such a API.
 
 When the plugin detects your user has moved beyond his stationary-region, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter` and `#locationTimeout`.  The plugin attempts to intelligently scale `#distanceFilter` based upon the current reported speed.  Each time `#distanceFilter` is determined to have changed by 5m/s, it recalculates it by squaring the speed rounded-to-nearest-five and adding #distanceFilter (I arbitrarily came up with that formula.  Better ideas?).
 
@@ -109,13 +110,19 @@ When the plugin detects your user has moved beyond his stationary-region, it eng
 
 The plugin works with iOS and Android, however both platforms differ significantly in their interaction with server.
 
-### iOS
+### iOS and WP8
 
-*Only* on iOS will the plugin execute your configured ```callbackFn```.  You may manually POST the received ```GeoLocation``` to your server using standard XHR.  iOS ignores the @config params ```url```, ```params``` and ```headers```.
+On iOS and WP8 the plugin will execute your configured ```callbackFn```.  You may manually POST the received ```GeoLocation``` to your server using standard XHR. iOS and WP8 ignore the @config params ```url```, ```params``` and ```headers```.
 
 ### Android
 
 Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manages sync-ing GeoLocations to your server automatically, using the configured ```url```, ```params``` and ```headers```.  Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.  This is why the Android plugin cannot execute the Javascript ```callbackFn```, since your app is not guaranteed to keep running -- syncing locations to the server must be handled by the plugin.
+
+### WP8
+
+On WP8 the plugin does not support the Stationairy location and does not implement ```getStationaryLocation()```, ```onPaceChange()```, and ```finish()```
+Keep in mind that it is **not** possible to start the plugin on WP8 at the pause event of Cordova/PhoneGap because the app is suspended immediately. So make sure you fire start() before the app is closed. 
+At this moment there is no debug mode in WP8 with background audio signals
 
 ### Config
 

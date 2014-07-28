@@ -1,0 +1,244 @@
+﻿using System;
+using System.Windows;
+using Windows.Devices.Geolocation;
+using WPCordovaClassLib.Cordova;
+using WPCordovaClassLib.Cordova.Commands;
+using WPCordovaClassLib.Cordova.JSON;
+using System.Diagnostics;
+
+namespace Cordova.Extension.Commands
+{
+    public class BackgroundGeoLocation : BaseCommand, IBackgroundGeoLocation
+    {
+        private string ConfigureCallbackToken { get; set; }
+        private BackgroundGeoLocationOptions BackgroundGeoLocationOptions { get; set; }
+
+        /// <summary>
+        /// Geolocator and RunningInBackground are required properties to run in background
+        /// For more information read http://msdn.microsoft.com/library/windows/apps/jj662935(v=vs.105).aspx
+        /// </summary>
+        public static Geolocator Geolocator { get; set; }
+        public static bool RunningInBackground { get; set; }
+
+        /// <summary>
+        /// When start() is fired immediate after configure() in javascript, configure may not be finished yet, IsConfigured and IsConfiguring are used to keep track of this
+        /// </summary>
+        private bool IsConfigured { get; set; }
+        private bool IsConfiguring { get; set; }
+
+        public BackgroundGeoLocation()
+        {
+            this.IsConfiguring = false;
+            this.IsConfigured = false;
+        }
+
+        public void configure(string args)
+        {
+            this.IsConfiguring = true;
+            this.ConfigureCallbackToken = CurrentCommandCallbackId;
+            RunningInBackground = false;
+
+            BackgroundGeoLocationOptions = this.ParseBackgroundGeoLocationOptions(args);
+            if (!BackgroundGeoLocationOptions.ParsingSucceeded) return;
+
+            // DispatchMessage(PluginResult.Status.OK, "init", true, ConfigureCallbackToken);
+            this.IsConfigured = true;
+            this.IsConfiguring = false;
+        }
+
+        private BackgroundGeoLocationOptions ParseBackgroundGeoLocationOptions(string configureArgs)
+        {
+            var parsingSucceeded = true;
+
+            var options = JsonHelper.Deserialize<string[]>(configureArgs);
+            var customParameters = JsonHelper.Deserialize<BackgroundGeoLocationOptionsParameters>(options[0]);
+
+            var stationaryRadius = 0.0;
+            var distanceFilter = 0.0;
+            UInt32 locationTimeout = 0;
+            UInt32 desiredAccuracy = 0;
+            var debug = false;
+
+            if (!double.TryParse(options[3], out stationaryRadius))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for stationaryRadius:{0}", options[3])));
+                parsingSucceeded = false;
+            }
+            if (!double.TryParse(options[4], out distanceFilter))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for distanceFilter:{0}", options[4])));
+                parsingSucceeded = false;
+            }
+            if (!UInt32.TryParse(options[5], out locationTimeout))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for locationTimeout:{0}", options[5])));
+                parsingSucceeded = false;
+            }
+            if (!UInt32.TryParse(options[6], out desiredAccuracy))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for desiredAccuracy:{0}", options[6])));
+                parsingSucceeded = false;
+            }
+            if (!bool.TryParse(options[7], out debug))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for debug:{0}", options[7])));
+                parsingSucceeded = false;
+            }
+
+            return new BackgroundGeoLocationOptions
+            {
+                Parameters = customParameters,
+                Url = options[1],
+                StationaryRadius = stationaryRadius,
+                DistanceFilterInMeters = distanceFilter,
+                LocationTimeoutInMilliseconds = locationTimeout,
+                DesiredAccuracyInMeters = desiredAccuracy,
+                Debug = debug,
+                ParsingSucceeded = parsingSucceeded
+            };
+        }
+
+        public void start(string nothing)
+        {
+            while (!IsConfigured && IsConfiguring)
+            {
+                // Wait for configure() to complete...
+            }
+
+            if (!IsConfigured || !BackgroundGeoLocationOptions.ParsingSucceeded)
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.INVALID_ACTION, "Cannot start: Run configure() with proper values!"));
+                stop();
+                return;
+            }
+            StopGeolocatorIfActive();
+
+            Geolocator = new Geolocator
+            {
+                // Default: 50 meters
+                MovementThreshold = BackgroundGeoLocationOptions.DistanceFilterInMeters,
+
+                // JS Interface takes seconds, MS takes miliseconds, default 60 seconds
+                ReportInterval = BackgroundGeoLocationOptions.LocationTimeoutInMilliseconds * 1000,
+
+                // In our case this property has always a value, if left empty or below zero the default will be 100 meter but can be overridden via parameter DesiredAccuracy
+                DesiredAccuracyInMeters = BackgroundGeoLocationOptions.DesiredAccuracyInMeters
+            };
+
+            if (!string.IsNullOrWhiteSpace(BackgroundGeoLocationOptions.Parameters.DesiredAccuracy))
+            {
+                // http://blogs.windows.com/windows_phone/b/wpdev/archive/2012/11/30/acquiring-a-single-geoposition-in-windows-phone-8.aspx
+                //  ' Note that the DesiredAccuracyInMeters property is a nullable unsigned integer. 
+                //    This way you can switch from one representation of accuracy to another. 
+                //     When DesiredAccuracyInMeters is set (not null), it takes precedence over DesiredAccuracy. 
+                //     When DesiredAccuracyInMeters is not set (is null), DesiredAccuracy takes precedence. 
+                //     In addition, explicitly setting the DesiredAccuracy property has the side effect of setting DesiredAccuracyInMeters to null. '
+                Geolocator.DesiredAccuracyInMeters = null;
+                Geolocator.DesiredAccuracy = (PositionAccuracy)Enum.Parse(typeof(PositionAccuracy), BackgroundGeoLocationOptions.Parameters.DesiredAccuracy);
+            }
+
+            Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
+
+            RunningInBackground = true;
+
+            DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+
+        }
+
+        private void OnGeolocatorOnPositionChanged(Geolocator sender, PositionChangedEventArgs ConfigureCallbackTokenargs)
+        {
+            if (Geolocator.LocationStatus == PositionStatus.Disabled ||
+              Geolocator.LocationStatus == PositionStatus.NotAvailable)
+            {
+                DispatchMessage(PluginResult.Status.ERROR, string.Format("Cannot start: LocationStatus/PositionStatus: {0}! {1}", Geolocator.LocationStatus, IsConfigured), true, this.ConfigureCallbackToken);
+                return;
+            }
+
+            var callbackJsonResult = ConfigureCallbackTokenargs.Position.Coordinate.ToJson();
+            Debug.WriteLine("PositionChanged token{0}, Coordinates: {1}", ConfigureCallbackToken, callbackJsonResult);
+            DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, this.ConfigureCallbackToken);
+        }
+
+        public void stop()
+        {
+            RunningInBackground = false;
+            StopGeolocatorIfActive();
+        }
+
+        private void StopGeolocatorIfActive()
+        {
+            if (Geolocator == null) return;
+
+            Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
+            Geolocator = null;
+        }
+
+        public void finish()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void onPaceChange(bool isMoving)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void setConfig(string setConfigArgs)
+        {
+            if (string.IsNullOrWhiteSpace(setConfigArgs))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.INVALID_ACTION, "Cannot set config because of an empty input"));
+                return;
+            }
+            var parsingSucceeded = true;
+
+            var options = JsonHelper.Deserialize<string[]>(setConfigArgs);
+
+            var stationaryRadius = 0.0;
+            var distanceFilter = 0.0;
+            UInt32 locationTimeout = 0;
+            UInt32 desiredAccuracy = 0;
+
+            if (!double.TryParse(options[0], out stationaryRadius))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for stationaryRadius:{0}", options[2])));
+                parsingSucceeded = false;
+            }
+            if (!double.TryParse(options[1], out distanceFilter))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for distanceFilter:{0}", options[3])));
+                parsingSucceeded = false;
+            }
+            if (!UInt32.TryParse(options[2], out locationTimeout))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for locationTimeout:{0}", options[4])));
+                parsingSucceeded = false;
+            }
+            if (!UInt32.TryParse(options[3], out desiredAccuracy))
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for desiredAccuracy:{0}", options[5])));
+                parsingSucceeded = false;
+            }
+            if (!parsingSucceeded) return;
+
+            BackgroundGeoLocationOptions.StationaryRadius = stationaryRadius;
+            BackgroundGeoLocationOptions.DistanceFilterInMeters = distanceFilter;
+            BackgroundGeoLocationOptions.LocationTimeoutInMilliseconds = locationTimeout * 1000;
+            BackgroundGeoLocationOptions.DesiredAccuracyInMeters = desiredAccuracy;
+
+            DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+        }
+
+        public void getStationaryLocation()
+        {
+            throw new NotImplementedException();
+
+        }
+        private void DispatchMessage(PluginResult.Status status, string message, bool keepCallback, string callBackId)
+        {
+            var pluginResult = new PluginResult(status, message) { KeepCallback = keepCallback };
+            DispatchCommandResult(pluginResult, callBackId);
+        }
+    }
+
+}
