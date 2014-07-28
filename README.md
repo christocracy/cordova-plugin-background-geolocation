@@ -73,7 +73,7 @@ A full example could be:
         params: {
             auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
             foo: 'bar',                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-			desiredAccuracy                          //  <-- WP8 ONLY:  Takes 'default' or 'high' as an optional override of the 'desiredAccuracy' config which only accepts meters 
+			desiredAccuracy: 'default'               //  <-- WP8 ONLY:  Takes 'default' or 'high'
         },
         headers: {                                   // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
             "X-Foo": "BAR"
@@ -122,7 +122,7 @@ Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manag
 
 On WP8 the plugin does not support the Stationairy location and does not implement ```getStationaryLocation()```, ```onPaceChange()```, and ```finish()```
 Keep in mind that it is **not** possible to start the plugin on WP8 at the pause event of Cordova/PhoneGap because the app is suspended immediately. So make sure you fire start() before the app is closed. 
-At this moment there is no debug mode in WP8 with background audio signals
+At this moment there is no debug mode in WP8 with background audio signals.
 
 ### Config
 
@@ -200,7 +200,7 @@ Optional HTTP headers POSTed to your server when persisting locations
 #####`@param {String} notificationText/Title`
 
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
-
+ 
 #####`@param {Integer} locationTimeout 
 
 The minimum time interval between location updates, in seconds.  See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) for more information.
@@ -210,6 +210,13 @@ The minimum time interval between location updates, in seconds.  See [Android do
 #####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
 
 Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
+
+### WP8 Config
+
+#####`{String} desiredAccuracy`
+
+Takes 'default' or 'high' as an optional override of the 'desiredAccuracy' config which only accepts meters. Leave empty when using the default desiredAccuracy config property.
+>>>>>>> Minor WP8 readme adjustments
 
 ## Licence ##
 
