@@ -163,6 +163,7 @@
     
     NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
     
+    [locationManager startMonitoringSignificantLocationChanges];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
     }
@@ -259,7 +260,6 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation resume");
     if (enabled) {
-        [locationManager stopMonitoringSignificantLocationChanges];
         [locationManager stopUpdatingLocation];
     }
 }
@@ -477,7 +477,6 @@
         isAcquiringSpeed = YES;
         speedAcquisitionAttempts = 0;
         
-        [locationManager stopMonitoringSignificantLocationChanges];
         locationManager.distanceFilter = distanceFilter;
         // Power-up the GPS temporarily until we get a good speed sample.
         locationManager.desiredAccuracy = kCLLocationAccuracyBest;
@@ -509,7 +508,6 @@
     [locationManager stopUpdatingLocation];
     locationManager.distanceFilter = distanceFilter;
     locationManager.desiredAccuracy = desiredAccuracy;
-    [locationManager startMonitoringSignificantLocationChanges];
     
     stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     stationaryRegion.notifyOnExit = YES;
