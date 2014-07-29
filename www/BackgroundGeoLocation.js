@@ -2,7 +2,7 @@ var exec = require("cordova/exec");
 module.exports = {
     configure: function(success, failure, config) {
         var params              = JSON.stringify(config.params || {}),
-	    headers		= JSON.stringify(config.headers || {}),
+            headers		        = JSON.stringify(config.headers || {}),
             url                 = config.url        || 'BackgroundGeoLocation_url',
             stationaryRadius    = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50,    // meters
             distanceFilter      = (config.distanceFilter >= 0) ? config.distanceFilter : 500,       // meters
@@ -11,12 +11,14 @@ module.exports = {
             debug               = config.debug || false,
             notificationTitle   = config.notificationTitle || "Background tracking",
             notificationText    = config.notificationText || "ENABLED";
+            activityType        = config.activityType || "OTHER";
 
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText]);
+             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
+        );
     },
     start: function(success, failure, config) {
         exec(success || function() {},

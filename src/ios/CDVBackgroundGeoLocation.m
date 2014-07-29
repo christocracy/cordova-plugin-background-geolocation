@@ -33,20 +33,21 @@
     NSMutableArray *locationCache;
     NSDate *suspendedAt;
     
-    BOOL isAcquiringStationaryLocation;
     CLLocation *stationaryLocation;
-    NSInteger stationaryLocationAttempts;
-    NSInteger maxStationaryLocationAttempts;
     CLCircularRegion *stationaryRegion;
+    NSInteger locationAcquisitionAttempts;
     
+    BOOL isAcquiringStationaryLocation;
+    NSInteger maxStationaryLocationAttempts;
+
     BOOL isAcquiringSpeed;
-    NSInteger speedAcquisitionAttempts;
     NSInteger maxSpeedAcquistionAttempts;
-    
+
     NSInteger stationaryRadius;
     NSInteger distanceFilter;
     NSInteger locationTimeout;
     NSInteger desiredAccuracy;
+    CLActivityType activityType;
 }
 
 - (void)pluginInitialize
@@ -56,6 +57,7 @@
     locationManager = [[CLLocationManager alloc] init];
     locationManager.delegate = self;
     
+    isMoving = NO;
     stationaryLocation = nil;
     stationaryRegion = nil;
     isDebugging = NO;
@@ -78,20 +80,23 @@
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
     // in iOS, we call to javascript for HTTP now so token and url should be @deprecated until Android calls out to javascript.
-    token = [command.arguments objectAtIndex: 0];
-    url = [command.arguments objectAtIndex: 1];
-    
     // Params.
+    //    0       1       2           3               4                5               6            7           8                8               9
+    //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
+    params = [command.arguments objectAtIndex: 0];
+    headers = [command.arguments objectAtIndex: 1];
+    url = [command.arguments objectAtIndex: 2];
+
     stationaryRadius    = [[command.arguments objectAtIndex: 3] intValue];
     distanceFilter      = [[command.arguments objectAtIndex: 4] intValue];
     locationTimeout     = [[command.arguments objectAtIndex: 5] intValue];
     desiredAccuracy     = [self translateDesiredAccuracy:[[command.arguments objectAtIndex: 6] intValue]];
     isDebugging         = [[command.arguments objectAtIndex: 7] boolValue];
-    
+    activityType        = [self decodeActivityType:[command.arguments objectAtIndex:9]];
+
     syncCallbackId = command.callbackId;
-    
-    // Set a movement threshold for new events.
-    locationManager.activityType = CLActivityTypeOther;
+
+    locationManager.activityType = activityType;
     locationManager.pausesLocationUpdatesAutomatically = YES;
     locationManager.distanceFilter = distanceFilter; // meters
     locationManager.desiredAccuracy = desiredAccuracy;
@@ -103,7 +108,8 @@
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
     NSLog(@"  - desiredAccuracy: %ld", (long)desiredAccuracy);
-    NSLog(@"  - debug: %hhd", isDebugging);
+    NSLog(@"  - activityType: %@", [command.arguments objectAtIndex:7]);
+    NSLog(@"  - debug: %d", isDebugging);
 }
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
@@ -111,7 +117,7 @@
     NSDictionary *config = [command.arguments objectAtIndex:0];
     
     if (config[@"desiredAccuracy"]) {
-        desiredAccuracy = [self translateDesiredAccuracy:[config[@"desiredAccuracy"] floatValue]];
+        desiredAccuracy = [self decodeDesiredAccuracy:[config[@"desiredAccuracy"] floatValue]];
         NSLog(@"    desiredAccuracy: %@", config[@"desiredAccuracy"]);
     }
     if (config[@"stationaryRadius"]) {
@@ -122,9 +128,9 @@
         distanceFilter = [config[@"distanceFilter"] intValue];
         NSLog(@"    distanceFilter: %@", config[@"distanceFilter"]);
     }
-    if (config[@"timeout"]) {
-        locationTimeout = [config[@"timeout"] intValue];
-        NSLog(@"    locationTimeout: %@", config[@"timeout"]);
+    if (config[@"locationTimeout"]) {
+        locationTimeout = [config[@"locationTimeout"] intValue];
+        NSLog(@"    locationTimeout: %@", config[@"locationTimeout"]);
     }
     
     CDVPluginResult* result = nil;
@@ -132,7 +138,7 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
--(NSInteger)translateDesiredAccuracy:(NSInteger)accuracy
+-(NSInteger)decodeDesiredAccuracy:(NSInteger)accuracy
 {
     switch (accuracy) {
         case 1000:
@@ -151,6 +157,19 @@
             accuracy = kCLLocationAccuracyHundredMeters;
     }
     return accuracy;
+}
+
+-(CLActivityType)decodeActivityType:(NSString*)name
+{
+    if ([name caseInsensitiveCompare:@"AutomotiveNavigation"]) {
+        return CLActivityTypeAutomotiveNavigation;
+    } else if ([name caseInsensitiveCompare:@"OtherNavigation"]) {
+        return CLActivityTypeOtherNavigation;
+    } else if ([name caseInsensitiveCompare:@"Fitness"]) {
+        return CLActivityTypeFitness;
+    } else {
+        return CLActivityTypeOther;
+    }
 }
 
 /**
@@ -177,6 +196,8 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation stop");
     enabled = NO;
+    isMoving = NO;
+    
     [locationManager stopUpdatingLocation];
     [locationManager stopMonitoringSignificantLocationChanges];
     if (stationaryRegion != nil) {
@@ -188,6 +209,7 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     
 }
+
 /**
  * Change pace to moving/stopped
  * @param {Boolean} isMoving
@@ -195,7 +217,7 @@
 - (void) onPaceChange:(CDVInvokedUrlCommand *)command
 {
     isMoving = [[command.arguments objectAtIndex: 0] boolValue];
-    NSLog(@"- CDVBackgroundGeoLocation onPaceChange %hhd", isMoving);
+    NSLog(@"- CDVBackgroundGeoLocation onPaceChange %d", isMoving);
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
@@ -245,7 +267,7 @@
  */
 -(void) onSuspend:(NSNotification *) notification
 {
-    NSLog(@"- CDVBackgroundGeoLocation suspend (enabled? %hhd)", enabled);
+    NSLog(@"- CDVBackgroundGeoLocation suspend (enabled? %d)", enabled);
     suspendedAt = [NSDate date];
     
     if (enabled) {
@@ -266,8 +288,8 @@
 
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations (isMoving: %hhd)", isMoving);
-    CLLocation *newLocation = [locations lastObject];
+    NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations (isMoving: %d)", isMoving);
+    CLLocation *location = [locations lastObject];
     
     if (!isMoving && !isAcquiringStationaryLocation && !stationaryLocation) {
         // Perhaps our GPS signal was interupted, re-acquire a stationaryLocation now.
@@ -284,78 +306,81 @@
     
     // test the age of the location measurement to determine if the measurement is cached
     // in most cases you will not want to rely on cached measurements
-    NSTimeInterval locationAge = -[newLocation.timestamp timeIntervalSinceNow];
+    NSTimeInterval locationAge = -[location.timestamp timeIntervalSinceNow];
     
     if (locationAge > 5.0) return;
     
     // test that the horizontal accuracy does not indicate an invalid measurement
-    if (newLocation.horizontalAccuracy < 0) return;
+    if (location.horizontalAccuracy < 0) return;
     
     // test the measurement to see if it is more accurate than the previous measurement
     if (isAcquiringStationaryLocation) {
-        NSLog(@"- Acquiring stationary location, accuracy: %f", newLocation.horizontalAccuracy);
-        if (![self isBestStationaryLocation:newLocation]) {
+        NSLog(@"- Acquiring stationary location, accuracy: %f", location.horizontalAccuracy);
+        if (isDebugging) {
+            AudioServicesPlaySystemSound (acquiringLocationSound);
+        }
+        if (stationaryLocation == nil || stationaryLocation.horizontalAccuracy > location.horizontalAccuracy) {
+            stationaryLocation = location;
+        }
+        if (++locationAcquisitionAttempts == maxStationaryLocationAttempts) {
+            isAcquiringStationaryLocation = NO;
+            [self startMonitoringStationaryRegion:stationaryLocation];
             if (isDebugging) {
-                AudioServicesPlaySystemSound (acquiringLocationSound);
+                AudioServicesPlaySystemSound (acquiredLocationSound);
             }
+        } else {
+            // Unacceptable stationary-location: bail-out and wait for another.
             return;
         }
+    } else if (isAcquiringSpeed) {
         if (isDebugging) {
-            AudioServicesPlaySystemSound (acquiredLocationSound);
+            AudioServicesPlaySystemSound (acquiringLocationSound);
         }
-        [self startMonitoringStationaryRegion:stationaryLocation];
+        if (++locationAcquisitionAttempts == maxSpeedAcquistionAttempts) {
+            // We should have a good sample for speed now, power down our GPS as configured by user.
+            isAcquiringSpeed = NO;
+            [locationManager setDesiredAccuracy:desiredAccuracy];
+            [locationManager setDistanceFilter:[self calculateDistanceFilter:location.speed]];
+            [locationManager startUpdatingLocation];
+        } else {
+            return;
+        }
+    } else if (isMoving) {
+        // Adjust distanceFilter incrementally based upon current speed
+        float newDistanceFilter = [self calculateDistanceFilter:location.speed];
+        if (newDistanceFilter != locationManager.distanceFilter) {
+            NSLog(@"- CDVBackgroundGeoLocation updated distanceFilter, new: %f, old: %f", newDistanceFilter, locationManager.distanceFilter);
+            //[locationManager stopUpdatingLocation];
+            [locationManager setDistanceFilter:newDistanceFilter];
+            [locationManager startUpdatingLocation];
+        }
     }
-    
+
     // Bail out if there's already a background-task in-effect.
     if (bgTask != UIBackgroundTaskInvalid) {
         NSLog(@" Abort:  found existing background-task");
         return;
     }
-
+    
+    // Create a background-task and delegate to Javascript for syncing location
     bgTask = [app beginBackgroundTaskWithExpirationHandler:^{
         [self stopBackgroundTask];
     }];
-    
     [self.commandDelegate runInBackground:^{
-        [self sync:newLocation];
+        [self sync:location];
     }];
-    
-    // Adjust distanceFilter incrementally based upon current speed
-    if (isMoving)
-    {
-        float newDistanceFilter = [self calculateDistanceFilter:newLocation.speed];
-        if (newDistanceFilter != locationManager.distanceFilter) {
-            NSLog(@"- CDVBackgroundGeoLocation updated distanceFilter, new: %f, old: %f", newDistanceFilter, locationManager.distanceFilter);
-            [locationManager stopUpdatingLocation];
-            locationManager.distanceFilter = newDistanceFilter;
-            [locationManager startUpdatingLocation];
-        }
-    }
 }
+
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
     NSLog(@"- CDVBackgroundGeoLocation locationManager failed:  %@", error);
-    [locationManager stopUpdatingLocation];
     
     isMoving = NO;
     isAcquiringStationaryLocation = NO;
     stationaryLocation = nil;
-    
+
     [locationManager startMonitoringSignificantLocationChanges];
-}
--(BOOL) isBestStationaryLocation:(CLLocation*)location {
-    stationaryLocationAttempts++;
-    if (stationaryLocationAttempts == maxStationaryLocationAttempts) {
-        return true;
-    }
-    if (stationaryLocation == nil || stationaryLocation.horizontalAccuracy > location.horizontalAccuracy) {
-        // store the location as the "best effort"
-        stationaryLocation = location;
-        if (location.horizontalAccuracy <= 5.0) {
-            return true;
-        }
-    }
-    return false;
+    [locationManager stopUpdatingLocation];
 }
 
 /**
@@ -364,25 +389,13 @@
 -(float) calculateDistanceFilter:(float)speed
 {
     float newDistanceFilter = distanceFilter;
-    if (isAcquiringSpeed) {
-        if (++speedAcquisitionAttempts == maxSpeedAcquistionAttempts) {
-            // We should have a good sample for speed now, power down our GPS as configured by user.
-            isAcquiringSpeed = NO;
-            [locationManager stopUpdatingLocation];
-            locationManager.desiredAccuracy = desiredAccuracy;
-            [locationManager startUpdatingLocation];
-        } else {
-            return newDistanceFilter;
-        }
-    }
-    if (speed > 3.0 && speed < 100) {
+    if (speed < 100) {
         // (rounded-speed-to-nearest-5) / 2)^2
         // eg 5.2 becomes (5/2)^2
         newDistanceFilter = pow((5.0 * floorf(speed / 5.0 + 0.5f)), 2) + distanceFilter;
     }
     return (newDistanceFilter < 1000) ? newDistanceFilter : 1000;
 }
-
 
 /**
  * We are running in the background if this is being executed.
@@ -465,29 +478,29 @@
 - (void)setPace:(BOOL)value
 {
     NSLog(@"- CDVBackgroundGeoLocation setPace %d, stationaryRegion? %d", value, stationaryRegion!=nil);
-    isMoving = value;
+
+    isMoving                        = value;
+    isAcquiringStationaryLocation   = NO;
+    isAcquiringSpeed                = NO;
+    locationAcquisitionAttempts     = 0;
+    
+    // Kill the current stationary-region.
+    if (stationaryRegion != nil) {
+        [locationManager stopMonitoringForRegion:stationaryRegion];
+        stationaryRegion = nil;
+    }
+    
     if (isDebugging) {
         AudioServicesPlaySystemSound (isMoving ? paceChangeYesSound : paceChangeNoSound);
     }
     if (isMoving) {
-        if (stationaryRegion != nil) {
-            [locationManager stopMonitoringForRegion:stationaryRegion];
-            stationaryRegion = nil;
-        }
         isAcquiringSpeed = YES;
-        speedAcquisitionAttempts = 0;
-        
-        [locationManager stopMonitoringSignificantLocationChanges];
-        locationManager.distanceFilter = distanceFilter;
-        // Power-up the GPS temporarily until we get a good speed sample.
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-        [locationManager startUpdatingLocation];
     } else {
-        // Crank up the GPS power temporarily to get a good fix on our current staionary location in order to set up region-monitoring.
-        stationaryLocation = nil;
-        isAcquiringStationaryLocation = YES;
-        stationaryLocationAttempts = 0;
-        
+        isAcquiringStationaryLocation   = YES;
+    }
+    if (isAcquiringSpeed || isAcquiringStationaryLocation) {
+        // Crank up the GPS power temporarily to get a good fix on our current location
+        [locationManager stopUpdatingLocation];
         locationManager.distanceFilter = kCLDistanceFilterNone;
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
         [locationManager startUpdatingLocation];
@@ -498,22 +511,20 @@
  */
 - (void) startMonitoringStationaryRegion:(CLLocation*)location {
     CLLocationCoordinate2D coord = [location coordinate];
-    
     NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion (%f,%f)", coord.latitude, coord.longitude);
     
     if (stationaryRegion != nil) {
         [locationManager stopMonitoringForRegion:stationaryRegion];
     }
-
-    isAcquiringStationaryLocation = NO;
-    [locationManager stopUpdatingLocation];
-    locationManager.distanceFilter = distanceFilter;
-    locationManager.desiredAccuracy = desiredAccuracy;
     [locationManager startMonitoringSignificantLocationChanges];
     
     stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     stationaryRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:stationaryRegion];
+    
+    locationManager.distanceFilter = distanceFilter;
+    locationManager.desiredAccuracy = desiredAccuracy;
+    [locationManager stopUpdatingLocation];
 }
 
 // If you don't stopMonitorying when application terminates, the app will be awoken still when a

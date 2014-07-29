@@ -95,12 +95,16 @@ var app = {
                 auth_token: 'user_secret_auth_token',
                 foo: 'bar'
             },
+            headers: {
+                'X-Foo': 'bar'
+            },
             desiredAccuracy: 10,
             stationaryRadius: 20,
             distanceFilter: 30,
-            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-            notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
-            notificationText: 'ENABLED' // <-- android only, customize the text of the notification
+            notificationTitle: 'Background tracking',   // <-- android only, customize the title of the notification
+            notificationText: 'ENABLED',                // <-- android only, customize the text of the notification
+            activityType: "AutomotiveNavigation",       // <-- iOS-only
+            debug: true     // <-- enable this hear sounds for background-geolocation life-cycle.
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

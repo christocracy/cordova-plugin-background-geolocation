@@ -68,7 +68,9 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = true;
             try {
-                // [params, headers url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug]);
+                // Params.
+                //    0       1       2           3               4                5               6            7           8                8               9
+                //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
                 this.params = data.getString(0);
                 this.headers = data.getString(1);
                 this.url = data.getString(2);
