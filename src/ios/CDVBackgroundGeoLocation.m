@@ -83,14 +83,15 @@
     // Params.
     //    0       1       2           3               4                5               6            7           8                8               9
     //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
-    params = [command.arguments objectAtIndex: 0];
-    headers = [command.arguments objectAtIndex: 1];
-    url = [command.arguments objectAtIndex: 2];
 
+    // UNUSED ANDROID VARS
+    //params = [command.arguments objectAtIndex: 0];
+    //headers = [command.arguments objectAtIndex: 1];
+    //url = [command.arguments object
     stationaryRadius    = [[command.arguments objectAtIndex: 3] intValue];
     distanceFilter      = [[command.arguments objectAtIndex: 4] intValue];
     locationTimeout     = [[command.arguments objectAtIndex: 5] intValue];
-    desiredAccuracy     = [self translateDesiredAccuracy:[[command.arguments objectAtIndex: 6] intValue]];
+    desiredAccuracy     = [self decodeDesiredAccuracy:[[command.arguments objectAtIndex: 6] intValue]];
     isDebugging         = [[command.arguments objectAtIndex: 7] boolValue];
     activityType        = [self decodeActivityType:[command.arguments objectAtIndex:9]];
 
