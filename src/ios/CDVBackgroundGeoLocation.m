@@ -87,7 +87,7 @@
     // UNUSED ANDROID VARS
     //params = [command.arguments objectAtIndex: 0];
     //headers = [command.arguments objectAtIndex: 1];
-    //url = [command.arguments object
+    //url = [command.arguments objectAtIndex: 2];
     stationaryRadius    = [[command.arguments objectAtIndex: 3] intValue];
     distanceFilter      = [[command.arguments objectAtIndex: 4] intValue];
     locationTimeout     = [[command.arguments objectAtIndex: 5] intValue];
@@ -183,6 +183,7 @@
     
     NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
     
+    [locationManager startMonitoringSignificantLocationChanges];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
     }
@@ -282,7 +283,6 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation resume");
     if (enabled) {
-        [locationManager stopMonitoringSignificantLocationChanges];
         [locationManager stopUpdatingLocation];
     }
 }
@@ -496,6 +496,12 @@
     }
     if (isMoving) {
         isAcquiringSpeed = YES;
+        speedAcquisitionAttempts = 0;
+        
+        locationManager.distanceFilter = distanceFilter;
+        // Power-up the GPS temporarily until we get a good speed sample.
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+        [locationManager startUpdatingLocation];
     } else {
         isAcquiringStationaryLocation   = YES;
     }
@@ -517,15 +523,14 @@
     if (stationaryRegion != nil) {
         [locationManager stopMonitoringForRegion:stationaryRegion];
     }
-    [locationManager startMonitoringSignificantLocationChanges];
+    isAcquiringStationaryLocation = NO;
+    [locationManager stopUpdatingLocation];
+    locationManager.distanceFilter = distanceFilter;
+    locationManager.desiredAccuracy = desiredAccuracy;
     
     stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
     stationaryRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:stationaryRegion];
-    
-    locationManager.distanceFilter = distanceFilter;
-    locationManager.desiredAccuracy = desiredAccuracy;
-    [locationManager stopUpdatingLocation];
 }
 
 // If you don't stopMonitorying when application terminates, the app will be awoken still when a
