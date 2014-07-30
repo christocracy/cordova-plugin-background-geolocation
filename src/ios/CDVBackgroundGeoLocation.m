@@ -496,7 +496,7 @@
     }
     if (isMoving) {
         isAcquiringSpeed = YES;
-        speedAcquisitionAttempts = 0;
+        locationAcquisitionAttempts = 0;
         
         locationManager.distanceFilter = distanceFilter;
         // Power-up the GPS temporarily until we get a good speed sample.
