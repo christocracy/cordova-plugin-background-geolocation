@@ -48,8 +48,7 @@ namespace Cordova.Extension.Commands
         {
             var parsingSucceeded = true;
 
-            var options = JsonHelper.Deserialize<string[]>(configureArgs);
-            var customParameters = JsonHelper.Deserialize<BackgroundGeoLocationOptionsParameters>(options[0]);
+            var options = JsonHelper.Deserialize<string[]>(configureArgs); 
 
             double stationaryRadius;
             double distanceFilter;
@@ -84,8 +83,7 @@ namespace Cordova.Extension.Commands
             }
 
             return new BackgroundGeoLocationOptions
-            {
-                Parameters = customParameters,
+            { 
                 Url = options[1],
                 StationaryRadius = stationaryRadius,
                 DistanceFilterInMeters = distanceFilter,
@@ -121,19 +119,7 @@ namespace Cordova.Extension.Commands
 
                 // In our case this property has always a value, if left empty or below zero the default will be 100 meter but can be overridden via parameter DesiredAccuracy
                 DesiredAccuracyInMeters = BackgroundGeoLocationOptions.DesiredAccuracyInMeters
-            };
-
-            if (!string.IsNullOrWhiteSpace(BackgroundGeoLocationOptions.Parameters.DesiredAccuracy))
-            {
-                // http://blogs.windows.com/windows_phone/b/wpdev/archive/2012/11/30/acquiring-a-single-geoposition-in-windows-phone-8.aspx
-                //  ' Note that the DesiredAccuracyInMeters property is a nullable unsigned integer. 
-                //    This way you can switch from one representation of accuracy to another. 
-                //     When DesiredAccuracyInMeters is set (not null), it takes precedence over DesiredAccuracy. 
-                //     When DesiredAccuracyInMeters is not set (is null), DesiredAccuracy takes precedence. 
-                //     In addition, explicitly setting the DesiredAccuracy property has the side effect of setting DesiredAccuracyInMeters to null. '
-                Geolocator.DesiredAccuracyInMeters = null;
-                Geolocator.DesiredAccuracy = (PositionAccuracy)Enum.Parse(typeof(PositionAccuracy), BackgroundGeoLocationOptions.Parameters.DesiredAccuracy);
-            }
+            }; 
 
             Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
 

@@ -120,9 +120,8 @@ Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manag
 
 ### WP8
 
-On WP8 the plugin does not support the Stationairy location and does not implement ```getStationaryLocation()```, ```onPaceChange()```, and ```finish()```
-Keep in mind that it is **not** possible to start the plugin on WP8 at the pause event of Cordova/PhoneGap because the app is suspended immediately. So make sure you fire start() before the app is closed. 
-At this moment there is no debug mode in WP8 with background audio signals.
+On WP8 the plugin does not support the Stationairy location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
+Keep in mind that it is **not** possible to use ```start()``` at the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.  
 
 ### Config
 
@@ -141,7 +140,7 @@ When stopped, the minimum distance the device must move beyond the stationary lo
 When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
 
 - Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
-- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep
+- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep, *[WP8]* High beep, 1 sec.
 - Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
 - Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
 - Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
@@ -215,8 +214,7 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 
 #####`{String} desiredAccuracy`
 
-Takes 'default' or 'high' as an optional override of the 'desiredAccuracy' config which only accepts meters. Leave empty when using the default desiredAccuracy config property.
->>>>>>> Minor WP8 readme adjustments
+In Windows Phone, the underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
 ## Licence ##
 

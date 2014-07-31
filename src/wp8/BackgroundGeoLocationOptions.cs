@@ -4,8 +4,7 @@ namespace Cordova.Extension.Commands
 {
     public class BackgroundGeoLocationOptions
     {
-        public string Url;
-        public BackgroundGeoLocationOptionsParameters Parameters;
+        public string Url; 
         public double StationaryRadius;
         public double DistanceFilterInMeters;
         public UInt32 LocationTimeoutInMilliseconds;
