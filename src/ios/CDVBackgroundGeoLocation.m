@@ -21,7 +21,6 @@
     BOOL enabled;
     NSString *token;
     NSString *url;
-    NSString *syncCallbackId;
     UIBackgroundTaskIdentifier bgTask;
     NSTimer *backgroundTimer;
     
@@ -39,10 +38,10 @@
     
     BOOL isAcquiringStationaryLocation;
     NSInteger maxStationaryLocationAttempts;
-
+    
     BOOL isAcquiringSpeed;
     NSInteger maxSpeedAcquistionAttempts;
-
+    
     NSInteger stationaryRadius;
     NSInteger distanceFilter;
     NSInteger locationTimeout;
@@ -83,7 +82,7 @@
     // Params.
     //    0       1       2           3               4                5               6            7           8                8               9
     //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
-
+    
     // UNUSED ANDROID VARS
     //params = [command.arguments objectAtIndex: 0];
     //headers = [command.arguments objectAtIndex: 1];
@@ -94,9 +93,9 @@
     desiredAccuracy     = [self decodeDesiredAccuracy:[[command.arguments objectAtIndex: 6] intValue]];
     isDebugging         = [[command.arguments objectAtIndex: 7] boolValue];
     activityType        = [self decodeActivityType:[command.arguments objectAtIndex:9]];
-
-    syncCallbackId = command.callbackId;
-
+    
+    self.syncCallbackId = command.callbackId;
+    
     locationManager.activityType = activityType;
     locationManager.pausesLocationUpdatesAutomatically = YES;
     locationManager.distanceFilter = distanceFilter; // meters
@@ -356,7 +355,7 @@
             [locationManager startUpdatingLocation];
         }
     }
-
+    
     // Bail out if there's already a background-task in-effect.
     if (bgTask != UIBackgroundTaskInvalid) {
         NSLog(@" Abort:  found existing background-task");
@@ -379,7 +378,7 @@
     isMoving = NO;
     isAcquiringStationaryLocation = NO;
     stationaryLocation = nil;
-
+    
     [locationManager startMonitoringSignificantLocationChanges];
     [locationManager stopUpdatingLocation];
 }
@@ -427,7 +426,7 @@
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
     [result setKeepCallbackAsBool:YES];
     
-    [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
+    [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
 }
 
 - (void) stopBackgroundTask
@@ -479,7 +478,7 @@
 - (void)setPace:(BOOL)value
 {
     NSLog(@"- CDVBackgroundGeoLocation setPace %d, stationaryRegion? %d", value, stationaryRegion!=nil);
-
+    
     isMoving                        = value;
     isAcquiringStationaryLocation   = NO;
     isAcquiringSpeed                = NO;
@@ -496,12 +495,6 @@
     }
     if (isMoving) {
         isAcquiringSpeed = YES;
-        locationAcquisitionAttempts = 0;
-        
-        locationManager.distanceFilter = distanceFilter;
-        // Power-up the GPS temporarily until we get a good speed sample.
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-        [locationManager startUpdatingLocation];
     } else {
         isAcquiringStationaryLocation   = YES;
     }

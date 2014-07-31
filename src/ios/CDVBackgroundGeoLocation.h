@@ -9,6 +9,9 @@
 #import <AudioToolbox/AudioToolbox.h>
 
 @interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
+
+@property (nonatomic, strong) NSString* syncCallbackId;
+
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
