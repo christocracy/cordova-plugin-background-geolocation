@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Windows;
-using Windows.Devices.Geolocation;
+using Windows.Devices.Geolocation; 
 using WPCordovaClassLib.Cordova;
 using WPCordovaClassLib.Cordova.Commands;
 using WPCordovaClassLib.Cordova.JSON;
@@ -28,20 +27,21 @@ namespace Cordova.Extension.Commands
 
         public BackgroundGeoLocation()
         {
-            this.IsConfiguring = false;
-            this.IsConfigured = false;
+            IsConfiguring = false;
+            IsConfigured = false;
+
         }
 
         public void configure(string args)
         {
-            this.IsConfiguring = true;
-            this.ConfigureCallbackToken = CurrentCommandCallbackId;
+            IsConfiguring = true;
+            ConfigureCallbackToken = CurrentCommandCallbackId;
             RunningInBackground = false;
 
             BackgroundGeoLocationOptions = this.ParseBackgroundGeoLocationOptions(args);
 
-            this.IsConfigured = BackgroundGeoLocationOptions.ParsingSucceeded;
-            this.IsConfiguring = false;
+            IsConfigured = BackgroundGeoLocationOptions.ParsingSucceeded;
+            IsConfiguring = false;
         }
 
         private BackgroundGeoLocationOptions ParseBackgroundGeoLocationOptions(string configureArgs)
@@ -51,11 +51,11 @@ namespace Cordova.Extension.Commands
             var options = JsonHelper.Deserialize<string[]>(configureArgs);
             var customParameters = JsonHelper.Deserialize<BackgroundGeoLocationOptionsParameters>(options[0]);
 
-            var stationaryRadius = 0.0;
-            var distanceFilter = 0.0;
-            UInt32 locationTimeout = 0;
-            UInt32 desiredAccuracy = 0;
-            var debug = false;
+            double stationaryRadius;
+            double distanceFilter;
+            UInt32 locationTimeout;
+            UInt32 desiredAccuracy;
+            bool debug;
 
             if (!double.TryParse(options[3], out stationaryRadius))
             {
@@ -140,22 +140,25 @@ namespace Cordova.Extension.Commands
             RunningInBackground = true;
 
             DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
-
         }
 
-        private void OnGeolocatorOnPositionChanged(Geolocator sender, PositionChangedEventArgs ConfigureCallbackTokenargs)
+        private void OnGeolocatorOnPositionChanged(Geolocator sender, PositionChangedEventArgs configureCallbackTokenargs)
         {
-            if (Geolocator.LocationStatus == PositionStatus.Disabled ||
-              Geolocator.LocationStatus == PositionStatus.NotAvailable)
+            if (Geolocator.LocationStatus == PositionStatus.Disabled || Geolocator.LocationStatus == PositionStatus.NotAvailable)
             {
-                DispatchMessage(PluginResult.Status.ERROR, string.Format("Cannot start: LocationStatus/PositionStatus: {0}! {1}", Geolocator.LocationStatus, IsConfigured), true, this.ConfigureCallbackToken);
+                DispatchMessage(PluginResult.Status.ERROR, string.Format("Cannot start: LocationStatus/PositionStatus: {0}! {1}", Geolocator.LocationStatus, IsConfigured), true, ConfigureCallbackToken);
                 return;
             }
 
-            var callbackJsonResult = ConfigureCallbackTokenargs.Position.Coordinate.ToJson();
-            Debug.WriteLine("PositionChanged token{0}, Coordinates: {1}", ConfigureCallbackToken, callbackJsonResult);
-            DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, this.ConfigureCallbackToken);
-        }
+            var callbackJsonResult = configureCallbackTokenargs.Position.Coordinate.ToJson();
+            if (BackgroundGeoLocationOptions.Debug)
+            {
+                DebugAudioNotifier.GetDebugAudioNotifier().PlaySound(DebugAudioNotifier.Tone.High, TimeSpan.FromSeconds(3));
+                Debug.WriteLine("PositionChanged token{0}, Coordinates: {1}", ConfigureCallbackToken, callbackJsonResult);
+            }
+
+            DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, ConfigureCallbackToken);
+        } 
 
         public void stop()
         {
@@ -173,7 +176,7 @@ namespace Cordova.Extension.Commands
 
         public void finish()
         {
-            throw new NotImplementedException();
+            DispatchCommandResult(new PluginResult(PluginResult.Status.NO_RESULT));
         }
 
         public void onPaceChange(bool isMoving)
@@ -192,10 +195,10 @@ namespace Cordova.Extension.Commands
 
             var options = JsonHelper.Deserialize<string[]>(setConfigArgs);
 
-            var stationaryRadius = 0.0;
-            var distanceFilter = 0.0;
-            UInt32 locationTimeout = 0;
-            UInt32 desiredAccuracy = 0;
+            double stationaryRadius;
+            double distanceFilter;
+            UInt32 locationTimeout;
+            UInt32 desiredAccuracy;
 
             if (!double.TryParse(options[0], out stationaryRadius))
             {
@@ -238,5 +241,4 @@ namespace Cordova.Extension.Commands
             DispatchCommandResult(pluginResult, callBackId);
         }
     }
-
 }
