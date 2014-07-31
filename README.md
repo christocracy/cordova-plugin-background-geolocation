@@ -72,8 +72,7 @@ A full example could be:
         url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to 
         params: {
             auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-            foo: 'bar',                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-			desiredAccuracy: 'default'               //  <-- WP8 ONLY:  Takes 'default' or 'high'
+            foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
         },
         headers: {                                   // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
             "X-Foo": "BAR"
