@@ -48,6 +48,7 @@
     NSInteger desiredAccuracy;
     CLActivityType activityType;
 }
+@synthesize syncCallbackId;
 
 - (void)pluginInitialize
 {
