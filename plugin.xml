@@ -70,7 +70,7 @@
      </platform>          
 
 	<!-- wp8 -->
-	<platform name="wp">
+	<platform name="wp8">
 		<config-file target="config.xml" parent="/*">
 			<feature name="BackgroundGeoLocation">
 				<param name="wp-package" value="BackgroundGeoLocation" onload="true" />
