@@ -123,9 +123,7 @@ namespace Cordova.Extension.Commands
 
             Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
 
-            RunningInBackground = true;
-
-            DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+            RunningInBackground = true; 
         }
 
         private void OnGeolocatorOnPositionChanged(Geolocator sender, PositionChangedEventArgs configureCallbackTokenargs)
