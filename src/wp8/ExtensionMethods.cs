@@ -19,7 +19,7 @@ namespace Cordova.Extension.Commands
                                  "\"altitude\": {3}," +
                                  "\"altitudeAccuracy\": {4}," +
                                  "\"heading\": {5}," +
-                                 "\"speed\": {6}," +
+                                 "\"velocity\": {6}," +
                                  "\"timestamp\": {7}" +
                                  "}}"
                 , geocoordinate.Accuracy.ToString(numberFormatInfo)

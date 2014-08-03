@@ -148,6 +148,7 @@ namespace Cordova.Extension.Commands
         {
             RunningInBackground = false;
             StopGeolocatorIfActive();
+            DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
         }
 
         private void StopGeolocatorIfActive()
