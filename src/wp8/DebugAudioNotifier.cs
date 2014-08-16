@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Cordova.Extension.Commands
 {
-    public class DebugAudioNotifier : IDisposable
+    public class DebugAudioNotifier 
     {
         private static DebugAudioNotifier _audioNotifier;
 
@@ -19,8 +19,7 @@ namespace Cordova.Extension.Commands
 
         private int _bufferSize;
         private byte[] _soundBuffer;
-        private int _totalTime;
-
+        private int _totalTime; 
 
         public enum Tone
         {
@@ -85,11 +84,6 @@ namespace Cordova.Extension.Commands
             }
 
             _dynamicSound.SubmitBuffer(_soundBuffer);
-        }
-
-        public void Dispose()
-        {
-            _dynamicSound.Dispose();
-        }
+        } 
     }
 }
