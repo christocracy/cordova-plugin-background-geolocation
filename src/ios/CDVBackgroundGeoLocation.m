@@ -256,7 +256,6 @@
     
     if (isDebugging) {
         AudioServicesPlaySystemSound (isMoving ? paceChangeYesSound : paceChangeNoSound);
-        [self notify:[NSString stringWithFormat:@"Pace change: %hhd", isMoving]];
     }
     if (isMoving) {
         isAcquiringSpeed = YES;
@@ -347,7 +346,7 @@
         // Perhaps our GPS signal was interupted, re-acquire a stationaryLocation now.
         [self setPace: NO];
     }
-
+    
     // test the age of the location measurement to determine if the measurement is cached
     // in most cases you will not want to rely on cached measurements
     NSTimeInterval locationAge = -[location.timestamp timeIntervalSinceNow];
@@ -463,7 +462,7 @@
                       (int) locationManager.distanceFilter]];
         AudioServicesPlaySystemSound (locationSyncSound);
     }
-
+    
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
     [returnInfo setObject:timestamp forKey:@"timestamp"];
@@ -564,7 +563,22 @@
         AudioServicesPlaySystemSound (locationError);
         [self notify:[NSString stringWithFormat:@"Location error: %@", error.localizedDescription]];
     }
-    [self stopUpdatingLocation];
+    switch(error.code) {
+        case kCLErrorLocationUnknown:
+        case kCLErrorNetwork:
+        case kCLErrorRegionMonitoringDenied:
+        case kCLErrorRegionMonitoringSetupDelayed:
+        case kCLErrorRegionMonitoringResponseDelayed:
+        case kCLErrorGeocodeFoundNoResult:
+        case kCLErrorGeocodeFoundPartialResult:
+        case kCLErrorGeocodeCanceled:
+            break;
+        case kCLErrorDenied:
+            [self stopUpdatingLocation];
+            break;
+        default:
+            [self stopUpdatingLocation];
+    }
 }
 - (void) stopUpdatingLocation
 {
@@ -573,6 +587,7 @@
 }
 - (void) startUpdatingLocation
 {
+    locationManager.pausesLocationUpdatesAutomatically = YES;
     [locationManager startUpdatingLocation];
     isUpdatingLocation = YES;
 }
@@ -591,10 +606,10 @@
     [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
 }
 /**
-* If you don't stopMonitoring when application terminates, the app will be awoken still when a
-* new location arrives, essentially monitoring the user's location even when they've killed the app.
-* Might be desirable in certain apps.
-*/
+ * If you don't stopMonitoring when application terminates, the app will be awoken still when a
+ * new location arrives, essentially monitoring the user's location even when they've killed the app.
+ * Might be desirable in certain apps.
+ */
 - (void)applicationWillTerminate:(UIApplication *)application {
     [locationManager stopMonitoringSignificantLocationChanges];
     [locationManager stopUpdatingLocation];
