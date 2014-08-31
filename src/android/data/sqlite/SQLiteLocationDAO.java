@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -16,7 +17,7 @@ import com.tenforwardconsulting.cordova.bgloc.data.Location;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
 public class SQLiteLocationDAO implements LocationDAO {
-	public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";
 	private static final String TAG = "SQLiteLocationDAO";
 	private Context context;
 	
@@ -80,6 +81,8 @@ public class SQLiteLocationDAO implements LocationDAO {
 		l.setLongitude(c.getString(c.getColumnIndex("longitude")));
 		l.setAccuracy(c.getString(c.getColumnIndex("accuracy")));
 		l.setSpeed(c.getString(c.getColumnIndex("speed")));
+		l.setAltitude(c.getString(c.getColumnIndex("altitude")));
+		l.setBearing(c.getString(c.getColumnIndex("bearing")));
 		
 		return l;
 	}
@@ -90,26 +93,31 @@ public class SQLiteLocationDAO implements LocationDAO {
 		values.put("longitude", location.getLongitude());
 		values.put("recordedAt", dateToString(location.getRecordedAt()));	
 		values.put("accuracy",  location.getAccuracy());
+		values.put("altitude", location.getAltitude());
+		values.put("bearing", location.getBearing());
 		values.put("speed", location.getSpeed());
 		return values;
 	}
 	
 	
 	public Date stringToDate(String dateTime) {
+		TimeZone tz = TimeZone.getTimeZone("UTC");
 		SimpleDateFormat iso8601Format = new SimpleDateFormat(DATE_FORMAT);
+		iso8601Format.setTimeZone(tz);
+		
 		Date date = null;
 		try {
-			date = iso8601Format.parse(dateTime);
-			
+			date = iso8601Format.parse(dateTime);			
 		} catch (ParseException e) {
 			Log.e("DBUtil", "Parsing ISO8601 datetime ("+ dateTime +") failed", e);
 		}
-		
 		return date;
 	}
 	
 	public String dateToString(Date date) {
+		TimeZone tz = TimeZone.getTimeZone("UTC");
 		SimpleDateFormat iso8601Format = new SimpleDateFormat(DATE_FORMAT);
+		iso8601Format.setTimeZone(tz);
 		return iso8601Format.format(date);
 	}
 

@@ -493,7 +493,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         if (isDebugging) {
             startTone("beep");
         }
-	float distance = abs(location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy());
+    float distance = abs(location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy());
         
         if (isDebugging) {
             Toast.makeText(this, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
@@ -650,7 +650,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.d(TAG, "afterexecute " +  task.getStatus());
     }
 
-    private boolean postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location l) {
+    private boolean postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location l, LocationDAO dao) {
         if (l == null) {
             Log.w(TAG, "postLocation: null location");
             return false;
@@ -666,9 +666,13 @@ public class LocationUpdateService extends Service implements LocationListener {
             location.put("longitude", l.getLongitude());
             location.put("accuracy", l.getAccuracy());
             location.put("speed", l.getSpeed());
-            location.put("recorded_at", l.getRecordedAt());
+            location.put("bearing", l.getBearing());
+            location.put("altitude", l.getAltitude());
+            location.put("recorded_at", dao.dateToString(l.getRecordedAt()));
             params.put("location", location);
-
+            
+            Log.i(TAG, "location: " + location.toString());
+            
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
             request.setHeader("Accept", "application/json");
@@ -676,11 +680,11 @@ public class LocationUpdateService extends Service implements LocationListener {
 
             Iterator<String> headkeys = headers.keys();
             while( headkeys.hasNext() ){
-		String headkey = headkeys.next();
-		if(headkey != null) {
-            		Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
-            		request.setHeader(headkey, (String)headers.getString(headkey));
-		}
+        String headkey = headkeys.next();
+        if(headkey != null) {
+                    Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
+                    request.setHeader(headkey, (String)headers.getString(headkey));
+        }
             }
             Log.d(TAG, "Posting to " + request.getURI().toString());
             HttpResponse response = httpClient.execute(request);
@@ -761,7 +765,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
             for (com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
                 Log.d(TAG, "Posting saved location");
-                if (postLocation(savedLocation)) {
+                if (postLocation(savedLocation, locationDAO)) {
                     locationDAO.deleteLocation(savedLocation);
                 }
             }

@@ -11,7 +11,9 @@ public class Location {
 	private Date recordedAt;
 	private String accuracy;
 	private String speed;
-	
+	private String altitude;
+	private String bearing;
+
 	private Long id;
 	
 	public Long getId() {
@@ -50,6 +52,18 @@ public class Location {
 	public void setSpeed(String speed) {
 		this.speed = speed;
 	}
+	public String getBearing() {
+		return bearing;
+	}
+	public void setBearing(String bearing) {
+		this.bearing = bearing;
+	}
+	public String getAltitude() {
+		return altitude;
+	}
+	public void setAltitude(String altitude) {
+		this.altitude = altitude;
+	}
 	
 	public static Location fromAndroidLocation(android.location.Location originalLocation) {
 		Location location = new Location();
@@ -58,6 +72,8 @@ public class Location {
 		location.setLatitude(String.valueOf(originalLocation.getLatitude()));
 		location.setAccuracy(String.valueOf(originalLocation.getAccuracy()));
 		location.setSpeed(String.valueOf(originalLocation.getSpeed()));
+		location.setBearing(String.valueOf(originalLocation.getBearing()));
+		location.setAltitude(String.valueOf(originalLocation.getAltitude()));
 		
 		return location;
 	}

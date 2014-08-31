@@ -15,6 +15,8 @@ public class LocationOpenHelper extends SQLiteOpenHelper {
         " recordedAt TEXT," +
         " accuracy TEXT," +
         " speed TEXT," +
+        " bearing TEXT," +
+        " altitude TEXT," +
         " latitude TEXT," +
         " longitude TEXT";
     private static final String LOCATION_TABLE_CREATE =
