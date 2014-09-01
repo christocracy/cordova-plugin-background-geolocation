@@ -15,7 +15,7 @@
 #define paceChangeNoSound       1112
 #define acquiringLocationSound  1103
 #define acquiredLocationSound   1052
-#define locationError           1073
+#define locationErrorSound      1073
 
 @implementation CDVBackgroundGeoLocation {
     BOOL isDebugging;
@@ -26,6 +26,8 @@
     NSString *url;
     UIBackgroundTaskIdentifier bgTask;
     NSDate *lastBgTaskAt;
+    
+    NSError *locationError;
     
     BOOL isMoving;
     
@@ -336,9 +338,12 @@
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
     NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations (isMoving: %d)", isMoving);
+    
+    locationError = nil;
     if (isMoving && !isUpdatingLocation) {
         [self startUpdatingLocation];
     }
+
     CLLocation *location = [locations lastObject];
     lastLocation = location;
     
@@ -368,10 +373,6 @@
         if (++locationAcquisitionAttempts == maxStationaryLocationAttempts) {
             isAcquiringStationaryLocation = NO;
             [self startMonitoringStationaryRegion:stationaryLocation];
-            if (isDebugging) {
-                AudioServicesPlaySystemSound (acquiredLocationSound);
-                [self notify:@"Acquired stationary location"];
-            }
         } else {
             // Unacceptable stationary-location: bail-out and wait for another.
             return;
@@ -405,25 +406,38 @@
     // Uh-oh:  already a background-task in-effect.
     // If we have a bgTask hanging around for 60 seconds, kill it and move on; otherwise, wait a bit longer for the existing bgTask to finish.
     if (bgTask != UIBackgroundTaskInvalid) {
+        // Fail-safe:  If Javascript doesn't explicitly execute our #finish method (perhaps it crashed or waiting for long HTTP timeout),
+        //  bgTask will never get cleared.  Enforces that bgTask can never last longer than 60s
         NSTimeInterval duration = -[lastBgTaskAt timeIntervalSinceNow];
         if (duration > 60.0) {
             [self stopBackgroundTask];
         } else {
             NSLog(@"Abort:  found existing background-task");
             if (isDebugging) {
-                [self notify:@"found existing background-task"];
+                [self notify:@"waiting for existing background-task"];
             }
             return;
         }
     }
-    
+
     // Create a background-task and delegate to Javascript for syncing location
     bgTask = [self createBackgroundTask];
     
     [self.commandDelegate runInBackground:^{
         [self sync:location];
     }];
+    
+    NSLog(@" position: %f,%f, speed: %f", location.coordinate.latitude, location.coordinate.longitude, location.speed);
+    if (isDebugging) {
+        [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %0.1f | DF: %0.1f | ACY: %d",
+                      ((isMoving) ? "MOVING" : "STATIONARY"),
+                      fabsf(location.speed),
+                      locationManager.distanceFilter,
+                      (int) location.horizontalAccuracy]];
+        AudioServicesPlaySystemSound (locationSyncSound);
+    }
 }
+
 -(UIBackgroundTaskIdentifier) createBackgroundTask
 {
     lastBgTaskAt = [NSDate date];
@@ -433,7 +447,7 @@
 }
 
 /**
- * Calculates distanceFilter by rounding speed to nearest 5 and multiplying by 10.
+ * Calculates distanceFilter by rounding speed to nearest 5 and multiplying by 10.  Clamped at 1km max.
  */
 -(float) calculateDistanceFilter:(float)speed
 {
@@ -441,7 +455,7 @@
     if (speed < 100) {
         // (rounded-speed-to-nearest-5) / 2)^2
         // eg 5.2 becomes (5/2)^2
-        newDistanceFilter = pow((5.0 * floorf(speed / 5.0 + 0.5f)), 2) + distanceFilter;
+        newDistanceFilter = pow((5.0 * floorf(fabsf(speed) / 5.0 + 0.5f)), 2) + distanceFilter;
     }
     return (newDistanceFilter < 1000) ? newDistanceFilter : 1000;
 }
@@ -453,16 +467,6 @@
  */
 -(void) sync:(CLLocation*)location
 {
-    NSLog(@" position: %f,%f, speed: %f", location.coordinate.latitude, location.coordinate.longitude, location.speed);
-    if (isDebugging) {
-        [self notify:[NSString stringWithFormat:@"Location update: moving? %d\nSPD: %d, ACY: %d, DF: %d",
-                      isMoving,
-                      (int) location.speed,
-                      (int) location.horizontalAccuracy,
-                      (int) locationManager.distanceFilter]];
-        AudioServicesPlaySystemSound (locationSyncSound);
-    }
-    
     NSMutableDictionary* returnInfo = [NSMutableDictionary dictionaryWithCapacity:8];
     NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
     [returnInfo setObject:timestamp forKey:@"timestamp"];
@@ -490,6 +494,10 @@
     CLLocationCoordinate2D coord = [location coordinate];
     NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion (%f,%f)", coord.latitude, coord.longitude);
     
+    if (isDebugging) {
+        AudioServicesPlaySystemSound (acquiredLocationSound);
+        [self notify:@"Acquired stationary location"];
+    }
     if (stationaryRegion != nil) {
         [locationManager stopMonitoringForRegion:stationaryRegion];
     }
@@ -539,7 +547,13 @@
     if (isDebugging) {
         [self notify:@"Stop detected"];
     }
-    [self setPace:NO];
+    if (locationError) {
+        isMoving = NO;
+        [self startMonitoringStationaryRegion:lastLocation];
+        [self stopUpdatingLocation];
+    } else {
+        [self setPace:NO];
+    }
 }
 
 /**
@@ -560,9 +574,12 @@
 {
     NSLog(@"- CDVBackgroundGeoLocation locationManager failed:  %@", error);
     if (isDebugging) {
-        AudioServicesPlaySystemSound (locationError);
+        AudioServicesPlaySystemSound (locationErrorSound);
         [self notify:[NSString stringWithFormat:@"Location error: %@", error.localizedDescription]];
     }
+    
+    locationError = error;
+
     switch(error.code) {
         case kCLErrorLocationUnknown:
         case kCLErrorNetwork:
@@ -580,14 +597,15 @@
             [self stopUpdatingLocation];
     }
 }
+
 - (void) stopUpdatingLocation
 {
     [locationManager stopUpdatingLocation];
     isUpdatingLocation = NO;
 }
+
 - (void) startUpdatingLocation
 {
-    locationManager.pausesLocationUpdatesAutomatically = YES;
     [locationManager startUpdatingLocation];
     isUpdatingLocation = YES;
 }
