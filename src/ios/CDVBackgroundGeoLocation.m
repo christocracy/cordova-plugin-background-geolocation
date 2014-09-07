@@ -235,7 +235,7 @@
     enabled = YES;
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     
-    NSLog(@"- CDVBackgroundGeoLocation start (background? %ld)", state);
+    NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
     
     [locationManager startMonitoringSignificantLocationChanges];
     if (state == UIApplicationStateBackground) {

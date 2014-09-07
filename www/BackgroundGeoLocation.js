@@ -1,6 +1,16 @@
 var exec = require("cordova/exec");
 module.exports = {
+    /**
+    * @property {Object} stationaryRegion
+    */
+    stationaryRegion: null,
+    /**
+    * @property {Object} config
+    */
+    config: {},
+
     configure: function(success, failure, config) {
+        this.config = config || {};
         var params              = JSON.stringify(config.params || {}),
             headers		        = JSON.stringify(config.headers || {}),
             url                 = config.url        || 'BackgroundGeoLocation_url',
@@ -55,20 +65,34 @@ module.exports = {
     * @param {Integer} timeout
     */
     setConfig: function(success, failure, config) {
+        this.config = config || {};
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'setConfig',
             [config]);
     },
-   /**
+    /**
     * Returns current stationaryLocation if available.  null if not
     */
-   getStationaryLocation: function(success, failure) {
-       exec(success || function() {},
+    getStationaryLocation: function(success, failure) {  
+        exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'getStationaryLocation',
             []);
-       }
+    },
+    onStationary: function(success, failure) {
+        var me = this;
+        success = success || function() {};
+        var callback = function(region) {
+            me.stationaryRegion = region;
+            success.apply(me, arguments);
+        };
+        exec(callback,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'addStationaryRegionListener',
+            []);    
+    }
 };
