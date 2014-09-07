@@ -11,6 +11,7 @@
 @interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
 
 @property (nonatomic, strong) NSString* syncCallbackId;
+@property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
