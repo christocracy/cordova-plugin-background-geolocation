@@ -19,7 +19,8 @@
 - (void) finish:(CDVInvokedUrlCommand*)command;
 - (void) onPaceChange:(CDVInvokedUrlCommand*)command;
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
-
+- (void) onStationary:(CDVInvokedUrlCommand*)command;
+- (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
 
