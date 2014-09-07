@@ -144,10 +144,13 @@
 
 - (void) flushQueue
 {
-    NSLog(@"- CDVBackgroundGeoLocation#flushQueue, %lu, %d", (unsigned long)[locationQueue count], bgTask == UIBackgroundTaskInvalid);
     // Sanity-check the duration of last bgTask:  If greater than 30s, kill it.
     if (bgTask != UIBackgroundTaskInvalid) {
         if (-[lastBgTaskAt timeIntervalSinceNow] > 30.0) {
+            NSLog(@"- CDVBackgroundGeoLocation#flushQueue has to kill an out-standing background-task!");
+            if (isDebugging) {
+                [self notify:@"Outstanding bg-task was force-killed"];
+            }
             [self stopBackgroundTask];
         }
         return;
@@ -457,33 +460,6 @@
         }
     }
     [self queue:location type:@"current"];
-    
-    // Uh-oh:  already a background-task in-effect.
-    // If we have a bgTask hanging around for 60 seconds, kill it and move on; otherwise, wait a bit longer for the existing bgTask to finish.
-    /*
-    if (bgTask != UIBackgroundTaskInvalid) {
-        NSLog(@"Found existing background-task.  Added to Queue");
-        
-        return;
-    }
-     */
-
-    
-}
--(void) queue:(CLLocation*)location type:(id)type
-{
-    NSLog(@"- CDVBackgroundGeoLocation queue %@", type);
-    NSMutableDictionary *data = [self locationToHash:location];
-    [data setObject:type forKey:@"location_type"];
-    [locationQueue addObject:data];
-    [self flushQueue];
-}
--(UIBackgroundTaskIdentifier) createBackgroundTask
-{
-    lastBgTaskAt = [NSDate date];
-    return [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-        [self stopBackgroundTask];
-    }];
 }
 
 /**
@@ -498,6 +474,23 @@
         newDistanceFilter = pow((5.0 * floorf(fabsf(speed) / 5.0 + 0.5f)), 2) + distanceFilter;
     }
     return (newDistanceFilter < 1000) ? newDistanceFilter : 1000;
+}
+
+-(void) queue:(CLLocation*)location type:(id)type
+{
+    NSLog(@"- CDVBackgroundGeoLocation queue %@", type);
+    NSMutableDictionary *data = [self locationToHash:location];
+    [data setObject:type forKey:@"location_type"];
+    [locationQueue addObject:data];
+    [self flushQueue];
+}
+
+-(UIBackgroundTaskIdentifier) createBackgroundTask
+{
+    lastBgTaskAt = [NSDate date];
+    return [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self stopBackgroundTask];
+    }];
 }
 
 /**
@@ -534,6 +527,24 @@
     }
 }
 
+- (void) fireStationaryRegionListeners:(NSMutableDictionary*)data
+{
+    NSLog(@"- CDVBackgroundGeoLocation#fireStationaryRegionListeners: %d", [locationQueue count]);
+    if (![self.stationaryRegionListeners count]) {
+        [self stopBackgroundTask];
+        return;
+    }
+    // Any javascript stationaryRegion event-listeners?
+    [data setObject:[NSNumber numberWithDouble:stationaryRadius] forKey:@"radius"];
+    
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+    [result setKeepCallbackAsBool:YES];
+    for (NSString *callbackId in self.stationaryRegionListeners)
+    {
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    }
+}
+
 /**
  * Creates a new circle around user and region-monitors it for exit
  */
@@ -563,23 +574,6 @@
     locationManager.desiredAccuracy = desiredAccuracy;
 }
 
-- (void) fireStationaryRegionListeners:(NSMutableDictionary*)data
-{
-    NSLog(@"- CDVBackgroundGeoLocation#fireStationaryRegionListeners: %d", [locationQueue count]);
-    if (![self.stationaryRegionListeners count]) {
-        [self stopBackgroundTask];
-        return;
-    }
-    // Any javascript stationaryRegion event-listeners?
-    [data setObject:[NSNumber numberWithDouble:stationaryRadius] forKey:@"radius"];
-    
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-    [result setKeepCallbackAsBool:YES];
-    for (NSString *callbackId in self.stationaryRegionListeners)
-    {
-        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-    }
-}
 - (bool) stationaryRegionContainsLocation:(CLLocation*)location {
     CLCircularRegion *region = [locationManager.monitoredRegions member:stationaryRegion];
     return ([region containsCoordinate:location.coordinate]) ? YES : NO;
