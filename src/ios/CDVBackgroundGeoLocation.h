@@ -20,7 +20,6 @@
 - (void) onPaceChange:(CDVInvokedUrlCommand*)command;
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
 
-- (void) sync:(CLLocation*)location;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
 
