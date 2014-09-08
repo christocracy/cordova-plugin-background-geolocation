@@ -503,11 +503,11 @@
     NSLog(@"- CDVBackgroundGeoLocation#sync");
     NSLog(@"  type: %@, position: %@,%@ speed: %@", [data objectForKey:@"location_type"], [data objectForKey:@"latitude"], [data objectForKey:@"longitude"], [data objectForKey:@"speed"]);
     if (isDebugging) {
-        [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %@ | DF: %0.1f | ACY: %@",
+        [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %0.0f | DF: %0.1f | ACY: %0.0f",
                       ((isMoving) ? "MOVING" : "STATIONARY"),
-                      [data objectForKey:@"speed"],
+                      [[data objectForKey:@"speed"] doubleValue],
                       locationManager.distanceFilter,
-                      [data objectForKey:@"accuracy"]]];
+                      [[data objectForKey:@"accuracy"] doubleValue]]];
          
         AudioServicesPlaySystemSound (locationSyncSound);
     }
