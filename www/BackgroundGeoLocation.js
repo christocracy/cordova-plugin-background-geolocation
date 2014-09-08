@@ -10,7 +10,7 @@ module.exports = {
     config: {},
 
     configure: function(success, failure, config) {
-        this.config = config || {};
+        this.config = config;
         var params              = JSON.stringify(config.params || {}),
             headers		        = JSON.stringify(config.headers || {}),
             url                 = config.url        || 'BackgroundGeoLocation_url',
@@ -65,7 +65,7 @@ module.exports = {
     * @param {Integer} timeout
     */
     setConfig: function(success, failure, config) {
-        this.config = config || {};
+        this.apply(this.config, config);
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
@@ -82,6 +82,11 @@ module.exports = {
             'getStationaryLocation',
             []);
     },
+    /**
+    * Add a stationary-region listener.  Whenever the devices enters "stationary-mode", your #success callback will be executed with #location param containing #radius of region
+    * @param {Function} success
+    * @param {Function} failure [optional] NOT IMPLEMENTED
+    */
     onStationary: function(success, failure) {
         var me = this;
         success = success || function() {};
@@ -94,5 +99,14 @@ module.exports = {
             'BackgroundGeoLocation',
             'addStationaryRegionListener',
             []);    
+    },
+    apply: function(destination, source) {
+        source = source || {};
+        for (var property in source) {
+            if (source.hasOwnProperty(property)) {
+                destination[property] = source[property];
+            }
+        }
+        return destination;
     }
 };
