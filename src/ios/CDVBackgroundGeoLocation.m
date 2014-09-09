@@ -338,15 +338,15 @@
     NSMutableDictionary *returnInfo;
     returnInfo = [NSMutableDictionary dictionaryWithCapacity:10];
     
-    NSNumber* timestamp = [NSNumber numberWithDouble:([stationaryLocation.timestamp timeIntervalSince1970] * 1000)];
+    NSNumber* timestamp = [NSNumber numberWithDouble:([location.timestamp timeIntervalSince1970] * 1000)];
     [returnInfo setObject:timestamp forKey:@"timestamp"];
-    [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.speed] forKey:@"speed"];
-    [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.verticalAccuracy] forKey:@"altitudeAccuracy"];
-    [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.horizontalAccuracy] forKey:@"accuracy"];
-    [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.course] forKey:@"heading"];
-    [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.altitude] forKey:@"altitude"];
-    [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.coordinate.latitude] forKey:@"latitude"];
-    [returnInfo setObject:[NSNumber numberWithDouble:stationaryLocation.coordinate.longitude] forKey:@"longitude"];
+    [returnInfo setObject:[NSNumber numberWithDouble:location.speed] forKey:@"speed"];
+    [returnInfo setObject:[NSNumber numberWithDouble:location.verticalAccuracy] forKey:@"altitudeAccuracy"];
+    [returnInfo setObject:[NSNumber numberWithDouble:location.horizontalAccuracy] forKey:@"accuracy"];
+    [returnInfo setObject:[NSNumber numberWithDouble:location.course] forKey:@"heading"];
+    [returnInfo setObject:[NSNumber numberWithDouble:location.altitude] forKey:@"altitude"];
+    [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.latitude] forKey:@"latitude"];
+    [returnInfo setObject:[NSNumber numberWithDouble:location.coordinate.longitude] forKey:@"longitude"];
     
     return returnInfo;
 }
@@ -503,10 +503,10 @@
     NSLog(@"- CDVBackgroundGeoLocation#sync");
     NSLog(@"  type: %@, position: %@,%@ speed: %@", [data objectForKey:@"location_type"], [data objectForKey:@"latitude"], [data objectForKey:@"longitude"], [data objectForKey:@"speed"]);
     if (isDebugging) {
-        [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %0.0f | DF: %0.1f | ACY: %0.0f",
+        [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %0.0f | DF: %ld | ACY: %0.0f",
                       ((isMoving) ? "MOVING" : "STATIONARY"),
                       [[data objectForKey:@"speed"] doubleValue],
-                      locationManager.distanceFilter,
+                      (long) locationManager.distanceFilter,
                       [[data objectForKey:@"accuracy"] doubleValue]]];
          
         AudioServicesPlaySystemSound (locationSyncSound);
