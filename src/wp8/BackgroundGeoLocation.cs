@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System; 
 using Windows.Devices.Geolocation; 
 using WPCordovaClassLib.Cordova;
 using WPCordovaClassLib.Cordova.Commands;
@@ -25,11 +25,13 @@ namespace Cordova.Extension.Commands
         private bool IsConfigured { get; set; }
         private bool IsConfiguring { get; set; }
 
+        private IDebugNotifier _debugNotifier;
+
         public BackgroundGeoLocation()
         {
             IsConfiguring = false;
             IsConfigured = false;
-
+            _debugNotifier = DebugNotifier.GetDebugNotifier();
         }
 
         public void configure(string args)
@@ -117,7 +119,7 @@ namespace Cordova.Extension.Commands
                 // JS Interface takes seconds, MS takes miliseconds, default 60 seconds
                 ReportInterval = BackgroundGeoLocationOptions.LocationTimeoutInMilliseconds * 1000,
 
-                // In our case this property has always a value, if left empty or below zero the default will be 100 meter but can be overridden via parameter DesiredAccuracy
+                // Default: 100 meters
                 DesiredAccuracyInMeters = BackgroundGeoLocationOptions.DesiredAccuracyInMeters
             }; 
 
@@ -137,7 +139,7 @@ namespace Cordova.Extension.Commands
             var callbackJsonResult = configureCallbackTokenargs.Position.Coordinate.ToJson();
             if (BackgroundGeoLocationOptions.Debug)
             {
-                DebugAudioNotifier.GetDebugAudioNotifier().PlaySound(DebugAudioNotifier.Tone.High, TimeSpan.FromSeconds(3));
+                _debugNotifier.Notify(string.Format("Ac: {0}, Sp: {1}", configureCallbackTokenargs.Position.Coordinate.Accuracy, configureCallbackTokenargs.Position.Coordinate.Speed), new Tone(750, Frequency.High));
                 Debug.WriteLine("PositionChanged token{0}, Coordinates: {1}", ConfigureCallbackToken, callbackJsonResult);
             }
 
@@ -148,7 +150,6 @@ namespace Cordova.Extension.Commands
         {
             RunningInBackground = false;
             StopGeolocatorIfActive();
-            DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
         }
 
         private void StopGeolocatorIfActive()
