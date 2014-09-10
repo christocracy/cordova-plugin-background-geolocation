@@ -34,9 +34,7 @@ namespace Cordova.Extension.Commands
 
         public static long ToJavaScriptMilliseconds(this DateTime dt)
         {
-            var ticksSinceEpoch = dt.ToUniversalTime().Ticks - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks;
-
-            return (ticksSinceEpoch / 10000); 
+            return ((dt.ToUniversalTime().Ticks - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks)/10000);
         }
     }
 }
