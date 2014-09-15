@@ -23,6 +23,7 @@
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
+- (void) onAppTerminiate:(NSNotification*)notification;
 
 @end
 

@@ -22,12 +22,13 @@ module.exports = {
             notificationTitle   = config.notificationTitle || "Background tracking",
             notificationText    = config.notificationText || "ENABLED";
             activityType        = config.activityType || "OTHER";
+            stopOnTerminate     = config.stopOnTerminate || false;
 
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
+             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate]
         );
     },
     start: function(success, failure, config) {
@@ -49,14 +50,14 @@ module.exports = {
             failure || function() {},
             'BackgroundGeoLocation',
             'finish',
-            []);  
+            []);
     },
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'onPaceChange',
-            [isMoving]);   
+            [isMoving]);
     },
     /**
     * @param {Integer} stationaryRadius
@@ -75,7 +76,7 @@ module.exports = {
     /**
     * Returns current stationaryLocation if available.  null if not
     */
-    getStationaryLocation: function(success, failure) {  
+    getStationaryLocation: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
@@ -98,7 +99,7 @@ module.exports = {
             failure || function() {},
             'BackgroundGeoLocation',
             'addStationaryRegionListener',
-            []);    
+            []);
     },
     apply: function(destination, source) {
         source = source || {};
