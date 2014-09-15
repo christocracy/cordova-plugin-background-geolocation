@@ -71,7 +71,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
             result = true;
             try {
                 // Params.
-                //    0       1       2           3               4                5               6            7           8                8               9              10
+                //    0       1       2           3               4                5               6            7           8                9               10              11
                 //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate]
                 this.params = data.getString(0);
                 this.headers = data.getString(1);
@@ -83,7 +83,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 this.isDebugging = data.getString(7);
                 this.notificationTitle = data.getString(8);
                 this.notificationText = data.getString(9);
-                this.stopOnTerminate = data.getString(10);
+                this.stopOnTerminate = data.getString(11);
             } catch (JSONException e) {
                 callbackContext.error("authToken/url required as parameters: " + e.getMessage());
             }
