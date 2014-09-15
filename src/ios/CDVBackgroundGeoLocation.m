@@ -402,11 +402,21 @@
 /**@
  * Termination. Checks to see if it should turn off
  */
--(void) onAppTerminiate:(NSNotification *) notification
+-(void) onAppTerminate
 {
-    NSLog(@"- CDVBackgroundGeoLocation terminate");
-    if (isUpdatingLocation && stopOnTerminate) {
+    NSLog(@"- CDVBackgroundGeoLocation appTerminate");
+    if (enabled && stopOnTerminate) {
+        NSLog(@"- CDVBackgroundGeoLocation stoping on terminate");
+
+        enabled = NO;
+        isMoving = NO;
+
         [self stopUpdatingLocation];
+        [locationManager stopMonitoringSignificantLocationChanges];
+        if (stationaryRegion != nil) {
+            [locationManager stopMonitoringForRegion:stationaryRegion];
+            stationaryRegion = nil;
+        }
     }
 }
 
