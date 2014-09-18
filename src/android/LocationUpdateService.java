@@ -94,6 +94,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Boolean isDebugging;
     private String notificationTitle = "Background checking";
     private String notificationText = "ENABLED";
+    private String jsonLocationObjName = "location";
 
     private ToneGenerator toneGenerator;
     
@@ -179,6 +180,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
             notificationTitle = intent.getStringExtra("notificationTitle");
             notificationText = intent.getStringExtra("notificationText");
+            jsonLocationObjName = intent.getStringExtra("jsonLocationObjName");
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
@@ -209,6 +211,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "- isDebugging: "        + isDebugging);
         Log.i(TAG, "- notificationTitle: "  + notificationTitle);
         Log.i(TAG, "- notificationText: "   + notificationText);
+        Log.i(TAG, "- jsonLocationObjName: "   + jsonLocationObjName);
 
         this.setPace(false);
         
@@ -661,17 +664,17 @@ public class LocationUpdateService extends Service implements LocationListener {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
 
-            JSONObject mobileLocation = new JSONObject();
-            mobileLocation.put("latitude", l.getLatitude());
-            mobileLocation.put("longitude", l.getLongitude());
-            mobileLocation.put("accuracy", l.getAccuracy());
-            mobileLocation.put("speed", l.getSpeed());
-            mobileLocation.put("bearing", l.getBearing());
-            mobileLocation.put("altitude", l.getAltitude());
-            mobileLocation.put("recorded_at", dao.dateToString(l.getRecordedAt()));
-            params.put("mobileLocation", mobileLocation);
+            JSONObject location = new JSONObject();
+            location.put("latitude", l.getLatitude());
+            location.put("longitude", l.getLongitude());
+            location.put("accuracy", l.getAccuracy());
+            location.put("speed", l.getSpeed());
+            location.put("bearing", l.getBearing());
+            location.put("altitude", l.getAltitude());
+            location.put("recorded_at", dao.dateToString(l.getRecordedAt()));
+            params.put(jsonLocationObjName, location);
             
-            Log.i(TAG, "mobileLocation: " + mobileLocation.toString());
+            Log.i(TAG, "location: " + location.toString());
             
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);

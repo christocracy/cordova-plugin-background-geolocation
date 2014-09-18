@@ -99,13 +99,14 @@
 {
     // in iOS, we call to javascript for HTTP now so token and url should be @deprecated until Android calls out to javascript.
     // Params.
-    //    0       1       2           3               4                5               6            7           8                8               9
-    //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
+    //    0       1       2           3               4                5               6            7           8                8               9                  10
+    //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName]
     
     // UNUSED ANDROID VARS
     //params = [command.arguments objectAtIndex: 0];
     //headers = [command.arguments objectAtIndex: 1];
     //url = [command.arguments objectAtIndex: 2];
+    //jsonLocationObjName = [command.arguments objectAtIndex: 10];
     stationaryRadius    = [[command.arguments objectAtIndex: 3] intValue];
     distanceFilter      = [[command.arguments objectAtIndex: 4] intValue];
     locationTimeout     = [[command.arguments objectAtIndex: 5] intValue];

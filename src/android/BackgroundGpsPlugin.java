@@ -33,6 +33,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     private String isDebugging = "false";
     private String notificationTitle = "Background tracking";
     private String notificationText = "ENABLED";
+    private String jsonLocationObjName = "location";
     
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
@@ -56,6 +57,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 updateServiceIntent.putExtra("isDebugging", isDebugging);
                 updateServiceIntent.putExtra("notificationTitle", notificationTitle);
                 updateServiceIntent.putExtra("notificationText", notificationText);
+                updateServiceIntent.putExtra("jsonLocationObjName", jsonLocationObjName);
 
                 activity.startService(updateServiceIntent);
                 isEnabled = true;
@@ -69,8 +71,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
             result = true;
             try {
                 // Params.
-                //    0       1       2           3               4                5               6            7           8                8               9
-                //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
+                //    0       1       2           3               4                5               6            7           8                8               9                  10
+                //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName]
                 this.params = data.getString(0);
                 this.headers = data.getString(1);
                 this.url = data.getString(2);
@@ -81,6 +83,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 this.isDebugging = data.getString(7);
                 this.notificationTitle = data.getString(8);
                 this.notificationText = data.getString(9);
+                this.jsonLocationObjName = data.getString(10);
             } catch (JSONException e) {
                 callbackContext.error("authToken/url required as parameters: " + e.getMessage());
             }
