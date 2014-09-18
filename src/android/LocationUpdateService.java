@@ -661,17 +661,17 @@ public class LocationUpdateService extends Service implements LocationListener {
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpPost request = new HttpPost(url);
 
-            JSONObject location = new JSONObject();
-            location.put("latitude", l.getLatitude());
-            location.put("longitude", l.getLongitude());
-            location.put("accuracy", l.getAccuracy());
-            location.put("speed", l.getSpeed());
-            location.put("bearing", l.getBearing());
-            location.put("altitude", l.getAltitude());
-            location.put("recorded_at", dao.dateToString(l.getRecordedAt()));
-            params.put("location", location);
+            JSONObject mobileLocation = new JSONObject();
+            mobileLocation.put("latitude", l.getLatitude());
+            mobileLocation.put("longitude", l.getLongitude());
+            mobileLocation.put("accuracy", l.getAccuracy());
+            mobileLocation.put("speed", l.getSpeed());
+            mobileLocation.put("bearing", l.getBearing());
+            mobileLocation.put("altitude", l.getAltitude());
+            mobileLocation.put("recorded_at", dao.dateToString(l.getRecordedAt()));
+            params.put("mobileLocation", mobileLocation);
             
-            Log.i(TAG, "location: " + location.toString());
+            Log.i(TAG, "mobileLocation: " + mobileLocation.toString());
             
             StringEntity se = new StringEntity(params.toString());
             request.setEntity(se);
