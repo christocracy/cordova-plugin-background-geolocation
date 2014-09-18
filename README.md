@@ -5,16 +5,16 @@ Cross-platform background geolocation for Cordova / PhoneGap with battery-saving
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
-This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html). 
+This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html).
 
 ## Using the plugin ##
-The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods 
+The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
 
-  `configure(success, fail, option)`, 
+  `configure(success, fail, option)`,
 
   `start(success, fail)`
 
-  `stop(success, fail)`. 
+  `stop(success, fail)`.
 
 ## Installing the plugin ##
 
@@ -66,10 +66,10 @@ A full example could be:
     var failureFn = function(error) {
         console.log('BackgroundGeoLocation error');
     }
-    
+
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
-        url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to 
+        url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to
         params: {
             auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
             foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
@@ -79,11 +79,12 @@ A full example could be:
         },
         desiredAccuracy: 10,
         stationaryRadius: 20,
-        distanceFilter: 30, 
+        distanceFilter: 30,
         notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
         notificationText: 'ENABLED', // <-- android only, customize the text of the notification
         activityType: 'AutomotiveNavigation',
-        debug: true // <-- enable this hear sounds for background-geolocation life-cycle.
+        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+        stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
     });
 
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -120,7 +121,7 @@ Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manag
 ### WP8
 
 On WP8 the plugin does not support the Stationairy location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
-Keep in mind that it is **not** possible to use ```start()``` at the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.  
+Keep in mind that it is **not** possible to use ```start()``` at the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.
 
 ### Config
 
@@ -181,6 +182,10 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
+#####`@param {Boolean} stopOnTerminate`
+Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app)
+
+
 ### Android Config
 
 #####`@param {String} url`
@@ -198,8 +203,8 @@ Optional HTTP headers POSTed to your server when persisting locations
 #####`@param {String} notificationText/Title`
 
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
- 
-#####`@param {Integer} locationTimeout 
+
+#####`@param {Integer} locationTimeout
 
 The minimum time interval between location updates, in seconds.  See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) for more information.
 
