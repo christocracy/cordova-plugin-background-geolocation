@@ -20,9 +20,15 @@ public class SQLiteLocationDAO implements LocationDAO {
 	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";
 	private static final String TAG = "SQLiteLocationDAO";
 	private Context context;
+	private final String jsonDateTimeFormat;
 	
 	public SQLiteLocationDAO(Context context) {
+		this(context, DATE_FORMAT);
+	}
+
+	public SQLiteLocationDAO(Context context, String jsonDateTimeFormat) {
 		this.context = context;
+		this.jsonDateTimeFormat = jsonDateTimeFormat;
 	}
 	
 	public Location[] getAllLocations() {
@@ -102,7 +108,7 @@ public class SQLiteLocationDAO implements LocationDAO {
 	
 	public Date stringToDate(String dateTime) {
 		TimeZone tz = TimeZone.getTimeZone("UTC");
-		SimpleDateFormat iso8601Format = new SimpleDateFormat(DATE_FORMAT);
+		SimpleDateFormat iso8601Format = new SimpleDateFormat(jsonDateTimeFormat);
 		iso8601Format.setTimeZone(tz);
 		
 		Date date = null;
@@ -116,7 +122,7 @@ public class SQLiteLocationDAO implements LocationDAO {
 	
 	public String dateToString(Date date) {
 		TimeZone tz = TimeZone.getTimeZone("UTC");
-		SimpleDateFormat iso8601Format = new SimpleDateFormat(DATE_FORMAT);
+		SimpleDateFormat iso8601Format = new SimpleDateFormat(jsonDateTimeFormat);
 		iso8601Format.setTimeZone(tz);
 		return iso8601Format.format(date);
 	}

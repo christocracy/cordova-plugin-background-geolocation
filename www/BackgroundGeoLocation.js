@@ -22,13 +22,14 @@ module.exports = {
             notificationTitle   = config.notificationTitle || "Background tracking",
             notificationText    = config.notificationText || "ENABLED",
             activityType        = config.activityType || "OTHER",
-            jsonLocationObjName = config.jsonLocationObjName || "location";
+            jsonLocationObjName = config.jsonLocationObjName || "location",
+            jsonDateTimeFormat  = config.jsonDateTimeFormat || "yyyy-MM-dd'T'HH:mm'Z'";
 
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName]
+             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName, jsonDateTimeFormat]
         );
     },
     start: function(success, failure, config) {

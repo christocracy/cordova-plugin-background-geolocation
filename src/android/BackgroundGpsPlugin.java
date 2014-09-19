@@ -5,6 +5,8 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import com.tenforwardconsulting.cordova.bgloc.data.sqlite.SQLiteLocationDAO;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -34,6 +36,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     private String notificationTitle = "Background tracking";
     private String notificationText = "ENABLED";
     private String jsonLocationObjName = "location";
+    private String jsonDateTimeFormat = SQLiteLocationDAO.DATE_FORMAT;
     
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
@@ -58,6 +61,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 updateServiceIntent.putExtra("notificationTitle", notificationTitle);
                 updateServiceIntent.putExtra("notificationText", notificationText);
                 updateServiceIntent.putExtra("jsonLocationObjName", jsonLocationObjName);
+                updateServiceIntent.putExtra("jsonDateTimeFormat", jsonDateTimeFormat);
 
                 activity.startService(updateServiceIntent);
                 isEnabled = true;
@@ -71,8 +75,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
             result = true;
             try {
                 // Params.
-                //    0       1       2           3               4                5               6            7           8                 9               10                  11
-                //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName]
+                //    0       1       2           3               4                5               6            7           8                 9               10                11                  12
+                //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName, jsonDateTimeFormat]
                 this.params = data.getString(0);
                 this.headers = data.getString(1);
                 this.url = data.getString(2);
@@ -84,6 +88,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 this.notificationTitle = data.getString(8);
                 this.notificationText = data.getString(9);
                 this.jsonLocationObjName = data.getString(11);
+                this.jsonDateTimeFormat = data.getString(12);
             } catch (JSONException e) {
                 callbackContext.error("authToken/url required as parameters: " + e.getMessage());
             }

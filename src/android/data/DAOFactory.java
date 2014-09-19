@@ -9,4 +9,8 @@ public abstract class DAOFactory {
 		//Very basic for now
 		return new SQLiteLocationDAO(context);
 	}
+
+	public static LocationDAO createLocationDAO(Context context, String jsonDateTimeFormat) {
+		return new SQLiteLocationDAO(context, jsonDateTimeFormat);
+	}
 }
