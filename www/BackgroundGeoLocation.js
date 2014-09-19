@@ -20,14 +20,16 @@ module.exports = {
             desiredAccuracy     = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100,     // meters
             debug               = config.debug || false,
             notificationTitle   = config.notificationTitle || "Background tracking",
-            notificationText    = config.notificationText || "ENABLED";
-            activityType        = config.activityType || "OTHER";
+            notificationText    = config.notificationText || "ENABLED",
+            activityType        = config.activityType || "OTHER",
+            jsonLocationObjName = config.jsonLocationObjName || "location",
+            jsonDateTimeFormat  = config.jsonDateTimeFormat || "yyyy-MM-dd'T'HH:mm'Z'";
 
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
+             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName, jsonDateTimeFormat]
         );
     },
     start: function(success, failure, config) {

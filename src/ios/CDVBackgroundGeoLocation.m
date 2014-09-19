@@ -99,19 +99,21 @@
 {
     // in iOS, we call to javascript for HTTP now so token and url should be @deprecated until Android calls out to javascript.
     // Params.
-    //    0       1       2           3               4                5               6            7           8                8               9
-    //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType]
+    //    0       1       2           3               4                5               6            7           8                9               10                  11                 12
+    //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, jsonLocationObjName, jsonDateTimeFormat]
     
     // UNUSED ANDROID VARS
     //params = [command.arguments objectAtIndex: 0];
     //headers = [command.arguments objectAtIndex: 1];
     //url = [command.arguments objectAtIndex: 2];
+    //jsonLocationObjName = [command.arguments objectAtIndex: 11];
+    //jsonDateTimeFormat = [command.arguments objectAtIndex: 12];
     stationaryRadius    = [[command.arguments objectAtIndex: 3] intValue];
     distanceFilter      = [[command.arguments objectAtIndex: 4] intValue];
     locationTimeout     = [[command.arguments objectAtIndex: 5] intValue];
     desiredAccuracy     = [self decodeDesiredAccuracy:[[command.arguments objectAtIndex: 6] intValue]];
     isDebugging         = [[command.arguments objectAtIndex: 7] boolValue];
-    activityType        = [self decodeActivityType:[command.arguments objectAtIndex:9]];
+    activityType        = [self decodeActivityType:[command.arguments objectAtIndex:10]];
     
     self.syncCallbackId = command.callbackId;
     

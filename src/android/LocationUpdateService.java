@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.tenforwardconsulting.cordova.bgloc.data.sqlite.SQLiteLocationDAO;
 
 import android.annotation.TargetApi;
 
@@ -94,6 +95,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Boolean isDebugging;
     private String notificationTitle = "Background checking";
     private String notificationText = "ENABLED";
+    private String jsonLocationObjName = "location";
+    private String jsonDateTimeFormat = SQLiteLocationDAO.DATE_FORMAT;
 
     private ToneGenerator toneGenerator;
     
@@ -179,6 +182,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
             notificationTitle = intent.getStringExtra("notificationTitle");
             notificationText = intent.getStringExtra("notificationText");
+            jsonLocationObjName = intent.getStringExtra("jsonLocationObjName");
+            jsonDateTimeFormat = intent.getStringExtra("jsonDateTimeFormat");
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
@@ -209,6 +214,8 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "- isDebugging: "        + isDebugging);
         Log.i(TAG, "- notificationTitle: "  + notificationTitle);
         Log.i(TAG, "- notificationText: "   + notificationText);
+        Log.i(TAG, "- jsonLocationObjName: "   + jsonLocationObjName);
+        Log.i(TAG, "- jsonDateTimeFormat: "   + jsonDateTimeFormat);
 
         this.setPace(false);
         
@@ -669,7 +676,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             location.put("bearing", l.getBearing());
             location.put("altitude", l.getAltitude());
             location.put("recorded_at", dao.dateToString(l.getRecordedAt()));
-            params.put("location", location);
+            params.put(jsonLocationObjName, location);
             
             Log.i(TAG, "location: " + location.toString());
             
@@ -701,7 +708,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
     }
     private void persistLocation(Location location) {
-        LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
+        LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext(), jsonDateTimeFormat);
         com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
 
         if (dao.persistLocation(savedLocation)) {
@@ -762,7 +769,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         @Override
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
+            LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext(), jsonDateTimeFormat);
             for (com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
                 Log.d(TAG, "Posting saved location");
                 if (postLocation(savedLocation, locationDAO)) {

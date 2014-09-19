@@ -65,7 +65,7 @@ A full example could be:
 
     var failureFn = function(error) {
         console.log('BackgroundGeoLocation error');
-    }
+    };
     
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
