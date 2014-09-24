@@ -52,6 +52,11 @@
 
      <platform name="ios">
         <!-- required background modes:  App registers for location updates -->
+        
+        <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
+            <string>This app requires background location tracking</string>
+        </config-file>
+
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
                 <string>location</string>

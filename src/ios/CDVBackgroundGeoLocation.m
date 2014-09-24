@@ -88,6 +88,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSuspend:) name:UIApplicationDidEnterBackgroundNotification object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
 }
 /**
  * configure plugin
@@ -122,7 +123,7 @@
     locationManager.pausesLocationUpdatesAutomatically = YES;
     locationManager.distanceFilter = distanceFilter; // meters
     locationManager.desiredAccuracy = desiredAccuracy;
-
+    
     NSLog(@"CDVBackgroundGeoLocation configure");
     NSLog(@"  - token: %@", token);
     NSLog(@"  - url: %@", url);
@@ -133,6 +134,14 @@
     NSLog(@"  - activityType: %@", [command.arguments objectAtIndex:7]);
     NSLog(@"  - debug: %d", isDebugging);
     NSLog(@"  - stopOnTerminate: %d", stopOnTerminate);
+    
+    // ios 8 requires permissions to send local-notifications
+    if (isDebugging) {
+        UIApplication *app = [UIApplication sharedApplication];
+        if ([app respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+            [app registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:UIUserNotificationTypeAlert|UIUserNotificationTypeBadge|UIUserNotificationTypeSound categories:nil]];
+        }
+    }
 }
 
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command
@@ -557,7 +566,7 @@
 
 - (void) fireStationaryRegionListeners:(NSMutableDictionary*)data
 {
-    NSLog(@"- CDVBackgroundGeoLocation#fireStationaryRegionListeners: %d", [locationQueue count]);
+    NSLog(@"- CDVBackgroundGeoLocation#fireStationaryRegionListener");
     if (![self.stationaryRegionListeners count]) {
         [self stopBackgroundTask];
         return;
@@ -701,8 +710,15 @@
 
 - (void) startUpdatingLocation
 {
-    [locationManager startUpdatingLocation];
-    isUpdatingLocation = YES;
+    SEL requestSelector = NSSelectorFromString(@"requestWhenInUseAuthorization");
+    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined && [locationManager respondsToSelector:requestSelector]) {
+        ((void (*)(id, SEL))[locationManager methodForSelector:requestSelector])(locationManager, requestSelector);
+        [locationManager startUpdatingLocation];
+        isUpdatingLocation = YES;
+    } else {
+        [locationManager startUpdatingLocation];
+        isUpdatingLocation = YES;
+    }
 }
 - (void) locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
