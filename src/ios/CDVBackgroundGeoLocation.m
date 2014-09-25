@@ -710,7 +710,7 @@
 
 - (void) startUpdatingLocation
 {
-    SEL requestSelector = NSSelectorFromString(@"requestWhenInUseAuthorization");
+    SEL requestSelector = NSSelectorFromString(@"requestAlwaysAuthorization");
     if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined && [locationManager respondsToSelector:requestSelector]) {
         ((void (*)(id, SEL))[locationManager methodForSelector:requestSelector])(locationManager, requestSelector);
         [locationManager startUpdatingLocation];
