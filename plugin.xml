@@ -94,9 +94,12 @@
 		</config-file> 
 		<source-file src="src/wp8/BackgroundGeoLocation.cs" />
 		<source-file src="src/wp8/BackgroundGeoLocationOptions.cs" />
-		<source-file src="src/wp8/DebugAudioNotifier.cs" />
+		<source-file src="src/wp8/DebugNotifier.cs" />
 		<source-file src="src/wp8/ExtensionMethods.cs" />
-		<source-file src="src/wp8/IBackgroundGeoLocation.cs" /> 
+        <source-file src="src/wp8/GeolocatorWrapper.cs" />
+        <source-file src="src/wp8/GeolocatorWrapperPositionChangedEventArgs.cs" />
+        <source-file src="src/wp8/IBackgroundGeoLocation.cs" />
+        <source-file src="src/wp8/UpdateScaledDistanceFilterResult.cs" />
 	</platform>
 
 </plugin>
