@@ -1,5 +1,5 @@
-﻿using System; 
-using Windows.Devices.Geolocation; 
+﻿using System;
+using Windows.Devices.Geolocation;
 using WPCordovaClassLib.Cordova;
 using WPCordovaClassLib.Cordova.Commands;
 using WPCordovaClassLib.Cordova.JSON;
@@ -12,11 +12,12 @@ namespace Cordova.Extension.Commands
         private string ConfigureCallbackToken { get; set; }
         private BackgroundGeoLocationOptions BackgroundGeoLocationOptions { get; set; }
 
+        public static IGeolocatorWrapper Geolocator { get; set; }
+
         /// <summary>
-        /// Geolocator and RunningInBackground are required properties to run in background
+        /// RunningInBackground is a required property to run in background (also an active Geolocator instance is required)
         /// For more information read http://msdn.microsoft.com/library/windows/apps/jj662935(v=vs.105).aspx
-        /// </summary>
-        public static Geolocator Geolocator { get; set; }
+        /// </summary> 
         public static bool RunningInBackground { get; set; }
 
         /// <summary>
@@ -25,7 +26,7 @@ namespace Cordova.Extension.Commands
         private bool IsConfigured { get; set; }
         private bool IsConfiguring { get; set; }
 
-        private IDebugNotifier _debugNotifier;
+        private readonly IDebugNotifier _debugNotifier;
 
         public BackgroundGeoLocation()
         {
@@ -40,7 +41,7 @@ namespace Cordova.Extension.Commands
             ConfigureCallbackToken = CurrentCommandCallbackId;
             RunningInBackground = false;
 
-            BackgroundGeoLocationOptions = this.ParseBackgroundGeoLocationOptions(args);
+            BackgroundGeoLocationOptions = ParseBackgroundGeoLocationOptions(args);
 
             IsConfigured = BackgroundGeoLocationOptions.ParsingSucceeded;
             IsConfiguring = false;
@@ -50,12 +51,10 @@ namespace Cordova.Extension.Commands
         {
             var parsingSucceeded = true;
 
-            var options = JsonHelper.Deserialize<string[]>(configureArgs); 
+            var options = JsonHelper.Deserialize<string[]>(configureArgs);
 
-            double stationaryRadius;
-            double distanceFilter;
-            UInt32 locationTimeout;
-            UInt32 desiredAccuracy;
+            double stationaryRadius, distanceFilter;
+            UInt32 locationTimeout, desiredAccuracy;
             bool debug;
 
             if (!double.TryParse(options[3], out stationaryRadius))
@@ -85,84 +84,77 @@ namespace Cordova.Extension.Commands
             }
 
             return new BackgroundGeoLocationOptions
-            { 
+            {
                 Url = options[1],
                 StationaryRadius = stationaryRadius,
                 DistanceFilterInMeters = distanceFilter,
-                LocationTimeoutInMilliseconds = locationTimeout,
+                LocationTimeoutInSeconds = locationTimeout,
                 DesiredAccuracyInMeters = desiredAccuracy,
                 Debug = debug,
                 ParsingSucceeded = parsingSucceeded
             };
         }
 
-        public void start(string nothing)
+        private readonly Object _startLock = new Object();
+
+        public void start(string args)
         {
-            while (!IsConfigured && IsConfiguring)
+            lock (_startLock)
             {
-                // Wait for configure() to complete...
+                while (!IsConfigured && IsConfiguring)
+                {
+                    // Wait for configure() to complete...
+                }
+
+                if (!IsConfigured || !BackgroundGeoLocationOptions.ParsingSucceeded)
+                {
+                    DispatchCommandResult(new PluginResult(PluginResult.Status.INVALID_ACTION, "Cannot start: Run configure() with proper values!"));
+                    stop(args);
+                    return;
+                }
+
+                if (Geolocator != null && Geolocator.IsActive)
+                {
+                    DispatchCommandResult(new PluginResult(PluginResult.Status.INVALID_ACTION, "Already started!"));
+                    return;
+                }
+
+                Geolocator = new GeolocatorWrapper(BackgroundGeoLocationOptions.DesiredAccuracyInMeters, BackgroundGeoLocationOptions.LocationTimeoutInSeconds * 1000, BackgroundGeoLocationOptions.DistanceFilterInMeters);
+                Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
+                Geolocator.Start();
+
+                RunningInBackground = true;
             }
-
-            if (!IsConfigured || !BackgroundGeoLocationOptions.ParsingSucceeded)
-            {
-                DispatchCommandResult(new PluginResult(PluginResult.Status.INVALID_ACTION, "Cannot start: Run configure() with proper values!"));
-                stop();
-                return;
-            }
-            StopGeolocatorIfActive();
-
-            Geolocator = new Geolocator
-            {
-                // Default: 50 meters
-                MovementThreshold = BackgroundGeoLocationOptions.DistanceFilterInMeters,
-
-                // JS Interface takes seconds, MS takes miliseconds, default 60 seconds
-                ReportInterval = BackgroundGeoLocationOptions.LocationTimeoutInMilliseconds * 1000,
-
-                // Default: 100 meters
-                DesiredAccuracyInMeters = BackgroundGeoLocationOptions.DesiredAccuracyInMeters
-            }; 
-
-            Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
-
-            RunningInBackground = true; 
         }
 
-        private void OnGeolocatorOnPositionChanged(Geolocator sender, PositionChangedEventArgs configureCallbackTokenargs)
+        private void OnGeolocatorOnPositionChanged(GeolocatorWrapper sender, GeolocatorWrapperPositionChangedEventArgs eventArgs)
         {
-            if (Geolocator.LocationStatus == PositionStatus.Disabled || Geolocator.LocationStatus == PositionStatus.NotAvailable)
+            if (eventArgs.GeolocatorLocationStatus == PositionStatus.Disabled || eventArgs.GeolocatorLocationStatus == PositionStatus.NotAvailable)
             {
-                DispatchMessage(PluginResult.Status.ERROR, string.Format("Cannot start: LocationStatus/PositionStatus: {0}! {1}", Geolocator.LocationStatus, IsConfigured), true, ConfigureCallbackToken);
+                DispatchMessage(PluginResult.Status.ERROR, string.Format("Cannot start: LocationStatus/PositionStatus: {0}! {1}", eventArgs.GeolocatorLocationStatus, IsConfigured), true, ConfigureCallbackToken);
                 return;
             }
 
-            var callbackJsonResult = configureCallbackTokenargs.Position.Coordinate.ToJson();
             if (BackgroundGeoLocationOptions.Debug)
             {
-                _debugNotifier.Notify(string.Format("Ac: {0}, Sp: {1}", configureCallbackTokenargs.Position.Coordinate.Accuracy, configureCallbackTokenargs.Position.Coordinate.Speed), new Tone(750, Frequency.High));
-                Debug.WriteLine("PositionChanged token{0}, Coordinates: {1}", ConfigureCallbackToken, callbackJsonResult);
+                Debug.WriteLine(eventArgs.DebugMessage);
+                _debugNotifier.Notify(eventArgs.DebugMessage, new Tone(750, Frequency.High));
             }
 
-            DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, ConfigureCallbackToken);
-        } 
+            var callbackJsonResult = eventArgs.Position.Coordinate.ToJson();
 
-        public void stop()
+            DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, ConfigureCallbackToken);
+        }
+
+        public void stop(string args)
         {
             RunningInBackground = false;
-            StopGeolocatorIfActive();
+            Geolocator.Stop();
         }
 
-        private void StopGeolocatorIfActive()
+        public void finish(string args)
         {
-            if (Geolocator == null) return;
-
-            Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
-            Geolocator = null;
-        }
-
-        public void finish()
-        {
-            DispatchCommandResult(new PluginResult(PluginResult.Status.NO_RESULT));
+            DispatchMessage(PluginResult.Status.NO_RESULT, string.Empty, true, ConfigureCallbackToken);
         }
 
         public void onPaceChange(bool isMoving)
@@ -172,6 +164,12 @@ namespace Cordova.Extension.Commands
 
         public void setConfig(string setConfigArgs)
         {
+            if (Geolocator.IsActive)
+            {
+                Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
+                Geolocator.Stop();
+            }
+
             if (string.IsNullOrWhiteSpace(setConfigArgs))
             {
                 DispatchCommandResult(new PluginResult(PluginResult.Status.INVALID_ACTION, "Cannot set config because of an empty input"));
@@ -181,10 +179,8 @@ namespace Cordova.Extension.Commands
 
             var options = JsonHelper.Deserialize<string[]>(setConfigArgs);
 
-            double stationaryRadius;
-            double distanceFilter;
-            UInt32 locationTimeout;
-            UInt32 desiredAccuracy;
+            double stationaryRadius, distanceFilter;
+            UInt32 locationTimeout, desiredAccuracy;
 
             if (!double.TryParse(options[0], out stationaryRadius))
             {
@@ -210,17 +206,21 @@ namespace Cordova.Extension.Commands
 
             BackgroundGeoLocationOptions.StationaryRadius = stationaryRadius;
             BackgroundGeoLocationOptions.DistanceFilterInMeters = distanceFilter;
-            BackgroundGeoLocationOptions.LocationTimeoutInMilliseconds = locationTimeout * 1000;
+            BackgroundGeoLocationOptions.LocationTimeoutInSeconds = locationTimeout * 1000;
             BackgroundGeoLocationOptions.DesiredAccuracyInMeters = desiredAccuracy;
+
+            Geolocator = new GeolocatorWrapper(desiredAccuracy, locationTimeout * 1000, distanceFilter);
+            Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
+            Geolocator.Start();
 
             DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
         }
 
-        public void getStationaryLocation()
+        public void getStationaryLocation(string args)
         {
             throw new NotImplementedException();
-
         }
+
         private void DispatchMessage(PluginResult.Status status, string message, bool keepCallback, string callBackId)
         {
             var pluginResult = new PluginResult(status, message) { KeepCallback = keepCallback };
