@@ -100,6 +100,10 @@
         <source-file src="src/wp8/GeolocatorWrapperPositionChangedEventArgs.cs" />
         <source-file src="src/wp8/IBackgroundGeoLocation.cs" />
         <source-file src="src/wp8/UpdateScaledDistanceFilterResult.cs" />
+        <source-file src="src/wp8/Position.cs" />
+        <source-file src="src/wp8/PositionPath.cs" />
+        <source-file src="src/wp8/PostionUpdateDebugData.cs" />
+        <source-file src="src/wp8/StationaryManager.cs" />
 	</platform>
 
 </plugin>
