@@ -6,6 +6,6 @@ namespace Cordova.Extension.Commands
     {
         public Geoposition Position { get; set; } 
         public PositionStatus GeolocatorLocationStatus { get; set; }
-        public string DebugMessage { get; set; }
+        public PostionUpdateDebugData PositionUpdateDebugData { get; set; }
     }
 }

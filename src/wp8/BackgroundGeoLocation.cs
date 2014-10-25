@@ -119,7 +119,7 @@ namespace Cordova.Extension.Commands
                     return;
                 }
 
-                Geolocator = new GeolocatorWrapper(BackgroundGeoLocationOptions.DesiredAccuracyInMeters, BackgroundGeoLocationOptions.LocationTimeoutInSeconds * 1000, BackgroundGeoLocationOptions.DistanceFilterInMeters);
+                Geolocator = new GeolocatorWrapper(BackgroundGeoLocationOptions.DesiredAccuracyInMeters, BackgroundGeoLocationOptions.LocationTimeoutInSeconds * 1000, BackgroundGeoLocationOptions.DistanceFilterInMeters, BackgroundGeoLocationOptions.StationaryRadius);
                 Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
                 Geolocator.Start();
 
@@ -135,15 +135,35 @@ namespace Cordova.Extension.Commands
                 return;
             }
 
-            if (BackgroundGeoLocationOptions.Debug)
-            {
-                Debug.WriteLine(eventArgs.DebugMessage);
-                _debugNotifier.Notify(eventArgs.DebugMessage, new Tone(750, Frequency.High));
-            }
+            if (BackgroundGeoLocationOptions.Debug) HandlePositionUpdateDebugData(eventArgs.PositionUpdateDebugData);
 
             var callbackJsonResult = eventArgs.Position.Coordinate.ToJson();
 
             DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, ConfigureCallbackToken);
+        }
+
+        private void HandlePositionUpdateDebugData(PostionUpdateDebugData postionUpdateDebugData)
+        {
+            var debugMessage = postionUpdateDebugData.GetDebugNotifyMessage();
+            Debug.WriteLine(debugMessage);
+            switch (postionUpdateDebugData.PositionUpdateType)
+            {
+                case PositionUpdateType.SkippedBecauseOfDistance:
+                    _debugNotifier.Notify(debugMessage, new Tone(250, Frequency.Low));
+                    break;
+                case PositionUpdateType.NewPosition:
+                    _debugNotifier.Notify(debugMessage, new Tone(750, Frequency.High));
+                    break;
+                case PositionUpdateType.EnteringStationary:
+                    _debugNotifier.Notify(debugMessage, new Tone(250, Frequency.High), new Tone(250, Frequency.High));
+                    break;
+                case PositionUpdateType.StationaryUpdate:
+                    _debugNotifier.Notify(debugMessage, new Tone(750, Frequency.Low), new Tone(750, Frequency.Low));
+                    break;
+                case PositionUpdateType.ExitStationary:
+                    _debugNotifier.Notify(debugMessage, new Tone(250, Frequency.High), new Tone(250, Frequency.High), new Tone(250, Frequency.High));
+                    break;
+            }
         }
 
         public void stop(string args)
@@ -209,7 +229,7 @@ namespace Cordova.Extension.Commands
             BackgroundGeoLocationOptions.LocationTimeoutInSeconds = locationTimeout * 1000;
             BackgroundGeoLocationOptions.DesiredAccuracyInMeters = desiredAccuracy;
 
-            Geolocator = new GeolocatorWrapper(desiredAccuracy, locationTimeout * 1000, distanceFilter);
+            Geolocator = new GeolocatorWrapper(desiredAccuracy, locationTimeout * 1000, distanceFilter, stationaryRadius);
             Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
             Geolocator.Start();
 
@@ -217,8 +237,9 @@ namespace Cordova.Extension.Commands
         }
 
         public void getStationaryLocation(string args)
-        {
-            throw new NotImplementedException();
+        { 
+            var stationaryGeolocation = Geolocator.GetStationaryLocation();  
+            DispatchMessage(PluginResult.Status.OK, stationaryGeolocation.ToJson(), true, ConfigureCallbackToken);
         }
 
         private void DispatchMessage(PluginResult.Status status, string message, bool keepCallback, string callBackId)

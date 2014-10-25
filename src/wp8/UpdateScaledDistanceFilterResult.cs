@@ -5,12 +5,10 @@ namespace Cordova.Extension.Commands
     public class UpdateScaledDistanceFilterResult
     { 
         public double InitialScaledDistanceFilter { get; set; }
-        public double NewScaledDistanceFilter { get; set; }
-
-        /// <summary>
-        /// Skip the result of this update (usually because there was not enough movement)
-        /// </summary>
-        public bool Skip { get; set; }
+        public double NewScaledDistanceFilter { get; set; } 
+        public bool SkipPositionBecauseOfDistance { get; set; }
+        public bool StartStationary { get; set; }
+        public double? Distance { get; set; }
 
         public bool ScaledDistanceFilterChanged
         {

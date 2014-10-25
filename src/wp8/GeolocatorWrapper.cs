@@ -2,6 +2,7 @@
 using System.Device.Location;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
+using WPCordovaClassLib.Cordova.Commands;
 
 namespace Cordova.Extension.Commands
 {
@@ -15,6 +16,7 @@ namespace Cordova.Extension.Commands
         void Start();
         void Stop();
         bool IsActive { get; }
+        Geocoordinate  GetStationaryLocation();
     }
 
     public class GeolocatorWrapper : IGeolocatorWrapper
@@ -41,36 +43,50 @@ namespace Cordova.Extension.Commands
         private readonly double _distanceFilter;
 
         /// <summary>
+        /// Stationary Radius in meters
+        /// </summary>
+        private readonly double _stationaryRadius;
+
+        /// <summary>
         /// Automatically scaled distance filter in meters
         /// </summary>
         private double? _scaledDistanceFilter;
 
         /// <summary>
-        /// Current speed in Meter/Second
+        /// Changing the ReportInterval fires the Geolocator.OnPositionChanged event. 
+        /// Prevent a direct/second update of the DistanceFilter/ReportInterval directly after the current one 
         /// </summary>
-        private double? _currentSpeed;
-
-        private GeoCoordinate _lastGeoCoordinate;
-        private DateTime? _lastGeoCoordinateDateTime;
         private bool _skipNextPosition;
 
+        private readonly PositionPath _positionPath;
+        private readonly StationaryManager _stationaryManager;
         public bool IsActive { get; private set; }
-
         public event TypedEventHandler<GeolocatorWrapper, GeolocatorWrapperPositionChangedEventArgs> PositionChanged;
+
+        private enum StationaryUpdateResult
+        {
+            NotInStationary,
+            InStationary,
+            ExitedFromStationary
+        }
 
         /// <param name="desiredAccuracy">In meters</param>
         /// <param name="reportInterval">In milliseconds</param>
         /// <param name="distanceFilter">In meters</param>
-        public GeolocatorWrapper(UInt32 desiredAccuracy, UInt32 reportInterval, double distanceFilter)
+        /// <param name="stationaryRadius"></param>
+        public GeolocatorWrapper(UInt32 desiredAccuracy, UInt32 reportInterval, double distanceFilter, double stationaryRadius)
         {
             _desiredAccuracy = desiredAccuracy;
             _reportInterval = reportInterval;
             _distanceFilter = distanceFilter;
+            _stationaryRadius = stationaryRadius;
+            _positionPath = new PositionPath();
+            _stationaryManager = new StationaryManager(stationaryRadius);
         }
 
         public void Start()
         {
-            if (Geolocator != null) Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
+            if (Geolocator != null) Geolocator.PositionChanged -= OnGeolocatorPositionChanged;
 
             Geolocator = new Geolocator
             {
@@ -82,7 +98,7 @@ namespace Cordova.Extension.Commands
                 DesiredAccuracyInMeters = _desiredAccuracy
             };
 
-            Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
+            Geolocator.PositionChanged += OnGeolocatorPositionChanged;
             IsActive = true;
         }
 
@@ -90,94 +106,118 @@ namespace Cordova.Extension.Commands
         {
             if (Geolocator == null) return;
 
-            Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
+            Geolocator.PositionChanged -= OnGeolocatorPositionChanged;
             Geolocator = null;
             IsActive = false;
-        }
+        } 
 
-        private void OnGeolocatorOnPositionChanged(Geolocator sender, PositionChangedEventArgs positionChangesEventArgs)
+        private void OnGeolocatorPositionChanged(Geolocator sender, PositionChangedEventArgs positionChangesEventArgs)
         {
             if (_skipNextPosition)
             {
-                _skipNextPosition = false;
+                _skipNextPosition = false; 
                 return;
             }
 
-            var updateScaledDistanceFilter = UpdateScaledDistanceFilter(positionChangesEventArgs);
-            if (updateScaledDistanceFilter.Skip) return;
-            if (updateScaledDistanceFilter.ScaledDistanceFilterChanged) UpdateReportInterval();
+            var newGeoCoordinate = new GeoCoordinate(positionChangesEventArgs.Position.Coordinate.Latitude, positionChangesEventArgs.Position.Coordinate.Longitude);
+            var newPosition = new Position(newGeoCoordinate, DateTime.Now, positionChangesEventArgs.Position.Coordinate.Accuracy);
 
-            var debugNotifyMessage = string.Format("SPD:{0:0.0}m/s | ACY:{1:0.}m ", _currentSpeed, positionChangesEventArgs.Position.Coordinate.Accuracy);
+            _positionPath.AddPosition(newPosition);
 
-            if (updateScaledDistanceFilter.ScaledDistanceFilterChanged)
-                debugNotifyMessage += string.Format("| SDF:{0:0.} > {1:0.} | TI {2:0.}s", updateScaledDistanceFilter.InitialScaledDistanceFilter, updateScaledDistanceFilter.NewScaledDistanceFilter, Geolocator.ReportInterval / 1000);
-            else
-                debugNotifyMessage += string.Format("| SDF: {0:0.} | TI {1:0.}s", updateScaledDistanceFilter.NewScaledDistanceFilter, Geolocator.ReportInterval / 1000);
+            var stationaryUpdateResult = StationaryUpdate(positionChangesEventArgs.Position, newPosition);
+            if (stationaryUpdateResult == StationaryUpdateResult.InStationary) return;
+
+            var currentAvgSpeed = _positionPath.GetCurrentSpeed(TimeSpan.FromMilliseconds(_reportInterval * 5)); // avg speed of last 5 (at max) positions
+
+            var updateScaledDistanceFilterResult = UpdateScaledDistanceFilter(currentAvgSpeed, positionChangesEventArgs.Position.Coordinate);
+            if (updateScaledDistanceFilterResult.SkipPositionBecauseOfDistance)
+            {
+                SkipPosition(updateScaledDistanceFilterResult.StartStationary, updateScaledDistanceFilterResult.Distance);
+                return;
+            }
+
+            var newReportInterval = CalculateNewReportInterval(currentAvgSpeed);
+            if (updateScaledDistanceFilterResult.ScaledDistanceFilterChanged) UpdateReportInterval(newReportInterval);
 
             PositionChanged(this, new GeolocatorWrapperPositionChangedEventArgs
             {
                 GeolocatorLocationStatus = Geolocator.LocationStatus,
                 Position = positionChangesEventArgs.Position,
-                DebugMessage = debugNotifyMessage
+                PositionUpdateDebugData = PostionUpdateDebugData.ForNewPosition(positionChangesEventArgs, currentAvgSpeed, updateScaledDistanceFilterResult, Geolocator.ReportInterval, stationaryUpdateResult == StationaryUpdateResult.ExitedFromStationary)
             });
         }
 
-        private UpdateScaledDistanceFilterResult UpdateScaledDistanceFilter(PositionChangedEventArgs positionChangesEventArgs)
+        private void SkipPosition(bool becauseOfEnteringStationary, double? distance)
+        {
+            var updateType = becauseOfEnteringStationary ? PositionUpdateType.EnteringStationary : PositionUpdateType.SkippedBecauseOfDistance;
+
+            PositionChanged(this, new GeolocatorWrapperPositionChangedEventArgs
+            {
+                PositionUpdateDebugData = PostionUpdateDebugData.ForSkip(updateType, distance, _distanceFilter, _stationaryRadius)
+            });
+        }
+
+        public Geocoordinate GetStationaryLocation()
+        {
+            return !_stationaryManager.InStationary ? null : _stationaryManager.GetStationaryGeocoordinate();
+        }
+
+        private StationaryUpdateResult StationaryUpdate(Geoposition geoPosition, Position newPosition)
+        {
+            if (_stationaryManager.InStationary)
+            {
+                var newStationaryReportInterval = _stationaryManager.GetNewReportInterval(newPosition);
+                if (newStationaryReportInterval.HasValue && _stationaryManager.InStationary)
+                {
+                    PositionChanged(this, new GeolocatorWrapperPositionChangedEventArgs
+                    {
+                        GeolocatorLocationStatus = Geolocator.LocationStatus,
+                        Position = geoPosition,
+                        PositionUpdateDebugData = PostionUpdateDebugData.ForStationaryUpdate((uint)newStationaryReportInterval, _stationaryManager.GetDistanceToStationary(newPosition))
+                    });
+
+                    // stay in stationary
+                    UpdateReportInterval((uint)newStationaryReportInterval);
+
+                    return StationaryUpdateResult.InStationary;
+                }
+                else return StationaryUpdateResult.ExitedFromStationary;
+            }
+            return StationaryUpdateResult.NotInStationary;
+        }
+
+        private UpdateScaledDistanceFilterResult UpdateScaledDistanceFilter(double? currentAvgSpeed, Geocoordinate geocoordinate)
         {
             var result = new UpdateScaledDistanceFilterResult(_scaledDistanceFilter.HasValue ? _scaledDistanceFilter.Value : 0);
-            var newGeoCoordinate = new GeoCoordinate(positionChangesEventArgs.Position.Coordinate.Latitude, positionChangesEventArgs.Position.Coordinate.Longitude);
+            var lastPosition = _positionPath.GetLastPosition();
+            result.Distance = lastPosition.DinstanceToPrevious;
 
-            if (_lastGeoCoordinate == null || !_lastGeoCoordinateDateTime.HasValue)
+            if (!lastPosition.Speed.HasValue || !currentAvgSpeed.HasValue)
             {
-                _lastGeoCoordinate = newGeoCoordinate;
-                _lastGeoCoordinateDateTime = DateTime.Now;
-            }
-            else if (positionChangesEventArgs.Position.Coordinate.Accuracy > _desiredAccuracy)
-            {
-                // Accuracy to low to measure the traveled distance and calculate the ScaledDistanceFilter (default distance filter is used)
-                _lastGeoCoordinate = newGeoCoordinate;
-                _lastGeoCoordinateDateTime = DateTime.Now;
                 _scaledDistanceFilter = _distanceFilter;
-                _currentSpeed = null;
                 return result;
             }
-            else
+
+            if (lastPosition.DinstanceToPrevious.HasValue && (lastPosition.DinstanceToPrevious.Value < _distanceFilter || lastPosition.DinstanceToPrevious.Value < _stationaryRadius))
             {
-                var distanceInMeters = newGeoCoordinate.GetDistanceTo(_lastGeoCoordinate);
+                // too little movement, start Stationary and/or skip this position update
 
-                if (distanceInMeters < _distanceFilter)
+                if (lastPosition.DinstanceToPrevious.Value < _stationaryRadius)
                 {
-                    //Todo: implement Stationary Location ?!
-                    result.Skip = true;
-                    return result;
+                    _stationaryManager.StartStationary(lastPosition, geocoordinate);
+                    result.StartStationary = true;
                 }
-
-                var secondsBetween = (DateTime.Now - _lastGeoCoordinateDateTime.Value).TotalSeconds;
-                var currentSpeed = distanceInMeters / secondsBetween;
-
-                _lastGeoCoordinate = newGeoCoordinate;
-                _lastGeoCoordinateDateTime = DateTime.Now;
-
-                result.NewScaledDistanceFilter = CalculateNewScaledDistanceFilter(currentSpeed);
-
-                if (!result.ScaledDistanceFilterChanged) return result;
-
-                _scaledDistanceFilter = result.NewScaledDistanceFilter;
-
-                // Not using GeoCoordinate speed (following line) because it is empty when in Emulator or when accuracy is low  
-                //_currentSpeed = positionChangesEventArgs.Position.Coordinate.Speed;
-                _currentSpeed = currentSpeed;
+                result.SkipPositionBecauseOfDistance = true;
+                return result;
             }
 
+            result.NewScaledDistanceFilter = CalculateNewScaledDistanceFilter(currentAvgSpeed.Value);
+            _scaledDistanceFilter = result.NewScaledDistanceFilter;
             return result;
         }
 
-        private void UpdateReportInterval()
+        private void UpdateReportInterval(uint reportInterval)
         {
-            var reportInterval = CalculateNewReportInterval();
-
-            // Changing the ReportInterval fires the Geolocator.OnPositionChanged event. 
-            // Prevent a direct/second update of the DistanceFilter/ReportInterval directly after the current one 
             _skipNextPosition = true;
 
             // Windows Phone suspends the app when all eventhandlers of all GeoLocator objects are removed (only in background mode)
@@ -191,9 +231,9 @@ namespace Cordova.Extension.Commands
             tempGeolocator.PositionChanged += dummyHandler;
 
             // It is not allowed to change properties of Geolocator when eventhandlers are attached 
-            Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
+            Geolocator.PositionChanged -= OnGeolocatorPositionChanged;
             Geolocator.ReportInterval = reportInterval;
-            Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
+            Geolocator.PositionChanged += OnGeolocatorPositionChanged;
 
             tempGeolocator.PositionChanged -= dummyHandler;
         }
@@ -213,18 +253,19 @@ namespace Cordova.Extension.Commands
         }
 
         /// <returns>New report interval in milliseconds</returns>
-        private uint CalculateNewReportInterval()
+        private uint CalculateNewReportInterval(double? currentAvgSpeed)
         {
             var defaultReportInterval = _reportInterval;
-            if (!_currentSpeed.HasValue || Math.Abs(_currentSpeed.Value) < 0.1) return defaultReportInterval;
 
-            var newReportInterval = (_scaledDistanceFilter / _currentSpeed.Value) * 1000;
+            if (!currentAvgSpeed.HasValue || Math.Abs(currentAvgSpeed.Value) < 0.1) return defaultReportInterval;
+
+            var newReportInterval = (_scaledDistanceFilter / currentAvgSpeed.Value) * 1000;
             if (newReportInterval > UInt32.MaxValue) newReportInterval = UInt32.MaxValue;
 
-            // Never longer than ten times the defaultReportInterval 
+            // Limit new Report Interval to 10 * defaultReportInterval 
             if (newReportInterval > (10 * defaultReportInterval)) newReportInterval = (10 * _reportInterval);
 
-            // Never longer than one hour 
+            // Limit new Report Interval to one hour 
             if (newReportInterval > TimeSpan.FromHours(1).TotalMilliseconds) newReportInterval = TimeSpan.FromHours(1).TotalMilliseconds;
 
             return newReportInterval > defaultReportInterval ? Convert.ToUInt32(newReportInterval) : defaultReportInterval;
