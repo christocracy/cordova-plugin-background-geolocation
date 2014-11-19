@@ -106,13 +106,10 @@ When the plugin detects your user has moved beyond his stationary-region, it eng
 
   `(round(speed, 5))^2 + distanceFilter`
 
-## iOS and Android
+## iOS
 
-The plugin works with iOS and Android, however both platforms differ significantly in their interaction with server.
+On iOS the plugin will execute your configured ```callbackFn```. You may manually POST the received ```GeoLocation``` to your server using standard XHR. iOS ignores the @config params ```url```, ```params``` and ```headers```. The plugin uses iOS Significant Changes API, and starts triggering ```callbackFn``` only when a cell-tower switch is detected (i.e. the device exits stationary radius). The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
 
-### iOS and WP8
-
-On iOS and WP8 the plugin will execute your configured ```callbackFn```.  You may manually POST the received ```GeoLocation``` to your server using standard XHR. iOS and WP8 ignore the @config params ```url```, ```params``` and ```headers```.
 
 ### Android
 
@@ -120,7 +117,7 @@ Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manag
 
 ### WP8
 
-On WP8 the plugin does not support the Stationairy location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
+WP8 uses ```callbackFn``` the way iOS do. On WP8, however, the plugin does not support the Stationary location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
 Keep in mind that it is **not** possible to use ```start()``` at the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.
 
 ### Config
