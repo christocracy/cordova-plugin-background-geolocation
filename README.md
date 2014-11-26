@@ -115,6 +115,20 @@ On iOS the plugin will execute your configured ```callbackFn```. You may manuall
 
 Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manages sync-ing GeoLocations to your server automatically, using the configured ```url```, ```params``` and ```headers```.  Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.  This is why the Android plugin cannot execute the Javascript ```callbackFn```, since your app is not guaranteed to keep running -- syncing locations to the server must be handled by the plugin.
 
+The Android plugin sends an HTTP POST to your configured ```url``` with ```Content-Type: application/json```.  The JSON location-data is encoded into the Request Body.  PHP people have trouble with this.
+```
+{
+    "location": {
+        "latitude": "<data>",
+        "longitude": "<data>",
+        "speed": "<data>",
+        "bearing" "<data>",
+        "altitude": "<data>",
+        "recorded_at": "<data>"
+    }
+}
+```
+
 ### WP8
 
 WP8 uses ```callbackFn``` the way iOS do. On WP8, however, the plugin does not support the Stationary location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
