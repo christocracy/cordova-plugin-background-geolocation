@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="org.transistorsoft.cordova.background-geolocation"
-    version="0.3.4">
+    version="0.3.5">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
     <license>MIT</license>
@@ -14,6 +14,7 @@
     </engines>
 
     <dependency id="org.apache.cordova.geolocation" />
+    <dependency id="org.apache.cordova.dialogs" />
 
     <js-module src="www/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
         <clobbers target="plugins.backgroundGeoLocation" />
