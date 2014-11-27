@@ -169,7 +169,7 @@ namespace Cordova.Extension.Commands
         public void stop(string args)
         {
             RunningInBackground = false;
-            Geolocator.Stop();
+            if (Geolocator != null) Geolocator.Stop();
         }
 
         public void finish(string args)
@@ -184,6 +184,8 @@ namespace Cordova.Extension.Commands
 
         public void setConfig(string setConfigArgs)
         {
+            if (Geolocator == null) return;
+
             if (Geolocator.IsActive)
             {
                 Geolocator.PositionChanged -= OnGeolocatorOnPositionChanged;
