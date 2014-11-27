@@ -135,17 +135,21 @@ namespace Cordova.Extension.Commands
                 return;
             }
 
-            if (BackgroundGeoLocationOptions.Debug) HandlePositionUpdateDebugData(eventArgs.PositionUpdateDebugData);
+            HandlePositionUpdateDebugData(eventArgs.PositionUpdateDebugData);
 
-            var callbackJsonResult = eventArgs.Position.Coordinate.ToJson();
-
-            DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, ConfigureCallbackToken);
+            if (eventArgs.Position != null)
+                DispatchMessage(PluginResult.Status.OK, eventArgs.Position.Coordinate.ToJson(), true, ConfigureCallbackToken);
+            else
+                DispatchMessage(PluginResult.Status.ERROR, "Null position received", true, ConfigureCallbackToken);
         }
 
         private void HandlePositionUpdateDebugData(PostionUpdateDebugData postionUpdateDebugData)
         {
             var debugMessage = postionUpdateDebugData.GetDebugNotifyMessage();
             Debug.WriteLine(debugMessage);
+
+            if (!BackgroundGeoLocationOptions.Debug) return;
+
             switch (postionUpdateDebugData.PositionUpdateType)
             {
                 case PositionUpdateType.SkippedBecauseOfDistance:
@@ -174,12 +178,12 @@ namespace Cordova.Extension.Commands
 
         public void finish(string args)
         {
-            DispatchMessage(PluginResult.Status.NO_RESULT, string.Empty, true, ConfigureCallbackToken);
+            DispatchCommandResult(new PluginResult(PluginResult.Status.NO_RESULT));
         }
 
         public void onPaceChange(bool isMoving)
         {
-            throw new NotImplementedException();
+            DispatchCommandResult(new PluginResult(PluginResult.Status.NO_RESULT));
         }
 
         public void setConfig(string setConfigArgs)
@@ -239,8 +243,8 @@ namespace Cordova.Extension.Commands
         }
 
         public void getStationaryLocation(string args)
-        { 
-            var stationaryGeolocation = Geolocator.GetStationaryLocation();  
+        {
+            var stationaryGeolocation = Geolocator.GetStationaryLocation();
             DispatchMessage(PluginResult.Status.OK, stationaryGeolocation.ToJson(), true, ConfigureCallbackToken);
         }
 
