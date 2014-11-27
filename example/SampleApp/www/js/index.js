@@ -72,11 +72,13 @@ var app = {
 
         var btnHome     = document.getElementById('btn-home'),
             btnReset    = document.getElementById('btn-reset'),
-            btnPace     = document.getElementById('btn-pace');
+            btnPace     = document.getElementById('btn-pace'),
+            btnDisabled = document.getElementById('btn-disabled');
 
         btnHome.addEventListener('click', this.onClickHome);
         btnReset.addEventListener('click', this.onClickReset);
         btnPace.addEventListener('click', this.onClickChangePace);
+        btnDisabled.addEventListener('click', this.onClickToggleDisabled);
     },
     // deviceready Event Handler
     //
@@ -109,12 +111,42 @@ var app = {
             // Update our current-position marker.
             app.setCurrentLocation(location);
 
+            $.ajax({
+                type: "POST",
+                url: "http://l-track.azurewebsites.net/track",
+                data: JSON.stringify({ "location":  location }),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data){
+                    console.log('successfully logged location');
+                },
+                error: function(err) {
+                    console.log('error logging location');
+                }
+            });
+
             yourAjaxCallback.call(this);
         };
 
         var failureFn = function(error) {
             console.log('BackgroundGeoLocation error');
-        }
+        };
+
+        bgGeo.onStationary(function(location) {
+            if (!app.stationaryRadius) {
+                app.stationaryRadius = new google.maps.Circle({
+                    fillColor: '#cc0000',
+                    fillOpacity: 0.4,
+                    strokeOpacity: 0,
+                    map: app.map
+                });
+            }
+            var radius = (location.accuracy < location.radius) ? location.radius : location.accuracy;
+            var center = new google.maps.LatLng(location.latitude, location.longitude);
+            app.stationaryRadius.setRadius(radius);
+            app.stationaryRadius.setCenter(center);
+
+        });
 
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
@@ -124,15 +156,15 @@ var app = {
                 foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
             },
             desiredAccuracy: 0,
-            stationaryRadius: 20,
-            distanceFilter: 30,
+            stationaryRadius: 50,
+            distanceFilter: 50,
             notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
             notificationText: 'ENABLED', // <-- android only, customize the text of the notification
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
         });
-
+        
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
         bgGeo.start();
     },
@@ -156,15 +188,17 @@ var app = {
     },
     onClickChangePace: function() {
         var bgGeo   = window.plugins.backgroundGeoLocation,
-            btnPace = document.getElementById('btn-pace');
+            btnPace = document.getElementById('btn-pace'),
+            className = ['btn', 'navbar-btn'];
 
         app.aggressiveEnabled = !app.aggressiveEnabled;
         bgGeo.changePace(app.aggressiveEnabled);
         if (app.aggressiveEnabled) {
-            btnPace.innerHTML = 'BG Aggressive: ON';
+            className.push('btn-danger');
         } else {
-            btnPace.innerHTML = 'BG Aggressive: OFF';
+            className.push('btn-success');
         }
+        btnPace.className = className.join(' ');
     },
     onClickReset: function() {
         // Clear prev location markers.
@@ -177,6 +211,28 @@ var app = {
         // Clear Polyline.
         app.path.setMap(null);
         app.path = undefined;
+    },
+    onClickToggleDisabled: function() {
+        var bgGeo       = window.plugins.backgroundGeoLocation,
+            btnDisabled = document.getElementById('btn-disabled'),
+            isDisabled  = btnDisabled.getAttribute('data-id'),
+            text        = '',
+            className   = ['btn', 'navbar-btn'];
+
+        if (isDisabled === 'false') {
+            isDisabled = 'true';
+            bgGeo.stop();
+            text = 'Start';
+            className.push('btn-success');
+        } else {
+            isDisabled = 'false';
+            bgGeo.start();
+            text = 'Stop';
+            className.push('btn-danger');
+        }
+        btnDisabled.innerHTML = text;
+        btnDisabled.className = className.join(' ');
+        btnDisabled.setAttribute('data-id', isDisabled);
     },
     watchPosition: function() {
         var fgGeo = window.navigator.geolocation;

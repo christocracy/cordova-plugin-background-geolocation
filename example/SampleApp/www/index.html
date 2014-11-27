@@ -24,6 +24,7 @@
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-min.css" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>BG GeoLocation</title>
         <script type="text/javascript"
@@ -32,16 +33,22 @@
 
     </head>
     <body>
-        <div id="header" class="header" style="padding-top: 15px;">
-            <h1>BG GeoLocation</h1>            
+        <div id="header" class="header">
+            <h3>BG GeoLocation</h3>            
         </div>
         <div id="map-canvas"></div>
-        <div id="footer" style="position:absolute;bottom:0">
-            <button id="btn-home">HOME</button>
-            <button id="btn-reset">Reset</button>
-            <button id="btn-pace">BG Agressive: OFF</button>
-        </div>
+        
+        
+        <nav id="footer" class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+            <button id="btn-home" class="btn navbar-btn btn-default glyphicon glyphicon-screenshot"></button>    
+            <button id="btn-reset" class="btn btn-default glyphicon">Reset</button>
+            <button id="btn-pace" class="btn navbar-btn btn-success">Aggressive</button>
+            <button id="btn-disabled" class="btn navbar-btn btn-danger" data-id="false">Stop</button>
+        </nav>
+
+
         <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
     </body>
 </html>
