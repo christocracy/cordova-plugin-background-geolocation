@@ -111,20 +111,7 @@ var app = {
             // Update our current-position marker.
             app.setCurrentLocation(location);
 
-            $.ajax({
-                type: "POST",
-                url: "http://l-track.azurewebsites.net/track",
-                data: JSON.stringify({ "location":  location }),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(data){
-                    console.log('successfully logged location');
-                },
-                error: function(err) {
-                    console.log('error logging location');
-                }
-            });
-
+            // After you Ajax callback is complete, you MUST signal to the native code, which is running a background-thread, that you're done and it can gracefully kill that thread.
             yourAjaxCallback.call(this);
         };
 
