@@ -60,8 +60,8 @@ namespace Cordova.Extension.Commands
         private bool _skipNextPosition;
 
         private readonly PositionPath _positionPath;
-        private readonly StationaryManager _stationaryManager; 
-        public bool IsActive { get; private set; } 
+        private readonly StationaryManager _stationaryManager;
+        public bool IsActive { get; private set; }
         public event TypedEventHandler<GeolocatorWrapper, GeolocatorWrapperPositionChangedEventArgs> PositionChanged;
 
         private enum StationaryUpdateResult
@@ -133,7 +133,7 @@ namespace Cordova.Extension.Commands
             var updateScaledDistanceFilterResult = UpdateScaledDistanceFilter(currentAvgSpeed, positionChangesEventArgs.Position.Coordinate);
             if (updateScaledDistanceFilterResult.SkipPositionBecauseOfDistance)
             {
-                SkipPosition(updateScaledDistanceFilterResult.StartStationary, updateScaledDistanceFilterResult.Distance);
+                SkipPosition(updateScaledDistanceFilterResult.StartStationary, updateScaledDistanceFilterResult.StartStationary, updateScaledDistanceFilterResult.Distance);
                 return;
             }
 
@@ -144,16 +144,18 @@ namespace Cordova.Extension.Commands
             {
                 GeolocatorLocationStatus = Geolocator.LocationStatus,
                 Position = positionChangesEventArgs.Position,
+                EnteredStationary = false,
                 PositionUpdateDebugData = PostionUpdateDebugData.ForNewPosition(positionChangesEventArgs, currentAvgSpeed, updateScaledDistanceFilterResult, Geolocator.ReportInterval, stationaryUpdateResult == StationaryUpdateResult.ExitedFromStationary)
             });
         }
 
-        private void SkipPosition(bool becauseOfEnteringStationary, double? distance)
+        private void SkipPosition(bool becauseOfEnteringStationary, bool startStationary, double? distance)
         {
             var updateType = becauseOfEnteringStationary ? PositionUpdateType.EnteringStationary : PositionUpdateType.SkippedBecauseOfDistance;
 
             PositionChanged(this, new GeolocatorWrapperPositionChangedEventArgs
             {
+                EnteredStationary = startStationary,
                 PositionUpdateDebugData = PostionUpdateDebugData.ForSkip(updateType, distance, _distanceFilter, _stationaryRadius)
             });
         }
@@ -178,26 +180,25 @@ namespace Cordova.Extension.Commands
 
         private StationaryUpdateResult StationaryUpdate(Geoposition geoPosition, Position newPosition)
         {
-            if (_stationaryManager.InStationary)
+            if (!_stationaryManager.InStationary) return StationaryUpdateResult.NotInStationary;
+
+            var newStationaryReportInterval = _stationaryManager.GetNewReportInterval(newPosition);
+
+            if (!newStationaryReportInterval.HasValue || !_stationaryManager.InStationary) return StationaryUpdateResult.ExitedFromStationary;
+
+            PositionChanged(this, new GeolocatorWrapperPositionChangedEventArgs
             {
-                var newStationaryReportInterval = _stationaryManager.GetNewReportInterval(newPosition);
-                if (newStationaryReportInterval.HasValue && _stationaryManager.InStationary)
-                {
-                    PositionChanged(this, new GeolocatorWrapperPositionChangedEventArgs
-                    {
-                        GeolocatorLocationStatus = Geolocator.LocationStatus,
-                        Position = geoPosition,
-                        PositionUpdateDebugData = PostionUpdateDebugData.ForStationaryUpdate((uint)newStationaryReportInterval, _stationaryManager.GetDistanceToStationary(newPosition))
-                    });
+                GeolocatorLocationStatus = Geolocator.LocationStatus,
+                Position = geoPosition,
+                PositionUpdateDebugData =
+                    PostionUpdateDebugData.ForStationaryUpdate((uint)newStationaryReportInterval,
+                        _stationaryManager.GetDistanceToStationary(newPosition))
+            });
 
-                    // stay in stationary
-                    UpdateReportInterval((uint)newStationaryReportInterval);
+            // stay in stationary
+            UpdateReportInterval((uint)newStationaryReportInterval);
 
-                    return StationaryUpdateResult.InStationary;
-                }
-                else return StationaryUpdateResult.ExitedFromStationary;
-            }
-            return StationaryUpdateResult.NotInStationary;
+            return StationaryUpdateResult.InStationary;
         }
 
         private UpdateScaledDistanceFilterResult UpdateScaledDistanceFilter(double? currentAvgSpeed, Geocoordinate geocoordinate)

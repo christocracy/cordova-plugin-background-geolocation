@@ -9,5 +9,6 @@ namespace Cordova.Extension.Commands
         void onPaceChange(bool isMoving);
         void setConfig(string config);
         void getStationaryLocation(string args);
+        void addStationaryRegionListener(string args);
     }
 }

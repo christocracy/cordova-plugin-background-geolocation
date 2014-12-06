@@ -10,6 +10,7 @@ namespace Cordova.Extension.Commands
     public class BackgroundGeoLocation : BaseCommand, IBackgroundGeoLocation
     {
         private string ConfigureCallbackToken { get; set; }
+        private string OnStationaryCallbackToken { get; set; }
         private BackgroundGeoLocationOptions BackgroundGeoLocationOptions { get; set; }
 
         public static IGeolocatorWrapper Geolocator { get; set; }
@@ -139,8 +140,11 @@ namespace Cordova.Extension.Commands
 
             if (eventArgs.Position != null)
                 DispatchMessage(PluginResult.Status.OK, eventArgs.Position.Coordinate.ToJson(), true, ConfigureCallbackToken);
+            else if (eventArgs.EnteredStationary)
+                DispatchMessage(PluginResult.Status.OK, string.Format("{0:0.}", BackgroundGeoLocationOptions.StationaryRadius), true, OnStationaryCallbackToken);
             else
                 DispatchMessage(PluginResult.Status.ERROR, "Null position received", true, ConfigureCallbackToken);
+
         }
 
         private void HandlePositionUpdateDebugData(PostionUpdateDebugData postionUpdateDebugData)
@@ -254,6 +258,11 @@ namespace Cordova.Extension.Commands
         {
             var stationaryGeolocation = Geolocator.GetStationaryLocation();
             DispatchMessage(PluginResult.Status.OK, stationaryGeolocation.ToJson(), true, ConfigureCallbackToken);
+        }
+
+        public void addStationaryRegionListener(string args)
+        {
+            OnStationaryCallbackToken = CurrentCommandCallbackId;
         }
 
         private void DispatchMessage(PluginResult.Status status, string message, bool keepCallback, string callBackId)
