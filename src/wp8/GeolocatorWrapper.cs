@@ -16,7 +16,8 @@ namespace Cordova.Extension.Commands
         void Start();
         void Stop();
         bool IsActive { get; }
-        Geocoordinate  GetStationaryLocation();
+        Geocoordinate GetStationaryLocation();
+        void ChangeStationary(bool exitStationary);
     }
 
     public class GeolocatorWrapper : IGeolocatorWrapper
@@ -59,8 +60,8 @@ namespace Cordova.Extension.Commands
         private bool _skipNextPosition;
 
         private readonly PositionPath _positionPath;
-        private readonly StationaryManager _stationaryManager;
-        public bool IsActive { get; private set; }
+        private readonly StationaryManager _stationaryManager; 
+        public bool IsActive { get; private set; } 
         public event TypedEventHandler<GeolocatorWrapper, GeolocatorWrapperPositionChangedEventArgs> PositionChanged;
 
         private enum StationaryUpdateResult
@@ -109,13 +110,13 @@ namespace Cordova.Extension.Commands
             Geolocator.PositionChanged -= OnGeolocatorPositionChanged;
             Geolocator = null;
             IsActive = false;
-        } 
+        }
 
         private void OnGeolocatorPositionChanged(Geolocator sender, PositionChangedEventArgs positionChangesEventArgs)
         {
             if (_skipNextPosition)
             {
-                _skipNextPosition = false; 
+                _skipNextPosition = false;
                 return;
             }
 
@@ -160,6 +161,19 @@ namespace Cordova.Extension.Commands
         public Geocoordinate GetStationaryLocation()
         {
             return !_stationaryManager.InStationary ? null : _stationaryManager.GetStationaryGeocoordinate();
+        }
+
+        public void ChangeStationary(bool exitStationary)
+        {
+            if (exitStationary)
+            {
+                _stationaryManager.ExitStationary();
+                Start();
+            }
+            else
+            {
+                throw new NotImplementedException("Manually starting stationary not implemented yet");
+            }
         }
 
         private StationaryUpdateResult StationaryUpdate(Geoposition geoPosition, Position newPosition)

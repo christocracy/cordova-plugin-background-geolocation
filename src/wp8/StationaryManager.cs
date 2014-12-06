@@ -32,7 +32,7 @@ namespace Cordova.Extension.Commands
         public double? GetNewReportInterval(Position newPosition)
         {
             if (_previousPosition == null) // first position-update in stationary, always aggresive
-            { 
+            {
                 _previousPosition = newPosition;
                 return _stationaryPollingIntervalAggresive.TotalMilliseconds;
             }
@@ -47,7 +47,7 @@ namespace Cordova.Extension.Commands
             }
             var percentage = distance / _stationaryRadius;
 
-            return percentage < 0.5 ? _stationaryPollingIntervalLazy.TotalMilliseconds : _stationaryPollingIntervalAggresive.TotalMilliseconds; 
+            return percentage < 0.5 ? _stationaryPollingIntervalLazy.TotalMilliseconds : _stationaryPollingIntervalAggresive.TotalMilliseconds;
         }
 
         public double GetDistanceToStationary(Position position)
@@ -58,6 +58,11 @@ namespace Cordova.Extension.Commands
         public Geocoordinate GetStationaryGeocoordinate()
         {
             return _stationaryGeocoordinate;
+        }
+
+        public void ExitStationary()
+        {
+            _stationaryGeocoordinate = null;
         }
     }
 }

@@ -183,7 +183,15 @@ namespace Cordova.Extension.Commands
 
         public void onPaceChange(bool isMoving)
         {
-            DispatchCommandResult(new PluginResult(PluginResult.Status.NO_RESULT));
+            if (isMoving)
+            {
+                Geolocator.ChangeStationary(isMoving);
+                DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+            }
+            else
+            {
+                DispatchCommandResult(new PluginResult(PluginResult.Status.INVALID_ACTION, "Manualy start stationary not available"));
+            }
         }
 
         public void setConfig(string setConfigArgs)
