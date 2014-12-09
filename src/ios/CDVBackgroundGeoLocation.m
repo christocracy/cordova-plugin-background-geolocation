@@ -495,10 +495,27 @@
             [locationManager setDistanceFilter:newDistanceFilter];
             [self startUpdatingLocation];
         }
+    } else if ([self locationIsBeyondStationaryRegion:location]) {
+        if (isDebugging) {
+            [self notify:@"Manual stationary exit-detection"];
+        }
+        [self setPace:YES];
     }
     [self queue:location type:@"current"];
 }
-
+/**
+* Manual stationary location his-testing.  This seems to help stationary-exit detection in some places where the automatic geo-fencing soesn't
+*/
+-(bool)locationIsBeyondStationaryRegion:(CLLocation*)location
+{
+    NSLog(@"- CDVBackgroundGeoLocation locationIsBeyondStationaryRegion");
+    if (![stationaryRegion containsCoordinate:[location coordinate]]) {
+        double pointDistance = [stationaryLocation distanceFromLocation:location];
+        return (pointDistance - stationaryLocation.horizontalAccuracy - location.horizontalAccuracy) > stationaryRadius;
+    } else {
+        return NO;
+    }
+}
 /**
  * Calculates distanceFilter by rounding speed to nearest 5 and multiplying by 10.  Clamped at 1km max.
  */

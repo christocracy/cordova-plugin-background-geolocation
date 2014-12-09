@@ -43,7 +43,6 @@ body {
     height:100%;
     margin:0px;
     padding:0px;
-    text-transform:uppercase;
     width:100%;
 }
 
@@ -59,12 +58,22 @@ body {
 
 .header {
     padding-top: 15px;
+    background-color: #fedd1e;
 }
 .header h3 {
+    text-transform:uppercase;
     font-size:24px;
+}
+.header p, .header h3 {
     font-weight:normal;
     margin:0px;
     overflow:visible;
     padding:0px;
     text-align:center;
+}
+.header p {
+    font-size: 1.3em;
+}
+#footer {
+    background-color: #fedd1e;
 }
