@@ -16,6 +16,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+var ENV = (function() {
+    
+    var localStorage = window.localStorage;
+
+    return {
+        settings: {
+            /**
+            * state-mgmt
+            */
+            enabled:    localStorage.getItem('enabled')     || 'true',
+            aggressive: localStorage.getItem('aggressive')  || 'false'
+        },
+        toggle: function(key) {
+            var value       = localStorage.getItem(key)
+                newValue    = ((new String(value)) == 'true') ? 'false' : 'true';
+
+            localStorage.setItem(key, newValue);
+            return newValue;
+        }
+    }
+})()
+
 var app = {
     /**
     * @property {google.maps.Map} map
@@ -37,8 +59,15 @@ var app = {
     * @property {Array} locations List of rendered map markers of prev locations
     */
     locations: [],
+    /**
+    * @private
+    */
+    btnEnabled: undefined,
+    btnPace: undefined,
+    btnHome: undefined,
+    btnReset: undefined,
 
-    // Application Constructor
+    // Application Constructor  
     initialize: function() {
         this.bindEvents();
         google.maps.event.addDomListener(window, 'load', app.initializeMap);
@@ -51,15 +80,15 @@ var app = {
           zoomControl: false
         };
 
-        var header = document.getElementById('header'),
-            footer = document.getElementById('footer'),
-            canvas = document.getElementById('map-canvas'),
-            canvasHeight = window.innerHeight - header.clientHeight - footer.clientHeight;
+        var header = $('#header'),
+            footer = $('#footer'),
+            canvas = $('#map-canvas'),
+            canvasHeight = window.innerHeight - header[0].clientHeight - footer[0].clientHeight;
 
-        canvas.style.height = canvasHeight + 'px';
-        canvas.style.width = window.clientWidth + 'px';
+        canvas.height(canvasHeight);
+        canvas.width(window.clientWidth);
 
-        app.map = new google.maps.Map(canvas, mapOptions);
+        app.map = new google.maps.Map(canvas[0], mapOptions);
     },
     // Bind Event Listeners
     //
@@ -70,15 +99,29 @@ var app = {
         document.addEventListener('pause', this.onPause, false);
         document.addEventListener('resume', this.onResume, false);
 
-        var btnHome     = document.getElementById('btn-home'),
-            btnReset    = document.getElementById('btn-reset'),
-            btnPace     = document.getElementById('btn-pace'),
-            btnDisabled = document.getElementById('btn-disabled');
+        // Init UI buttons
+        this.btnHome        = $('button#btn-home');
+        this.btnReset       = $('button#btn-reset');
+        this.btnPace        = $('button#btn-pace');
+        this.btnEnabled     = $('button#btn-enabled');
 
-        btnHome.addEventListener('click', this.onClickHome);
-        btnReset.addEventListener('click', this.onClickReset);
-        btnPace.addEventListener('click', this.onClickChangePace);
-        btnDisabled.addEventListener('click', this.onClickToggleDisabled);
+        if (ENV.settings.aggressive == 'true') {
+            this.btnPace.addClass('btn-danger');
+        } else {
+            this.btnPace.addClass('btn-success');
+        }
+        if (ENV.settings.enabled == 'true') {
+            this.btnEnabled.addClass('btn-danger');
+            this.btnEnabled[0].innerHTML = 'Stop';
+        } else {
+            this.btnEnabled.addClass('btn-success');
+            this.btnEnabled[0].innerHTML = 'Start';
+        }
+        
+        this.btnHome.on('click', this.onClickHome);
+        this.btnReset.on('click', this.onClickReset);
+        this.btnPace.on('click', this.onClickChangePace);
+        this.btnEnabled.on('click', this.onClickToggleEnabled);
     },
     // deviceready Event Handler
     //
@@ -119,6 +162,7 @@ var app = {
             console.log('BackgroundGeoLocation error');
         };
 
+        // Only ios emits this stationary event
         bgGeo.onStationary(function(location) {
             if (!app.stationaryRadius) {
                 app.stationaryRadius = new google.maps.Circle({
@@ -153,7 +197,15 @@ var app = {
         });
         
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
-        bgGeo.start();
+        var settings = ENV.settings;
+
+        if (settings.enabled == 'true') {
+            bgGeo.start();
+        
+            if (settings.aggressive == 'true') {
+                bgGeo.changePace(true);
+            }
+        }
     },
     onClickHome: function() {
         var fgGeo = window.navigator.geolocation;
@@ -173,19 +225,21 @@ var app = {
             app.setCurrentLocation(coords);
         });
     },
-    onClickChangePace: function() {
+    onClickChangePace: function(value) {
         var bgGeo   = window.plugins.backgroundGeoLocation,
-            btnPace = document.getElementById('btn-pace'),
-            className = ['btn', 'navbar-btn'];
+            btnPace = app.btnPace;
 
-        app.aggressiveEnabled = !app.aggressiveEnabled;
-        bgGeo.changePace(app.aggressiveEnabled);
-        if (app.aggressiveEnabled) {
-            className.push('btn-danger');
+        btnPace.removeClass('btn-success');
+        btnPace.removeClass('btn-danger');
+
+        var isAggressive = ENV.toggle('aggressive');
+        if (isAggressive == 'true') {
+            btnPace.addClass('btn-danger');
+            bgGeo.changePace(true);
         } else {
-            className.push('btn-success');
+            btnPace.addClass('btn-success');
+            bgGeo.changePace(false);
         }
-        btnPace.className = className.join(' ');
     },
     onClickReset: function() {
         // Clear prev location markers.
@@ -199,27 +253,23 @@ var app = {
         app.path.setMap(null);
         app.path = undefined;
     },
-    onClickToggleDisabled: function() {
+    onClickToggleEnabled: function(value) {
         var bgGeo       = window.plugins.backgroundGeoLocation,
-            btnDisabled = document.getElementById('btn-disabled'),
-            isDisabled  = btnDisabled.getAttribute('data-id'),
-            text        = '',
-            className   = ['btn', 'navbar-btn'];
+            btnEnabled  = app.btnEnabled,
+            isEnabled   = ENV.toggle('enabled');
+        
+        btnEnabled.removeClass('btn-danger');
+        btnEnabled.removeClass('btn-success');
 
-        if (isDisabled === 'false') {
-            isDisabled = 'true';
-            bgGeo.stop();
-            text = 'Start';
-            className.push('btn-success');
-        } else {
-            isDisabled = 'false';
+        if (isEnabled == 'true') {
+            btnEnabled.addClass('btn-danger');
+            btnEnabled[0].innerHTML = 'Stop';
             bgGeo.start();
-            text = 'Stop';
-            className.push('btn-danger');
+        } else {
+            btnEnabled.addClass('btn-success');
+            btnEnabled[0].innerHTML = 'Start';
+            bgGeo.stop();
         }
-        btnDisabled.innerHTML = text;
-        btnDisabled.className = className.join(' ');
-        btnDisabled.setAttribute('data-id', isDisabled);
     },
     watchPosition: function() {
         var fgGeo = window.navigator.geolocation;
