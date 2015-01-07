@@ -95,6 +95,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private String notificationTitle = "Background checking";
     private String notificationText = "ENABLED";
     private Boolean stopOnTerminate;
+    private boolean postLocationsToServer = true;
 
     private ToneGenerator toneGenerator;
 
@@ -180,6 +181,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
             notificationTitle = intent.getStringExtra("notificationTitle");
             notificationText = intent.getStringExtra("notificationText");
+            this.postLocationsToServer = intent.getBooleanExtra("postLocationsToServer", /*defaultValue*/ true);
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
@@ -414,7 +416,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         lastLocation = location;
         persistLocation(location);
 
-        if (this.isNetworkConnected()) {
+        if (this.postLocationsToServer && this.isNetworkConnected()) {
             Log.d(TAG, "Scheduling location network post");
             schedulePostLocations();
         } else {
