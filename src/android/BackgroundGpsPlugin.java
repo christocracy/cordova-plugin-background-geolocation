@@ -18,6 +18,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     public static final String ACTION_STOP = "stop";
     public static final String ACTION_CONFIGURE = "configure";
     public static final String ACTION_SET_CONFIG = "setConfig";
+    public static final String ACTION_CHANGE_PACE = "onPaceChange";
 
     private Intent updateServiceIntent;
 
@@ -90,6 +91,9 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
             result = true;
             // TODO reconfigure Service
+            callbackContext.success();
+        } else if (ACTION_PACE_CHANGE.equalsIgnoreCase(action)) {
+            result = true;
             callbackContext.success();
         }
 
