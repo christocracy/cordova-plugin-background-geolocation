@@ -52,17 +52,23 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 import static java.lang.Math.*;
 
 public class LocationUpdateService extends Service implements LocationListener {
     private static final String TAG = "LocationUpdateService";
-    private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
-    private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
-    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
+
+    private static final String STATIONARY_REGION_ACTION           = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
+    private static final String STATIONARY_ALARM_ACTION            = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
+    private static final String SINGLE_LOCATION_UPDATE_ACTION      = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
+
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
+
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
 
@@ -92,8 +98,11 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Integer scaledDistanceFilter;
     private Integer locationTimeout = 30;
     private Boolean isDebugging;
+
+    private String notificationIcon  = "notification_icon";
     private String notificationTitle = "Background checking";
-    private String notificationText = "ENABLED";
+    private String notificationText  = "ENABLED";
+
     private Boolean stopOnTerminate;
 
     private ToneGenerator toneGenerator;
@@ -147,7 +156,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         //telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
         //
 
-        PowerManager pm         = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
 
         wakeLock.acquire();
@@ -162,6 +171,7 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         Log.i(TAG, "Received start id " + startId + ": " + intent);
         if (intent != null) {
             try {
@@ -178,25 +188,38 @@ public class LocationUpdateService extends Service implements LocationListener {
             desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
             locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
+
+            notificationIcon  = intent.getStringExtra("notificationIcon");
             notificationTitle = intent.getStringExtra("notificationTitle");
-            notificationText = intent.getStringExtra("notificationText");
+            notificationText  = intent.getStringExtra("notificationText");
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
+            Intent link = new Intent(this, NotificationHandlerActivity.class);
+
             main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
+
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent linkIntent    = PendingIntent.getActivity(this, 0, link, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Bitmap largeIcon = BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(notificationIcon + "_large"));
 
             Notification.Builder builder = new Notification.Builder(this);
+
             builder.setContentTitle(notificationTitle);
             builder.setContentText(notificationText);
-            builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
-            builder.setContentIntent(pendingIntent);
+            builder.setSmallIcon(getPluginResource(notificationIcon + "_small"));
+            builder.setLargeIcon(largeIcon);
+            builder.setContentIntent(linkIntent);
+
             Notification notification;
+
             if (android.os.Build.VERSION.SDK_INT >= 16) {
                 notification = buildForegroundNotification(builder);
             } else {
                 notification = buildForegroundNotificationCompat(builder);
             }
+
             notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
             startForeground(startId, notification);
         }
@@ -208,6 +231,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
         Log.i(TAG, "- locationTimeout: "    + locationTimeout);
         Log.i(TAG, "- isDebugging: "        + isDebugging);
+        Log.i(TAG, "- notificationIcon: "  + notificationIcon);
         Log.i(TAG, "- notificationTitle: "  + notificationTitle);
         Log.i(TAG, "- notificationText: "   + notificationText);
 
@@ -756,6 +780,11 @@ public class LocationUpdateService extends Service implements LocationListener {
     public void onTaskRemoved(Intent rootIntent) {
         this.stopSelf();
         super.onTaskRemoved(rootIntent);
+    }
+
+
+    public Integer getPluginResource(String resourceName) {
+        return getApplication().getResources().getIdentifier(resourceName, "drawable", getApplication().getPackageName());
     }
 
     private class PostLocationTask extends AsyncTask<Object, Integer, Boolean> {

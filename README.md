@@ -24,6 +24,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 ```
 
 A full example could be:
+
 ```
     //
     //
@@ -233,7 +234,30 @@ Optional HTTP headers POSTed to your server when persisting locations
 
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
 
-#####`@param {Integer} locationTimeout
+####`@param {String} notificationIcon`
+
+Optional: the filename of a custom notification icon. The icon must be located in the plugin directory. You should include a small and large icon; append "\_small" and "\_large" end of your image filenames. Omit the small and large when passing notificationIcon to configure. This will default to "notification_icon".
+
+```
+notificationIcon = "notification_icon"
+
+src/android/notification_icon_small.png
+src/android/notification_icon_large.png
+```
+
+In order to include any new images, you must add them to the plugin.xml source-files.
+
+```
+notificationIcon = "new_icon"
+
+src/android/new_icon_small.png
+src/android/new_icon_large.png
+
+<source-file src="src/android/new_icon_small.png" target-dir="res/drawable" />
+<source-file src="src/android/new_icon_large.png" target-dir="res/drawable" />
+```
+
+#####`@param {Integer} locationTimeout`
 
 The minimum time interval between location updates, in seconds.  See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) for more information.
 
