@@ -1,4 +1,17 @@
-package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
+/*
+According to apache license
+
+This is fork of christocracy cordova-plugin-background-geolocation plugin
+https://github.com/christocracy/cordova-plugin-background-geolocation
+
+Differences to original version:
+
+1. To avoid conflicts
+package com.tenforwardconsulting.cordova.bgloc
+was renamed to com.marianhello.cordova.bgloc
+*/
+
+package com.marianhello.cordova.bgloc.data.sqlite;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,8 +26,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.tenforwardconsulting.cordova.bgloc.data.Location;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.Location;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
 
 public class SQLiteLocationDAO implements LocationDAO {
 	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";

@@ -1,3 +1,11 @@
+Fork notice
+==============================
+
+This is fork of christocracy's cordova-backgroud-geolocation. The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS.
+
+Warning: You probably have to set your cordova app to keep running by keepRunning property to true 
+
+
 Premium Version
 ==============================
 

@@ -1,4 +1,19 @@
-package com.tenforwardconsulting.cordova.bgloc;
+/*
+According to apache license
+
+This is fork of christocracy cordova-plugin-background-geolocation plugin
+https://github.com/christocracy/cordova-plugin-background-geolocation
+
+Differences to original version:
+
+1. To avoid conflicts
+package com.tenforwardconsulting.cordova.bgloc
+was renamed to com.marianhello.cordova.bgloc
+
+2. location is not persisted to db anymore, but broadcasted using intents instead
+*/
+
+package com.marianhello.cordova.bgloc;
 
 import java.util.List;
 import java.util.Iterator;
@@ -10,8 +25,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.DAOFactory;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
 
 import android.annotation.TargetApi;
 
@@ -33,6 +48,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
+import android.support.v4.content.LocalBroadcastManager;
 
 import android.location.Location;
 import android.location.Criteria;
@@ -50,16 +66,17 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 
 import android.util.Log;
-import android.widget.Toast;
+import android.widget.Toast;;
+import org.json.JSONException;
 
 import static java.lang.Math.*;
 
 public class LocationUpdateService extends Service implements LocationListener {
     private static final String TAG = "LocationUpdateService";
-    private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
-    private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
-    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
-    private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
+    private static final String STATIONARY_REGION_ACTION        = "com.marianhello.cordova.bgloc.STATIONARY_REGION_ACTION";
+    private static final String STATIONARY_ALARM_ACTION         = "com.marianhello.cordova.bgloc.STATIONARY_ALARM_ACTION";
+    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.marianhello.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
+    private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.marianhello.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -412,14 +429,16 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         // Go ahead and cache, push to server
         lastLocation = location;
-        persistLocation(location);
+        // persistLocation(location);
+        broadcastLocation(location);
 
-        if (this.isNetworkConnected()) {
-            Log.d(TAG, "Scheduling location network post");
-            schedulePostLocations();
-        } else {
-            Log.d(TAG, "Network unavailable, waiting for now");
-        }
+        // if (this.isNetworkConnected()) {
+        //     Log.d(TAG, "Scheduling location network post");
+        //     schedulePostLocations();            
+
+        // } else {
+        //     Log.d(TAG, "Network unavailable, waiting for now");
+        // }
     }
 
     /**
@@ -651,7 +670,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.d(TAG, "afterexecute " +  task.getStatus());
     }
 
-    private boolean postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location l, LocationDAO dao) {
+    private boolean postLocation(com.marianhello.cordova.bgloc.data.Location l, LocationDAO dao) {
         if (l == null) {
             Log.w(TAG, "postLocation: null location");
             return false;
@@ -703,12 +722,27 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
     private void persistLocation(Location location) {
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
-        com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
+        com.marianhello.cordova.bgloc.data.Location savedLocation = com.marianhello.cordova.bgloc.data.Location.fromAndroidLocation(location);
 
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
         } else {
             Log.w(TAG, "Failed to persist location");
+        }
+    }
+
+    private void broadcastLocation (Location location) {
+        Log.d(TAG, "Broadcasting update message: " + location.toString());
+        try {
+            String locStr = com.marianhello.cordova.bgloc.data.Location.fromAndroidLocation(location).toJSONObject().toString();
+            Intent intent = new Intent(Constant.FILTER);
+            intent.putExtra(Constant.COMMAND, Constant.UPDATE_PROGRESS);
+            // intent.putExtra(Constant.DATA, location);
+            intent.putExtra(Constant.DATA, locStr);
+            // LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            this.sendBroadcast(intent);
+        } catch (JSONException e) {
+            Log.w(TAG, "Failed to broadcast location");
         }
     }
 
@@ -764,7 +798,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
             LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
-            for (com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
+            for (com.marianhello.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
                 Log.d(TAG, "Posting saved location");
                 if (postLocation(savedLocation, locationDAO)) {
                     locationDAO.deleteLocation(savedLocation);

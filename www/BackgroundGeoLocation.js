@@ -1,3 +1,14 @@
+/*
+According to apache license
+
+This is fork of christocracy cordova-plugin-background-geolocation plugin
+https://github.com/christocracy/cordova-plugin-background-geolocation
+
+Differences to original version:
+
+1. new method isLocationEnabled
+*/
+
 var exec = require("cordova/exec");
 module.exports = {
     /**
@@ -101,6 +112,15 @@ module.exports = {
             'addStationaryRegionListener',
             []);
     },
+
+    isLocationEnabled: function(success, failure) {
+        exec(success || function() {},
+             failure || function() {},
+             'BackgroundGeoLocation',
+             'isLocationEnabled',
+             []);
+    },
+
     apply: function(destination, source) {
         source = source || {};
         for (var property in source) {
