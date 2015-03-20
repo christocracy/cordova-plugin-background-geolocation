@@ -116,6 +116,8 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 
 This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
 
+![SampleApp](/android-sample-app.png "SampleApp")
+
 ```
 $ cd example/SampleApp
 $ cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
