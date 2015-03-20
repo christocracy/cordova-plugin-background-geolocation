@@ -15,7 +15,7 @@ BackgroundGeoLocation
 
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
-![distanceFilter at highway speed](/distance-filter-highway.png "distanceFilter at highway speed")
+![distanceFilter at highway speed](/images/distance-filter-highway.png "distanceFilter at highway speed")
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
@@ -116,7 +116,7 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 
 This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
 
-![SampleApp](/android-sample-app.png "SampleApp")
+![SampleApp](/images/android-sample-app.png "SampleApp")
 
 ```
 $ cd example/SampleApp
@@ -191,7 +191,7 @@ When enabled, the plugin will emit sounds for life-cycle events of background-ge
 - Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
 - Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
 
-![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
+![Enable Background Audio](/images/enable-background-audio.png "Enable Background Audio")
 
 #####`@param {Integer} distanceFilter`
 
@@ -221,11 +221,11 @@ A gps location will be recorded every 930m
 
 Note the following real example of background-geolocation on highway 101 towards San Francisco as the driver slows down as he runs into slower traffic (geolocations become compressed as distanceFilter decreases)
 
-![distanceFilter at highway speed](/distance-filter-highway.png "distanceFilter at highway speed")
+![distanceFilter at highway speed](/images/distance-filter-highway.png "distanceFilter at highway speed")
 
 Compare now background-geolocation in the scope of a city.  In this image, the left-hand track is from a cab-ride, while the right-hand track is walking speed.
 
-![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
+![distanceFilter at city scale](/images/distance-filter-city.png "distanceFilter at city scale")
 
 #####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app)
