@@ -6,12 +6,16 @@ A new [Premium Version](http://christocracy.github.io/cordova-background-geoloca
 - Android no longer handles HTTP -- It now executes your ```callback``` just like **iOS**!
 - 50% less code -- much easier to extend!
 
+![Android Battery Performance](/android-battery.png "Android battery performance")
+![SampleApp](/android-sample-app.png "SampleApp")
+![SampleApp](/android-sample-app.png "SampleApp")
+
 BackgroundGeoLocation
 ==============================
 
-![distanceFilter at highway speed](/distance-filter-highway.png "distanceFilter at highway speed")
-
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
+
+![distanceFilter at highway speed](/distance-filter-highway.png "distanceFilter at highway speed")
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
@@ -109,8 +113,6 @@ A full example could be:
 NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
 
 ## Example Application
-
-![SampleApp](/android-sample-app.png "SampleApp")
 
 This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
 
