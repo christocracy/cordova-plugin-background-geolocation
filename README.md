@@ -8,6 +8,8 @@ A new [Premium Version](http://christocracy.github.io/cordova-background-geoloca
 
 ![Android Battery Performance](/android-battery.png "Android battery performance")
 ![SampleApp](/android-sample-app.png "SampleApp")
+![SampleApp](/android-sample-app.png "SampleApp")
+
 BackgroundGeoLocation
 ==============================
 
