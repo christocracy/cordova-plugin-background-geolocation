@@ -9,6 +9,8 @@ A new [Premium Version](http://christocracy.github.io/cordova-background-geoloca
 BackgroundGeoLocation
 ==============================
 
+![distanceFilter at highway speed](/distance-filter-highway.png "distanceFilter at highway speed")
+
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
