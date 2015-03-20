@@ -1,4 +1,4 @@
-![Transistor Software](images/transistor-logo.svg "Transistor Software")
+![Transistor Software](/images/transistor-logo.svg "Transistor Software")
 
 Premium Version
 ==============================
