@@ -110,6 +110,8 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 
 ## Example Application
 
+![SampleApp](/android-sample-app.png "SampleApp")
+
 This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
 
 ```
