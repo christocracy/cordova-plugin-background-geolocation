@@ -1,13 +1,15 @@
+![Transistor Software](/images/transistor-logo.svg "Transistor Software")
+
 Premium Version
 ==============================
 
 A new [Premium Version](http://christocracy.github.io/cordova-background-geolocation/) is available for **$500.00**
 - Implements the latest Android Fused GeoLocation and ActivityRecognition APIs for **much-improved** battery performance.
 - Android no longer handles HTTP -- It now executes your ```callback``` just like **iOS**!
-- 50% less code -- much easier to extend!
+- Less than 500 lines-of-code in just two source-files -- much easier to extend!
 
 ![Android Battery Performance](/android-battery.png "Android battery performance")
-![SampleApp](/android-sample-app.png "SampleApp")
+![Android Battery Performance](/android-battery-detail.png "Android Battery Performance")
 ![SampleApp](/android-sample-app.png "SampleApp")
 
 BackgroundGeoLocation
@@ -115,6 +117,8 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 ## Example Application
 
 This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
+
+![SampleApp](/android-sample-app.png "SampleApp")
 
 ```
 $ cd example/SampleApp
