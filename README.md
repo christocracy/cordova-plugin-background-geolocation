@@ -6,6 +6,8 @@ A new [Premium Version](http://christocracy.github.io/cordova-background-geoloca
 - Android no longer handles HTTP -- It now executes your ```callback``` just like **iOS**!
 - 50% less code -- much easier to extend!
 
+![Android Battery Performance](/android-battery.png "Android battery performance")
+
 BackgroundGeoLocation
 ==============================
 
