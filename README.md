@@ -1,10 +1,11 @@
 Premium Version
 ==============================
 
-A new [Premium Version](http://christocracy.github.io/cordova-background-geolocation/) is available for **$500.00**
+A new [Premium Version](http://christocracy.github.io/cordova-background-geolocation/) is available.
 - Implements the latest Android Fused GeoLocation and ActivityRecognition APIs for **much-improved** battery performance.
 - Android no longer handles HTTP -- It now executes your ```callback``` just like **iOS**!
 - Less than 500 lines-of-code in just two source-files -- much easier to extend!
+- Auto-start Android on device-boot.
 
 ![Android Battery Performance](/images/android-battery.png "Android battery performance")
 ![SampleApp](/images/android-sample-app.png "SampleApp")
