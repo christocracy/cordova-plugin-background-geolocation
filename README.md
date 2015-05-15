@@ -37,6 +37,12 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
    cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
 ```
 
+**ACHTUNG!** If you're not using **Cordova 5.x**, you must use the tagged branch ```#cordova-4.x``` to install the plugin, like this (Because Cordova has [migrated to npm](https://cordova.apache.org/announcements/2015/04/21/plugins-release-and-move-to-npm.html))
+
+```
+  cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git#cordova-4.x
+```
+
 A full example could be:
 ```
     //
