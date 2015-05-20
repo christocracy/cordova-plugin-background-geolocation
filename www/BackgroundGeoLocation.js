@@ -23,12 +23,13 @@ module.exports = {
             notificationText    = config.notificationText || "ENABLED";
             activityType        = config.activityType || "OTHER";
             stopOnTerminate     = config.stopOnTerminate || false;
+            postLocationsToServer = typeof config.postLocationsToServer !== "undefined" ? config.postLocationsToServer : true;
 
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
-             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate]
+             [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate, postLocationsToServer]
         );
     },
     start: function(success, failure, config) {
@@ -58,6 +59,24 @@ module.exports = {
             'BackgroundGeoLocation',
             'onPaceChange',
             [isMoving]);
+    },
+    getLocations: function (success, failure, config) {
+        var deleteLocations = typeof config.deleteLocations === "undefined" ? true : config.deleteLocations;
+        exec(function(positions) { if (positions.length && success) { success(positions); } },
+             failure || function() { },
+             'BackgroundGeoLocation',
+             'getLocations',
+             [deleteLocations]);
+    },
+    watch: function (success, failure, config) {
+        window.plugins.backgroundGeoLocation.start(success, failure, config);
+        return window.setInterval(function () {
+            window.plugins.backgroundGeoLocation.getLocations(success, failure, config);
+        }, config.interval || 5000);
+    },
+    clearWatch: function (watchId, success, failure, config) {
+        window.plugins.backgroundGeoLocation.stop(success, failure, config);
+        window.clearTimeout(watchId);
     },
     /**
     * @param {Integer} stationaryRadius
