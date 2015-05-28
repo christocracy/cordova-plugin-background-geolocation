@@ -5,9 +5,9 @@ A new [Premium Version](http://christocracy.github.io/cordova-background-geoloca
 - Implements the latest Android Fused GeoLocation and ActivityRecognition APIs for **much-improved** battery performance.
 - Auto-start Android on device-boot.
 - Android now executes your ```callback``` just like **iOS**!
-- Both iOS & Android can optionally HTTP POST locations to your server with native code.
-- Native SQLite persistence layer (for when no network is available).  Plugin provides a javascript API to fetch and/or sync the locations to your server.
-- Geofencing.  Both iOS and Android allow you to add arbitrary circular geofences which execute your javascript-callback when a crossing-event occurs.
+- Both iOS & Android can optionally **HTTP** POST locations to your server with native code.
+- Native **SQLite persistence** layer (for when no network is available).  Plugin provides a javascript API to fetch and/or sync the locations to your server.
+- **Geofencing**.  Both iOS and Android allow you to add arbitrary circular geofences which execute your javascript-callback when a crossing-event occurs.
 
 ![Android Battery Performance](/images/android-battery.png "Android battery performance")
 ![SampleApp](/images/android-sample-app.png "SampleApp")
