@@ -3,9 +3,11 @@ Premium Version
 
 A new [Premium Version](http://christocracy.github.io/cordova-background-geolocation/) is available.
 - Implements the latest Android Fused GeoLocation and ActivityRecognition APIs for **much-improved** battery performance.
-- Auto-start Android on device-boot.
-- Android no longer handles HTTP -- It now executes your ```callback``` just like **iOS**!
-- Less than 500 lines-of-code in just two source-files -- much easier to extend!
+- Auto-start Android & iOS on device-boot.
+- Android now executes your ```callback``` just like **iOS**!
+- Both iOS & Android can optionally **HTTP** POST locations to your server in the native code.  Optional **batch-mode**.
+- Native **SQLite persistence** layer (for when no network is available).  Plugin provides a javascript API to fetch and/or sync the locations to your server.
+- **Geofencing**.  Both iOS and Android allow you to add arbitrary circular geofences which execute your javascript-callback when a crossing-event occurs.
 
 ![Android Battery Performance](/images/android-battery.png "Android battery performance")
 ![SampleApp](/images/android-sample-app.png "SampleApp")
@@ -35,6 +37,12 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 ```
 
    cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
+```
+
+**ACHTUNG!** If you're not using **Cordova 5.x**, you must use the tagged branch ```#cordova-4.x``` to install the plugin, like this (Because Cordova has [migrated to npm](https://cordova.apache.org/announcements/2015/04/21/plugins-release-and-move-to-npm.html))
+
+```
+  cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git#cordova-4.x
 ```
 
 A full example could be:
