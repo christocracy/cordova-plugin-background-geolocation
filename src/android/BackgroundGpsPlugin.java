@@ -68,7 +68,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
-        Context context = activity.getApplicationContext(); 
+        Context context = activity.getApplicationContext();
         Boolean result = false;
         updateServiceIntent = new Intent(activity, LocationUpdateService.class);
 
@@ -80,7 +80,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 IntentFilter intentFilter = new IntentFilter(Constant.FILTER);
                 // LocalBroadcastManager.getInstance(activity).registerReceiver(mMessageReceiver, intentFilter);
                 context.registerReceiver(mMessageReceiver, intentFilter);
-                
+
                 updateServiceIntent.putExtra("url", url);
                 updateServiceIntent.putExtra("params", params);
                 updateServiceIntent.putExtra("headers", headers);
@@ -141,7 +141,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 callbackContext.success(isLocationEnabled);
             } catch (SettingNotFoundException e) {
                 callbackContext.error("Location setting not found on this platform");
-            }            
+            }
         }
 
         return result;
@@ -171,7 +171,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
             locationProviders = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
             return !TextUtils.isEmpty(locationProviders);
         }
-    }    
+    }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
         @Override

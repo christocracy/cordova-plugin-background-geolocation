@@ -1,18 +1,9 @@
 Fork notice
 ==============================
 
-This is fork of christocracy's cordova-backgroud-geolocation. The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS.
+This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. It was possible be using intents.
 
-Warning: You probably have to set your cordova app to keep running by keepRunning property to true 
-
-
-Premium Version
-==============================
-
-A new [Premium Version](http://christocracy.github.io/cordova-background-geolocation/) is available for **$500.00**
-- Implements the latest Android Fused GeoLocation and ActivityRecognition APIs for **much-improved** battery performance.
-- Android no longer handles HTTP -- It now executes your ```callback``` just like **iOS**!
-- 50% less code -- much easier to extend!
+Warning: You probably have to set your cordova app to keep running by keepRunning property to true
 
 BackgroundGeoLocation
 ==============================
@@ -85,14 +76,6 @@ A full example could be:
 
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
-        url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to
-        params: {
-            auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-            foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-        },
-        headers: {                                   // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
-            "X-Foo": "BAR"
-        },
         desiredAccuracy: 10,
         stationaryRadius: 20,
         distanceFilter: 30,
@@ -144,23 +127,7 @@ On iOS the plugin will execute your configured ```callbackFn```. You may manuall
 
 ### Android
 
-Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manages sync-ing GeoLocations to your server automatically, using the configured ```url```, ```params``` and ```headers```.  Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.  This is why the Android plugin cannot execute the Javascript ```callbackFn```, since your app is not guaranteed to keep running -- syncing locations to the server must be handled by the plugin.
-
-The Android plugin sends an HTTP POST to your configured ```url``` with ```Content-Type: application/json```.  The JSON location-data is encoded into the Request Body.  PHP people have [trouble with this](https://github.com/christocracy/cordova-plugin-background-geolocation/issues/50).  In PHP, find the raw JSON body with:
-
-```$data = file_get_contents('php://input');```.
-
-```
-{
-    "location": {
-        "latitude": "<data>",
-        "longitude": "<data>",
-        "speed": "<data>",
-        "bearing" "<data>",
-        "altitude": "<data>",
-        "recorded_at": "<data>"
-    }
-}
+Android **WILL** execute your configured ```callbackFn```. This is the main difference from original christocracy plugin. Android is using intents to do so. Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.
 ```
 
 ### WP8
@@ -232,18 +199,6 @@ Enable this in order to force a stop() when the application terminated (e.g. on 
 
 
 ### Android Config
-
-#####`@param {String} url`
-
-The url which the Android plugin will persist background geolocation to
-
-#####`@param {Object} params`
-
-Optional HTTP params POSTed to your server when persisting locations (eg:  auth_token)
-
-#####`@param {Object} headers`
-
-Optional HTTP headers POSTed to your server when persisting locations
 
 #####`@param {String} notificationText/Title`
 
