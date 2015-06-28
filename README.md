@@ -30,9 +30,18 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 ## Installing the plugin ##
 
+As Cordova is [shifting towards npm](http://cordova.apache.org/announcements/2015/04/21/plugins-release-and-move-to-npm.html), this plugin can be installed from npm:
+
+```
+   cordova plugin add cordova-plugin-mauron85-background-geolocation
 ```
 
-   cordova plugin add https://github.com/mauron85/cordova-plugin-background-geolocation.git
+## Registering plugin for Adobe® PhoneGap™ Build
+
+[Adobe® PhoneGap™ Build](http://build.phonegap.com) supports plugins from npm as well. To register plugin add following line into your config.xml
+
+```
+   <gap:plugin name="cordova-plugin-mauron85-background-geolocation" source="npm"/>
 ```
 
 A full example could be:
@@ -107,8 +116,9 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
 
 ```
-$ cd example/SampleApp
-$ cordova plugin add https://github.com/mauron85/cordova-plugin-background-geolocation.git
+$ cordova create SampleApp
+$ cd SampleApp
+$ cordova plugin add cordova-plugin-mauron85-background-geolocation
 $ cordova platform add ios
 $ cordova build ios
 
