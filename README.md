@@ -1,3 +1,6 @@
+cordova-plugin-mauron85-background-geolocation
+==============================
+
 Fork notice
 ==============================
 
@@ -5,7 +8,7 @@ This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/
 
 Warning: You probably have to set your cordova app to keep running by keepRunning property to true
 
-cordova-plugin-mauron85-background-geolocation
+Description
 ==============================
 
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
