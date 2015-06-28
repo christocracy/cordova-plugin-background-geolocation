@@ -5,7 +5,7 @@ This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/
 
 Warning: You probably have to set your cordova app to keep running by keepRunning property to true
 
-BackgroundGeoLocation
+cordova-plugin-mauron85-background-geolocation
 ==============================
 
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
@@ -13,6 +13,8 @@ Cross-platform background geolocation for Cordova / PhoneGap with battery-saving
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
 This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html).
+
+Also available via npm.
 
 ## Using the plugin ##
 The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
@@ -27,7 +29,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 ```
 
-   cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
+   cordova plugin add https://github.com/mauron85/cordova-plugin-background-geolocation.git
 ```
 
 A full example could be:
@@ -103,7 +105,7 @@ This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp
 
 ```
 $ cd example/SampleApp
-$ cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
+$ cordova plugin add https://github.com/mauron85/cordova-plugin-background-geolocation.git
 $ cordova platform add ios
 $ cordova build ios
 
