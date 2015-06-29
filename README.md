@@ -275,9 +275,9 @@ In Windows Phone, the underlying GeoLocator you can choose to use 'DesiredAccura
 
 ## Licence ##
 
-The MIT License
+[Apache License](https://github.com/christocracy/cordova-plugin-background-geolocation/blob/master/LICENSE)
 
-Copyright (c) 2013 Chris Scott and Brian Samson
+Copyright (c) 2013 Christopher Scott, Transistor Software
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
