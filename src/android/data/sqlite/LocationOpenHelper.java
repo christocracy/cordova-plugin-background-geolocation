@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
+package com.zencity.cordova.bgloc.data.sqlite;
 
 
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc;
+package com.zencity.cordova.bgloc;
 
 import java.util.List;
 import java.util.Iterator;
@@ -10,8 +10,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.zencity.cordova.bgloc.data.DAOFactory;
+import com.zencity.cordova.bgloc.data.LocationDAO;
 
 import android.annotation.TargetApi;
 
@@ -56,10 +56,10 @@ import static java.lang.Math.*;
 
 public class LocationUpdateService extends Service implements LocationListener {
     private static final String TAG = "LocationUpdateService";
-    private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
-    private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
-    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
-    private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
+    private static final String STATIONARY_REGION_ACTION        = "com.zencity.cordova.bgloc.STATIONARY_REGION_ACTION";
+    private static final String STATIONARY_ALARM_ACTION         = "com.zencity.cordova.bgloc.STATIONARY_ALARM_ACTION";
+    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.zencity.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
+    private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.zencity.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
     private static final long STATIONARY_TIMEOUT                                = 500 * 60;    // 0.5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -651,7 +651,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.d(TAG, "afterexecute " +  task.getStatus());
     }
 
-    private boolean postLocation(com.tenforwardconsulting.cordova.bgloc.data.Location l, LocationDAO dao) {
+    private boolean postLocation(com.zencity.cordova.bgloc.data.Location l, LocationDAO dao) {
         if (l == null) {
             Log.w(TAG, "postLocation: null location");
             return false;
@@ -703,7 +703,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
     private void persistLocation(Location location) {
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
-        com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation = com.tenforwardconsulting.cordova.bgloc.data.Location.fromAndroidLocation(location);
+        com.zencity.cordova.bgloc.data.Location savedLocation = com.zencity.cordova.bgloc.data.Location.fromAndroidLocation(location);
 
         if (dao.persistLocation(savedLocation)) {
             Log.d(TAG, "Persisted Location: " + savedLocation);
@@ -764,7 +764,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         protected Boolean doInBackground(Object...objects) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
             LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
-            for (com.tenforwardconsulting.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
+            for (com.zencity.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
                 Log.d(TAG, "Posting saved location");
                 if (postLocation(savedLocation, locationDAO)) {
                     locationDAO.deleteLocation(savedLocation);

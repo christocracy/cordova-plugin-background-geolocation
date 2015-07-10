@@ -1,8 +1,8 @@
-package com.tenforwardconsulting.cordova.bgloc.data;
+package com.zencity.cordova.bgloc.data;
 
 import android.content.Context;
 
-import com.tenforwardconsulting.cordova.bgloc.data.sqlite.SQLiteLocationDAO;
+import com.zencity.cordova.bgloc.data.sqlite.SQLiteLocationDAO;
 
 public abstract class DAOFactory {
 	public static LocationDAO createLocationDAO(Context context) {

@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
+package com.zencity.cordova.bgloc.data.sqlite;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,8 +13,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.tenforwardconsulting.cordova.bgloc.data.Location;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.zencity.cordova.bgloc.data.Location;
+import com.zencity.cordova.bgloc.data.LocationDAO;
 
 public class SQLiteLocationDAO implements LocationDAO {
 	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";

@@ -22,18 +22,18 @@
 
     <!-- android -->
     <platform name="android">
-        <source-file src="src/android/BackgroundGpsPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc" />
-        <source-file src="src/android/LocationUpdateService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc" />
-        <source-file src="src/android/data/DAOFactory.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
-        <source-file src="src/android/data/Location.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
-        <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
-        <source-file src="src/android/data/sqlite/LocationOpenHelper.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
-        <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
+        <source-file src="src/android/BackgroundGpsPlugin.java" target-dir="src/com/zencity/cordova/bgloc" />
+        <source-file src="src/android/LocationUpdateService.java" target-dir="src/com/zencity/cordova/bgloc" />
+        <source-file src="src/android/data/DAOFactory.java" target-dir="src/com/zencity/cordova/bgloc/data" />
+        <source-file src="src/android/data/Location.java" target-dir="src/com/zencity/cordova/bgloc/data" />
+        <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/zencity/cordova/bgloc/data" />
+        <source-file src="src/android/data/sqlite/LocationOpenHelper.java" target-dir="src/com/zencity/cordova/bgloc/data/sqlite" />
+        <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/zencity/cordova/bgloc/data/sqlite" />
 
         <source-file src="src/android/notification.png" target-dir="res/drawable" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <service android:name="com.tenforwardconsulting.cordova.bgloc.LocationUpdateService" android:enabled="true" android:process=":remote" />
+            <service android:name="com.zencity.cordova.bgloc.LocationUpdateService" android:enabled="true" android:process=":remote" />
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
@@ -46,7 +46,7 @@
         </config-file>   
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="com.tenforwardconsulting.cordova.bgloc.BackgroundGpsPlugin"/>
+                <param name="android-package" value="com.zencity.cordova.bgloc.BackgroundGpsPlugin"/>
             </feature>
         </config-file> 
      </platform>          
