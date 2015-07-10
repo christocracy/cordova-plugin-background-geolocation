@@ -60,7 +60,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
-    private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
+    private static final long STATIONARY_TIMEOUT                                = 500 * 60;    // 0.5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
@@ -90,7 +90,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Integer desiredAccuracy = 100;
     private Integer distanceFilter = 30;
     private Integer scaledDistanceFilter;
-    private Integer locationTimeout = 30;
+    private Integer locationTimeout = 1;
     private Boolean isDebugging;
     private String notificationTitle = "Background checking";
     private String notificationText = "ENABLED";
@@ -277,7 +277,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 }
             }
         } else {
-            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
+            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, 0, this);
         }
     }
 
