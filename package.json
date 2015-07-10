@@ -3,7 +3,7 @@
   "version": "1.0.6",
   "description": "Cordova Background GeoLocation Plugin",
   "cordova": {
-    "id": "cordova-plugin-background-geolocation-zencity",
+    "id": "cordova-plugin-background-geolocation",
     "platforms": [
       "android",
       "ios",

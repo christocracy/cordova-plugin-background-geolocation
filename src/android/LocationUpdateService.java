@@ -60,9 +60,9 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final String STATIONARY_ALARM_ACTION         = "com.zencity.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.zencity.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
     private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.zencity.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
-    private static final long STATIONARY_TIMEOUT                                = 500 * 60;    // 0.5 minutes.
-    private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.
-    private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
+    private static final long STATIONARY_TIMEOUT                                = 100 * 60;    // 0.1 minutes.
+    private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 100 * 60;    // 0.1 minutes.
+    private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 50 * 60;    // 0.05 minute.
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
 
