@@ -1,26 +1,37 @@
 {
-  "name": "cordova-plugin-background-geolocation-zencity",
-  "version": "1.0.4",
-  "description": "Premium Version ==============================",
-  "main": "index.js",
-  "directories": {
-    "example": "example"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "name": "cordova-plugin-background-geolocation",
+  "version": "1.0.5",
+  "description": "Cordova Background GeoLocation Plugin",
+  "cordova": {
+    "id": "cordova-plugin-background-geolocation-zencity",
+    "platforms": [
+      "android",
+      "ios",
+      "wp8"
+    ]
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ZenCity/cordova-plugin-background-geolocation.git"
+    "url": "git+https://github.com/ZenCity/cordova-plugin-background-geolocation.git"
   },
+  "keywords": [
+    "phonegap",
+    "background geolocation",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "cordova-wp8"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ZenCity/cordova-plugin-background-geolocation/issues"
   },
-  "homepage": "https://github.com/ZenCity/cordova-plugin-background-geolocation",
-  "keywords": [
-    "cordova",
-    "ecosystem:cordova"
-  ]
+  "homepage": "https://github.com/ZenCity/cordova-plugin-background-geolocation#readme"
 }

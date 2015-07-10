@@ -1,0 +1,26 @@
+{
+  "name": "cordova-plugin-background-geolocation-zencity",
+  "version": "1.0.4",
+  "description": "Premium Version ==============================",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ZenCity/cordova-plugin-background-geolocation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ZenCity/cordova-plugin-background-geolocation/issues"
+  },
+  "homepage": "https://github.com/ZenCity/cordova-plugin-background-geolocation",
+  "keywords": [
+    "cordova",
+    "ecosystem:cordova"
+  ]
+}
