@@ -1,3 +1,5 @@
 .DS_Store
 example/SampleApp/platforms
 example/SampleApp/plugins
+
+.idea
