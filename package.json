@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/ZenCity/cordova-plugin-background-geolocation/issues"
   },
-  "homepage": "https://github.com/ZenCity/cordova-plugin-background-geolocation"
+  "homepage": "https://github.com/ZenCity/cordova-plugin-background-geolocation",
+  "keywords": [
+    "cordova",
+    "ecosystem:cordova"
+  ]
 }
