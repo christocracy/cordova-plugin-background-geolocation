@@ -246,7 +246,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "setPace: " + value);
 
         Boolean wasMoving   = isMoving;
-        isMoving            = value;
+        isMoving            = true;
         isAcquiringStationaryLocation = false;
         isAcquiringSpeed    = false;
         stationaryLocation  = null;
