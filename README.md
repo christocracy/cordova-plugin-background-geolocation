@@ -9,8 +9,8 @@ A new [Premium Version](http://christocracy.github.io/cordova-background-geoloca
 - Native **SQLite persistence** layer (for when no network is available).  Plugin provides a javascript API to fetch and/or sync the locations to your server.
 - **Geofencing**.  Both iOS and Android allow you to add arbitrary circular geofences which execute your javascript-callback when a crossing-event occurs.
 
-![Android Battery Performance](/images/android-battery.png "Android battery performance")
-![SampleApp](/images/android-sample-app.png "SampleApp")
+![Android Battery Performance](/images/Screenshot-android-battery-framed.png "Android battery performance")
+![SampleApp](/images/Screenshot-android-map1-framed.png "SampleApp")
 
 BackgroundGeoLocation
 ==============================
@@ -24,7 +24,7 @@ Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob
 This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html).
 
 ## Using the plugin ##
-The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
+The plugin creates the object `window.BackgroundGeolocation` with the methods
 
   `configure(success, fail, option)`,
 
@@ -59,7 +59,7 @@ A full example could be:
         console.log('Location from Phonegap');
     });
 
-    var bgGeo = window.plugins.backgroundGeoLocation;
+    var bgGeo = window.BackgroundGeolocation;
 
     /**
     * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
