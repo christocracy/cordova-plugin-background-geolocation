@@ -131,6 +131,7 @@ First, copy the `SampleApp` out of the repo and into any folder you wish (eg: `t
 $ cp -R cordova-plugin-background-geolocation/example/SampleApp ./tmp
 $ cd tmp/SampleApp
 $ cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
+$ cordova plugin add cordova-plugin-whitelist
 $ cordova platform add ios
 $ cordova build ios
 
