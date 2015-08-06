@@ -35,7 +35,7 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
 
-        if (window.plugins.backgroundGeoLocation) {
+        if (window.BackgroundGeolocation) {
             app.configureBackgroundGeoLocation();
         }
 
@@ -58,7 +58,7 @@ var app = {
             console.log('Location from Phonegap');
         });
 
-        var bgGeo = window.plugins.backgroundGeoLocation;
+        var bgGeo = window.BackgroundGeolocation;
 
         /**
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
