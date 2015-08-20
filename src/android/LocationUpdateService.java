@@ -691,6 +691,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             HttpResponse response = httpClient.execute(request);
             Log.i(TAG, "Response received: " + response.getStatusLine());
             if (response.getStatusLine().getStatusCode() == 200) {
+                dao.deleteAllLocation();
                 return true;
             } else {
                 return false;
