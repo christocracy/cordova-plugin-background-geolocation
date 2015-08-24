@@ -18,6 +18,11 @@ Premium iOS Now Available Free!
 
 The **[Premium iOS](https://github.com/transistorsoft/cordova-background-geolocation-lt)** version is now available free!
 
+- In-plugin SQLite storage of each recorded location
+- Optional native HTTP layer
+- Geofencing features
+- Many more configuration options
+- Extra meta-data added to each recorded location (eg: battery-state information)
 
 ![Android Battery Performance](/images/Screenshot-android-battery-framed.png "Android battery performance")
 ![SampleApp](/images/Screenshot-android-map1-framed.png "SampleApp")
