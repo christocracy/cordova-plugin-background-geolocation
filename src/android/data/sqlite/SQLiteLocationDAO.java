@@ -17,7 +17,7 @@ import com.tenforwardconsulting.cordova.bgloc.data.Location;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
 public class SQLiteLocationDAO implements LocationDAO {
-	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";
+	public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	private static final String TAG = "SQLiteLocationDAO";
 	private Context context;
 	
