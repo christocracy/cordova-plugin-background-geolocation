@@ -22,7 +22,7 @@ The **[Premium iOS](https://github.com/transistorsoft/cordova-background-geoloca
 ![Android Battery Performance](/images/Screenshot-android-battery-framed.png "Android battery performance")
 ![SampleApp](/images/Screenshot-android-map1-framed.png "SampleApp")
 
-BackgroundGeoLocation
+Background Geolocation
 ==============================
 
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
