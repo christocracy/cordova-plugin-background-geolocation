@@ -33,7 +33,7 @@ The **[Premium iOS](https://github.com/transistorsoft/cordova-background-geoloca
 
 Background Geolocation (Premium Version) has been [ported](http://www.reactnative.com/cross-platform-background-geolocation-module-for-react-native/?utm_content=buffer4e559&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer) to [React Native](https://facebook.github.io/react-native/)!
 
-Background Geolocation
+Cordova Background Geolocation
 ==============================
 
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
