@@ -13,7 +13,7 @@ A new [Premium Version](http://transistorsoft.github.io/cordova-background-geolo
 - **Geofencing**.  Both iOS and Android allow you to add arbitrary circular geofences which execute your javascript-callback when a crossing-event occurs.
 
 
-Premium iOS Now Available Free!
+[Premium iOS Now Available Free!](https://github.com/transistorsoft/cordova-background-geolocation-lt)
 ===============================
 
 The **[Premium iOS](https://github.com/transistorsoft/cordova-background-geolocation-lt)** version is now available free!
