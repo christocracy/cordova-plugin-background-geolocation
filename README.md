@@ -29,6 +29,7 @@ The **[Premium iOS](https://github.com/transistorsoft/cordova-background-geoloca
 ![SampleApp](/images/Screenshot-android-map1-framed.png "SampleApp")
 
 [Now Available for React Native](https://github.com/transistorsoft/react-native-background-geolocation)
+================================
 
 Background Geolocation has been [ported](http://www.reactnative.com/cross-platform-background-geolocation-module-for-react-native/?utm_content=buffer4e559&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer) to [React Native](https://facebook.github.io/react-native/)!
 
