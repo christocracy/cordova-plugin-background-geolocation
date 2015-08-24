@@ -18,6 +18,7 @@ Premium iOS Now Available Free!
 
 The **[Premium iOS](https://github.com/transistorsoft/cordova-background-geolocation-lt)** version is now available free!
 
+- Try out the [SampleApp](https://github.com/transistorsoft/cordova-background-geolocation-SampleApp) now!
 - In-plugin SQLite storage of each recorded location
 - Optional native HTTP layer
 - Geofencing features
