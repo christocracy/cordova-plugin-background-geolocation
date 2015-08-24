@@ -2,12 +2,22 @@ Premium Version
 ==============================
 
 A new [Premium Version](http://transistorsoft.github.io/cordova-background-geolocation/) is available.
+
 - Implements the latest Android APIs for **much-improved** battery performance.
 - Auto-start Android & iOS on device-boot.
-- Android now executes your ```callback``` just like **iOS**!
+- Extra meta-data for each recorded location (eg: battery-state, moving/stationary)
+- Cordova plugin `cordova-plugin-geolocation` is no longer required.
+- Android now executes your `callback` just like **iOS**!
 - Both iOS & Android can optionally **HTTP** POST locations to your server in the native code.  Optional **batch-mode**.
 - Native **SQLite persistence** layer (for when no network is available).  Plugin provides a javascript API to fetch and/or sync the locations to your server.
 - **Geofencing**.  Both iOS and Android allow you to add arbitrary circular geofences which execute your javascript-callback when a crossing-event occurs.
+
+
+Premium iOS Now Available Free!
+===============================
+
+The **[Premium iOS](https://github.com/transistorsoft/cordova-background-geolocation-lt)** version is now available free!
+
 
 ![Android Battery Performance](/images/Screenshot-android-battery-framed.png "Android battery performance")
 ![SampleApp](/images/Screenshot-android-map1-framed.png "SampleApp")
