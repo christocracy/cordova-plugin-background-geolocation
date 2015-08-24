@@ -1,4 +1,4 @@
-Premium Version
+[Premium Version](http://transistorsoft.github.io/cordova-background-geolocation/)
 ==============================
 
 A new [Premium Version](http://transistorsoft.github.io/cordova-background-geolocation/) is available.
