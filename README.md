@@ -8,7 +8,7 @@ Cordova Background Geolocation
 
 ### [cordova-background-geolocation-lt](https://github.com/transistorsoft/cordova-background-geolocation-lt)
 
-## Legacy Version
+# Legacy Version
 
 - [0.3.7](https://github.com/christocracy/cordova-plugin-background-geolocation/tree/0.3.7)
 
