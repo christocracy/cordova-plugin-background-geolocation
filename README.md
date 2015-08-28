@@ -6,7 +6,7 @@ Cordova Background Geolocation
 
 # We've moved
 
-- [cordova-background-geolocation-lt](https://github.com/transistorsoft/cordova-background-geolocation-lt)
+### [cordova-background-geolocation-lt](https://github.com/transistorsoft/cordova-background-geolocation-lt)
 
 ## Legacy Version
 
