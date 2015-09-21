@@ -11,6 +11,7 @@ Cordova Background Geolocation
 # Legacy Version
 
 - [0.3.7](https://github.com/christocracy/cordova-plugin-background-geolocation/tree/0.3.7)
+
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/trash.gif)
 
 Copyright (c) 2015 Christopher Scott, Transistor Software
