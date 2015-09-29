@@ -143,7 +143,6 @@ On iOS the plugin will execute your configured ```callbackFn```. You may manuall
 ### Android
 
 Android **WILL** execute your configured ```callbackFn```. This is the main difference from original christocracy plugin. Android is using intents to do so. Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.
-```
 
 ### WP8
 
