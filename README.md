@@ -237,9 +237,9 @@ In Windows Phone, the underlying GeoLocator you can choose to use 'DesiredAccura
 
 ## Licence ##
 
-The MIT License
+[Apache License](http://www.apache.org/licenses/LICENSE-2.0)
 
-Copyright (c) 2013 Chris Scott and Brian Samson
+Copyright (c) 2013 Christopher Scott, Transistor Software
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
