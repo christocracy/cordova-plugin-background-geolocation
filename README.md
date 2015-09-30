@@ -17,7 +17,21 @@ Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob
 
 This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html).
 
-Also available via npm.
+## Installing the plugin ##
+
+As Cordova is [shifting towards npm](http://cordova.apache.org/announcements/2015/04/21/plugins-release-and-move-to-npm.html), this plugin can be installed from npm:
+
+```
+cordova plugin add cordova-plugin-mauron85-background-geolocation
+```
+
+## Registering plugin for Adobe® PhoneGap™ Build
+
+[Adobe® PhoneGap™ Build](http://build.phonegap.com) supports plugins from npm as well. To register plugin add following line into your config.xml
+
+```
+<gap:plugin name="cordova-plugin-mauron85-background-geolocation" source="npm"/>
+```
 
 ## Using the plugin ##
 The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
@@ -27,22 +41,6 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   `start(success, fail)`
 
   `stop(success, fail)`.
-
-## Installing the plugin ##
-
-As Cordova is [shifting towards npm](http://cordova.apache.org/announcements/2015/04/21/plugins-release-and-move-to-npm.html), this plugin can be installed from npm:
-
-```
-   cordova plugin add cordova-plugin-mauron85-background-geolocation
-```
-
-## Registering plugin for Adobe® PhoneGap™ Build
-
-[Adobe® PhoneGap™ Build](http://build.phonegap.com) supports plugins from npm as well. To register plugin add following line into your config.xml
-
-```
-   <gap:plugin name="cordova-plugin-mauron85-background-geolocation" source="npm"/>
-```
 
 A full example could be:
 ```
@@ -246,7 +244,7 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 ## Changelog
 
-### [0.4.2] - 
+### [0.4.2] - 2015-09-30
 #### Added
 - Android open activity when notification clicked [69989e79a8a67485fc88463eec8d69bb713c2dbe](https://github.com/erikkemperman/cordova-plugin-background-geolocation/commit/69989e79a8a67485fc88463eec8d69bb713c2dbe) 
 
