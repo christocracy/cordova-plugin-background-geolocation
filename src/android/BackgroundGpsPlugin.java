@@ -22,7 +22,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import android.support.v4.content.LocalBroadcastManager;
 import android.content.BroadcastReceiver;
 
 import android.os.Build;
@@ -78,7 +77,6 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 callbackContext.error("Call configure before calling start");
             } else {
                 IntentFilter intentFilter = new IntentFilter(Constant.FILTER);
-                // LocalBroadcastManager.getInstance(activity).registerReceiver(mMessageReceiver, intentFilter);
                 context.registerReceiver(mMessageReceiver, intentFilter);
 
                 updateServiceIntent.putExtra("url", url);
@@ -88,18 +86,18 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 updateServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
                 updateServiceIntent.putExtra("distanceFilter", distanceFilter);
                 updateServiceIntent.putExtra("locationTimeout", locationTimeout);
-                updateServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
                 updateServiceIntent.putExtra("isDebugging", isDebugging);
                 updateServiceIntent.putExtra("notificationTitle", notificationTitle);
                 updateServiceIntent.putExtra("notificationText", notificationText);
                 updateServiceIntent.putExtra("stopOnTerminate", stopOnTerminate);
+                updateServiceIntent.putExtra("activity", cordova.getActivity().getClass().getCanonicalName());
+                Log.d( TAG, "Put activity " + cordova.getActivity().getClass().getCanonicalName() );
 
                 activity.startService(updateServiceIntent);
                 isEnabled = true;
                 Log.d(TAG, "bg service has been started");
             }
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
-            // LocalBroadcastManager.getInstance(activity).unregisterReceiver(mMessageReceiver);
             context.unregisterReceiver(mMessageReceiver);
 
             isEnabled = false;

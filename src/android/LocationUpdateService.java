@@ -48,7 +48,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
-import android.support.v4.content.LocalBroadcastManager;
 
 import android.location.Location;
 import android.location.Criteria;
@@ -112,6 +111,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private String notificationTitle = "Background checking";
     private String notificationText = "ENABLED";
     private Boolean stopOnTerminate;
+
+    private String activity;
 
     private ToneGenerator toneGenerator;
 
@@ -197,6 +198,15 @@ public class LocationUpdateService extends Service implements LocationListener {
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
             notificationTitle = intent.getStringExtra("notificationTitle");
             notificationText = intent.getStringExtra("notificationText");
+            
+            activity = intent.getStringExtra("activity");
+            Log.d( TAG, "Got activity" + activity );
+            Class<?> activityClass = null;
+            try {
+                activityClass = Class.forName( activity );
+            } catch ( ClassNotFoundException e ) {
+                e.printStackTrace();
+            }
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
@@ -208,6 +218,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             builder.setContentText(notificationText);
             builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
             builder.setContentIntent(pendingIntent);
+            builder.setContentIntent( PendingIntent.getActivity( this, 0,
+                new Intent( this, activityClass ), 0 ) );
             Notification notification;
             if (android.os.Build.VERSION.SDK_INT >= 16) {
                 notification = buildForegroundNotification(builder);
@@ -227,6 +239,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         Log.i(TAG, "- isDebugging: "        + isDebugging);
         Log.i(TAG, "- notificationTitle: "  + notificationTitle);
         Log.i(TAG, "- notificationText: "   + notificationText);
+        Log.i(TAG, "- activity: "   + activity);
 
         this.setPace(false);
 
@@ -431,14 +444,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         lastLocation = location;
         // persistLocation(location);
         broadcastLocation(location);
-
-        // if (this.isNetworkConnected()) {
-        //     Log.d(TAG, "Scheduling location network post");
-        //     schedulePostLocations();            
-
-        // } else {
-        //     Log.d(TAG, "Network unavailable, waiting for now");
-        // }
     }
 
     /**
@@ -737,9 +742,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             String locStr = com.marianhello.cordova.bgloc.data.Location.fromAndroidLocation(location).toJSONObject().toString();
             Intent intent = new Intent(Constant.FILTER);
             intent.putExtra(Constant.COMMAND, Constant.UPDATE_PROGRESS);
-            // intent.putExtra(Constant.DATA, location);
             intent.putExtra(Constant.DATA, locStr);
-            // LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
             this.sendBroadcast(intent);
         } catch (JSONException e) {
             Log.w(TAG, "Failed to broadcast location");

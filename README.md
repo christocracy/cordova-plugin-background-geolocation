@@ -234,6 +234,36 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 
 In Windows Phone, the underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
+## Development
+
+There many works of original christocracy's plugin. The most interesting repos I've found are: 
+* [huttj](https://github.com/huttj/cordova-plugin-background-geolocation)
+* [erikkemperman](https://github.com/erikkemperman/cordova-plugin-background-geolocation/)
+* [codebling](https://github.com/codebling/cordova-plugin-background-geolocation)
+
+Lot of work has been done, but scattered all over the github. My intention is to maintain
+this version and adopt all those cool changes. You're more then welcome to pull your request here.
+
+## Changelog
+
+### [0.4.2] - 
+#### Added
+- Android open activity when notification clicked [69989e79a8a67485fc88463eec8d69bb713c2dbe](https://github.com/erikkemperman/cordova-plugin-background-geolocation/commit/69989e79a8a67485fc88463eec8d69bb713c2dbe) 
+
+#### Fixed
+- Android duplicate desiredAccuracy extra
+- Android [compilation error](https://github.com/coletivoEITA/cordova-plugin-background-geolocation/commit/813f1695144823d2a61f9733ced5b9fdedf15ff3)
+
+### [0.4.1] - 2015-09-21
+- maintenance version
+
+### [0.4.0] - 2015-03-08
+#### Added
+- Android using callbacks same as iOS
+
+#### Removed
+- Android storing position into sqlite
+
 ## Licence ##
 
 [Apache License](http://www.apache.org/licenses/LICENSE-2.0)
