@@ -234,7 +234,7 @@ In Windows Phone, the underlying GeoLocator you can choose to use 'DesiredAccura
 
 ## Development
 
-There many works of original christocracy's plugin. The most interesting repos I've found are: 
+There are many works of original christocracy's plugin. The most interesting repos I've found are: 
 * [huttj](https://github.com/huttj/cordova-plugin-background-geolocation)
 * [erikkemperman](https://github.com/erikkemperman/cordova-plugin-background-geolocation/)
 * [codebling](https://github.com/codebling/cordova-plugin-background-geolocation)
@@ -243,6 +243,10 @@ Lot of work has been done, but scattered all over the github. My intention is to
 this version and adopt all those cool changes. You're more then welcome to pull your request here.
 
 ## Changelog
+
+### [0.4.3] - unreleased
+### Changed
+- Changed the plugin.xml dependencies to the new NPM-based plugin syntax
 
 ### [0.4.2] - 2015-09-30
 #### Added
