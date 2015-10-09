@@ -33,6 +33,7 @@ module.exports = {
             notificationIcon = config.notificationIcon || "notification_icon",
             notificationTitle = config.notificationTitle || "Background tracking",
             notificationText = config.notificationText || "ENABLED",
+            notificationIconColor = config.notificationIconColor || "#4CAF50",
             activityType = config.activityType || "OTHER",
             stopOnTerminate = config.stopOnTerminate || false;
 
@@ -42,7 +43,7 @@ module.exports = {
             },
             'BackgroundGeoLocation',
             'configure',
-            [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate, notificationIcon]
+            [params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate, notificationIcon, notificationIconColor]
         );
     },
     start: function (success, failure, config) {

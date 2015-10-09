@@ -70,6 +70,7 @@ import org.json.JSONException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 
 import static java.lang.Math.*;
 
@@ -111,6 +112,8 @@ public class LocationUpdateService extends Service implements LocationListener {
     private Integer scaledDistanceFilter;
     private Integer locationTimeout = 30;
     private Boolean isDebugging;
+    private String notificationIconColor = "#4CAF50";
+    private String notificationIconColorDefault = "#4CAF50";
     private String notificationIcon  = "notification_icon";
     private String notificationTitle = "Background checking";
     private String notificationText = "ENABLED";
@@ -200,6 +203,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
             locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
             isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
+            notificationIconColor  = intent.getStringExtra("notificationIconColor");
             notificationIcon  = intent.getStringExtra("notificationIcon");
             notificationTitle = intent.getStringExtra("notificationTitle");
             notificationText = intent.getStringExtra("notificationText");
@@ -225,6 +229,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             builder.setContentText(notificationText);
             builder.setSmallIcon(getPluginResource(notificationIcon + "_small"));
             builder.setLargeIcon(largeIcon);
+            builder.setColor(this.parseNotificationIconColor(notificationIconColor));
             builder.setContentIntent(pendingIntent);
             builder.setContentIntent( PendingIntent.getActivity( this, 0,
                 new Intent( this, activityClass ), 0 ) );
@@ -258,6 +263,23 @@ public class LocationUpdateService extends Service implements LocationListener {
     
     public Integer getPluginResource(String resourceName) {
         return getApplication().getResources().getIdentifier(resourceName, "drawable", getApplication().getPackageName());
+    }
+    
+    private Integer parseNotificationIconColor(String color) {
+        int iconColor = 0;
+        if (color != null) {
+            try {
+                iconColor = Color.parseColor(color);
+            } catch (IllegalArgumentException e) {
+                Log.e(TAG, "couldn't parse color from android options");
+            }
+        }
+        if (iconColor != 0) {
+           return iconColor;
+        }
+        else{
+	   return Color.parseColor(this.notificationIconColorDefault);
+        }
     }
 
     @TargetApi(16)
