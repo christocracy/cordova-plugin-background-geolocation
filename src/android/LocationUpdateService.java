@@ -6,27 +6,16 @@ https://github.com/christocracy/cordova-plugin-background-geolocation
 
 Differences to original version:
 
-1. To avoid conflicts
-package com.tenforwardconsulting.cordova.bgloc
-was renamed to com.marianhello.cordova.bgloc
-
-2. location is not persisted to db anymore, but broadcasted using intents instead
+1. location is not persisted to db anymore, but broadcasted using intents instead
 */
 
-package com.marianhello.cordova.bgloc;
+package com.tenforwardconsulting.cordova.bgloc;
 
 import java.util.List;
 import java.util.Iterator;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import com.marianhello.cordova.bgloc.data.DAOFactory;
-import com.marianhello.cordova.bgloc.data.LocationDAO;
 
 import android.annotation.TargetApi;
 
@@ -57,7 +46,6 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -74,12 +62,14 @@ import android.graphics.Color;
 
 import static java.lang.Math.*;
 
+import com.marianhello.cordova.bgloc.Constant;
+
 public class LocationUpdateService extends Service implements LocationListener {
     private static final String TAG = "LocationUpdateService";
-    private static final String STATIONARY_REGION_ACTION        = "com.marianhello.cordova.bgloc.STATIONARY_REGION_ACTION";
-    private static final String STATIONARY_ALARM_ACTION         = "com.marianhello.cordova.bgloc.STATIONARY_ALARM_ACTION";
-    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.marianhello.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
-    private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.marianhello.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
+    private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
+    private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
+    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
+    private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -88,11 +78,6 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     private PowerManager.WakeLock wakeLock;
     private Location lastLocation;
-    private long lastUpdateTime = 0l;
-
-    private JSONObject params;
-    private JSONObject headers;
-    private String url = "http://192.168.2.15:3000/users/current_location.json";
 
     private float stationaryRadius;
     private Location stationaryLocation;
@@ -189,14 +174,6 @@ public class LocationUpdateService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
         if (intent != null) {
-            try {
-                params = new JSONObject(intent.getStringExtra("params"));
-                headers = new JSONObject(intent.getStringExtra("headers"));
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            url = intent.getStringExtra("url");
             stationaryRadius = Float.parseFloat(intent.getStringExtra("stationaryRadius"));
             distanceFilter = Integer.parseInt(intent.getStringExtra("distanceFilter"));
             scaledDistanceFilter = distanceFilter;
@@ -207,7 +184,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             notificationIcon  = intent.getStringExtra("notificationIcon");
             notificationTitle = intent.getStringExtra("notificationTitle");
             notificationText = intent.getStringExtra("notificationText");
-            
+
             activity = intent.getStringExtra("activity");
             Log.d( TAG, "Got activity" + activity );
             Class<?> activityClass = null;
@@ -223,7 +200,7 @@ public class LocationUpdateService extends Service implements LocationListener {
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
 
             Bitmap largeIcon = BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(notificationIcon + "_large"));
-            
+
             Notification.Builder builder = new Notification.Builder(this);
             builder.setContentTitle(notificationTitle);
             builder.setContentText(notificationText);
@@ -242,15 +219,12 @@ public class LocationUpdateService extends Service implements LocationListener {
             notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
             startForeground(startId, notification);
         }
-        Log.i(TAG, "- url: " + url);
-        Log.i(TAG, "- params: " + params.toString());
-        Log.i(TAG, "- headers: " + headers.toString());
         Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
         Log.i(TAG, "- distanceFilter: "     + distanceFilter);
         Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
         Log.i(TAG, "- locationTimeout: "    + locationTimeout);
         Log.i(TAG, "- isDebugging: "        + isDebugging);
-        Log.i(TAG, "- notificationIcon: "  + notificationIcon);
+        Log.i(TAG, "- notificationIcon: "   + notificationIcon);
         Log.i(TAG, "- notificationTitle: "  + notificationTitle);
         Log.i(TAG, "- notificationText: "   + notificationText);
         Log.i(TAG, "- activity: "   + activity);
@@ -260,11 +234,11 @@ public class LocationUpdateService extends Service implements LocationListener {
         //We want this service to continue running until it is explicitly stopped
         return START_REDELIVER_INTENT;
     }
-    
+
     public Integer getPluginResource(String resourceName) {
         return getApplication().getResources().getIdentifier(resourceName, "drawable", getApplication().getPackageName());
     }
-    
+
     private Integer parseNotificationIconColor(String color) {
         int iconColor = 0;
         if (color != null) {
@@ -477,7 +451,6 @@ public class LocationUpdateService extends Service implements LocationListener {
         }
         // Go ahead and cache, push to server
         lastLocation = location;
-        // persistLocation(location);
         broadcastLocation(location);
     }
 
@@ -699,82 +672,11 @@ public class LocationUpdateService extends Service implements LocationListener {
         // TODO Auto-generated method stub
         Log.d(TAG, "- onStatusChanged: " + provider + ", status: " + status);
     }
-    private void schedulePostLocations() {
-        PostLocationTask task = new LocationUpdateService.PostLocationTask();
-        Log.d(TAG, "beforeexecute " +  task.getStatus());
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        else
-            task.execute();
-        Log.d(TAG, "afterexecute " +  task.getStatus());
-    }
-
-    private boolean postLocation(com.marianhello.cordova.bgloc.data.Location l, LocationDAO dao) {
-        if (l == null) {
-            Log.w(TAG, "postLocation: null location");
-            return false;
-        }
-        try {
-            lastUpdateTime = SystemClock.elapsedRealtime();
-            Log.i(TAG, "Posting  native location update: " + l);
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-            HttpPost request = new HttpPost(url);
-
-            JSONObject location = new JSONObject();
-            location.put("latitude", l.getLatitude());
-            location.put("longitude", l.getLongitude());
-            location.put("accuracy", l.getAccuracy());
-            location.put("speed", l.getSpeed());
-            location.put("bearing", l.getBearing());
-            location.put("altitude", l.getAltitude());
-            location.put("recorded_at", dao.dateToString(l.getRecordedAt()));
-            params.put("location", location);
-
-            Log.i(TAG, "location: " + location.toString());
-
-            StringEntity se = new StringEntity(params.toString());
-            request.setEntity(se);
-            request.setHeader("Accept", "application/json");
-            request.setHeader("Content-type", "application/json");
-
-            Iterator<String> headkeys = headers.keys();
-            while( headkeys.hasNext() ){
-        String headkey = headkeys.next();
-        if(headkey != null) {
-                    Log.d(TAG, "Adding Header: " + headkey + " : " + (String)headers.getString(headkey));
-                    request.setHeader(headkey, (String)headers.getString(headkey));
-        }
-            }
-            Log.d(TAG, "Posting to " + request.getURI().toString());
-            HttpResponse response = httpClient.execute(request);
-            Log.i(TAG, "Response received: " + response.getStatusLine());
-            if (response.getStatusLine().getStatusCode() == 200) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Throwable e) {
-            Log.w(TAG, "Exception posting location: " + e);
-            e.printStackTrace();
-            return false;
-        }
-    }
-    private void persistLocation(Location location) {
-        LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
-        com.marianhello.cordova.bgloc.data.Location savedLocation = com.marianhello.cordova.bgloc.data.Location.fromAndroidLocation(location);
-
-        if (dao.persistLocation(savedLocation)) {
-            Log.d(TAG, "Persisted Location: " + savedLocation);
-        } else {
-            Log.w(TAG, "Failed to persist location");
-        }
-    }
 
     private void broadcastLocation (Location location) {
         Log.d(TAG, "Broadcasting update message: " + location.toString());
         try {
-            String locStr = com.marianhello.cordova.bgloc.data.Location.fromAndroidLocation(location).toJSONObject().toString();
+            String locStr = com.tenforwardconsulting.cordova.bgloc.Location.fromAndroidLocation(location).toJSONObject().toString();
             Intent intent = new Intent(Constant.FILTER);
             intent.putExtra(Constant.COMMAND, Constant.UPDATE_PROGRESS);
             intent.putExtra(Constant.DATA, locStr);
@@ -828,25 +730,5 @@ public class LocationUpdateService extends Service implements LocationListener {
     public void onTaskRemoved(Intent rootIntent) {
         this.stopSelf();
         super.onTaskRemoved(rootIntent);
-    }
-
-    private class PostLocationTask extends AsyncTask<Object, Integer, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Object...objects) {
-            Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            LocationDAO locationDAO = DAOFactory.createLocationDAO(LocationUpdateService.this.getApplicationContext());
-            for (com.marianhello.cordova.bgloc.data.Location savedLocation : locationDAO.getAllLocations()) {
-                Log.d(TAG, "Posting saved location");
-                if (postLocation(savedLocation, locationDAO)) {
-                    locationDAO.deleteLocation(savedLocation);
-                }
-            }
-            return true;
-        }
-        @Override
-        protected void onPostExecute(Boolean result) {
-            Log.d(TAG, "PostLocationTask#onPostExecture");
-        }
     }
 }

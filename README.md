@@ -271,6 +271,13 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 ## Changelog
 
+### [0.5.0] - Unreleased
+#### Changed
+- Android package names reverted
+
+#### Removed
+- Android unused classes
+
 ### [0.4.3] - 2015-10-09
 #### Added
 - Android Add icon color parameter

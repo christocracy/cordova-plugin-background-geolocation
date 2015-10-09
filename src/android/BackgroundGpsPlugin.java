@@ -6,14 +6,10 @@ https://github.com/christocracy/cordova-plugin-background-geolocation
 
 Differences to original version:
 
-1. To avoid conflicts
-package com.tenforwardconsulting.cordova.bgloc
-was renamed to com.marianhello.cordova.bgloc
-
-2. new methods isLocationEnabled, mMessageReciever, handleMessage
+1. new methods isLocationEnabled, mMessageReciever, handleMessage
 */
 
-package com.marianhello.cordova.bgloc;
+package com.tenforwardconsulting.cordova.bgloc;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -37,7 +33,7 @@ import android.os.Bundle;
 import android.location.LocationManager;
 import android.util.Log;
 
-import com.marianhello.cordova.bgloc.data.Location;
+import com.marianhello.cordova.bgloc.Constant;
 
 public class BackgroundGpsPlugin extends CordovaPlugin {
     private static final String TAG = "BackgroundGpsPlugin";

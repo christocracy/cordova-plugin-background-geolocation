@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
-        version="0.4.3">
+        version="0.5.0">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
     <license>Apache-2.0</license>
@@ -13,8 +13,8 @@
         <engine name="cordova" version=">=3.0.0"/>
     </engines>
 
-    <dependency id="org.apache.cordova.geolocation"/>
-    <dependency id="org.apache.cordova.dialogs"/>
+    <dependency id="cordova-plugin-geolocation"/>
+    <dependency id="cordova-plugin-dialogs"/>
 
     <js-module src="www/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
         <clobbers target="plugins.backgroundGeoLocation"/>
@@ -23,15 +23,9 @@
     <!-- android -->
     <platform name="android">
         <source-file src="src/android/Constant.java" target-dir="src/com/marianhello/cordova/bgloc/Constant.java"/>
-        <source-file src="src/android/BackgroundGpsPlugin.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/LocationUpdateService.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/data/DAOFactory.java" target-dir="src/com/marianhello/cordova/bgloc/data"/>
-        <source-file src="src/android/data/Location.java" target-dir="src/com/marianhello/cordova/bgloc/data"/>
-        <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/marianhello/cordova/bgloc/data"/>
-        <source-file src="src/android/data/sqlite/LocationOpenHelper.java"
-                     target-dir="src/com/marianhello/cordova/bgloc/data/sqlite"/>
-        <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java"
-                     target-dir="src/com/marianhello/cordova/bgloc/data/sqlite"/>
+        <source-file src="src/android/BackgroundGpsPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
+        <source-file src="src/android/LocationUpdateService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
+        <source-file src="src/android/Location.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
 
         <source-file src="res/drawable/notification_icon_small.png" target-dir="res/drawable"/>
         <source-file src="res/drawable/notification_icon_large.png" target-dir="res/drawable"/>
@@ -55,7 +49,7 @@
         </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="com.marianhello.cordova.bgloc.BackgroundGpsPlugin"/>
+                <param name="android-package" value="com.tenforwardconsulting.cordova.bgloc.BackgroundGpsPlugin"/>
             </feature>
         </config-file>
     </platform>
