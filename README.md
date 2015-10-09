@@ -118,13 +118,12 @@ This plugin hosts a SampleApp in ```example/SampleApp``` folder. Replace platfor
 $ cd example/SampleApp
 $ cordova platform add android
 $ cordova build android
-
 ```
 
 Run on device
-
 ```
 $ cordova run --device
+```
 
 ### iOS quirks
 
