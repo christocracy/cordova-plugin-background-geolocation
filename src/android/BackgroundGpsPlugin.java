@@ -60,6 +60,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     private String distanceFilter = "30";
     private String locationTimeout = "60";
     private String isDebugging = "false";
+    private String notificationIconColor  = "#4CAF50";
     private String notificationIcon  = "notification_icon";
     private String notificationTitle = "Background tracking";
     private String notificationText = "ENABLED";
