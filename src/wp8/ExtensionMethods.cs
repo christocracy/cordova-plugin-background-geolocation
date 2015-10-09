@@ -19,7 +19,7 @@ namespace Cordova.Extension.Commands
                                  "\"altitude\": {3}," +
                                  "\"altitudeAccuracy\": {4}," +
                                  "\"heading\": {5}," +
-                                 "\"velocity\": {6}," +
+                                 "\"speed\": {6}," +
                                  "\"timestamp\": {7}" +
                                  "}}"
                 , geocoordinate.Accuracy.ToString(numberFormatInfo)
@@ -34,10 +34,7 @@ namespace Cordova.Extension.Commands
 
         public static long ToJavaScriptMilliseconds(this DateTime dt)
         {
-            return (long)dt
-                .ToUniversalTime()
-                .Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                .TotalMilliseconds; 
+            return ((dt.ToUniversalTime().Ticks - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Ticks)/10000);
         }
     }
 }
