@@ -6,7 +6,7 @@
         version="0.4.3">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
-    <license>Apache</license>
+    <license>Apache-2.0</license>
     <keywords>phonegap,background geolocation</keywords>
 
     <engines>
