@@ -175,8 +175,6 @@ When enabled, the plugin will emit sounds for life-cycle events of background-ge
 | Acquiring stationary location sound | "tick,tick,tick" sound |  | double long low tone |
 | Stationary location acquired sound | "bloom" sound | long tt beep | double short high tone |  
 
-![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
-
 #####`@param {Integer} distanceFilter`
 
 The minimum distance (measured in meters) a device must move horizontally before an update event is generated.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).  However, #distanceFilter is elastically auto-calculated by the plugin:  When speed increases, #distanceFilter increases;  when speed decreases, so does distanceFilter.
