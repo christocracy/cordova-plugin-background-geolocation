@@ -33,8 +33,8 @@
         <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java"
                      target-dir="src/com/marianhello/cordova/bgloc/data/sqlite"/>
 
-        <source-file src="src/android/notification_icon_small.png" target-dir="res/drawable"/>
-        <source-file src="src/android/notification_icon_large.png" target-dir="res/drawable"/>
+        <source-file src="res/drawable/notification_icon_small.png" target-dir="res/drawable"/>
+        <source-file src="res/drawable/notification_icon_large.png" target-dir="res/drawable"/>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:enabled="true" android:name="com.marianhello.cordova.bgloc.LocationUpdateService"
