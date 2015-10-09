@@ -273,11 +273,11 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 ## Changelog
 
-### [0.4.3] - unreleased
-### Added
+### [0.4.3] - 2015-10-09
+#### Added
 - Android Add icon color parameter
 
-### Changed
+#### Changed
 - Changed the plugin.xml dependencies to the new NPM-based plugin syntax
 - updated SampleApp
 
