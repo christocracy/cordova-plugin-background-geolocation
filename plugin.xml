@@ -31,7 +31,7 @@
         <source-file src="res/drawable/notification_icon_large.png" target-dir="res/drawable"/>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <service android:enabled="true" android:name="com.marianhello.cordova.bgloc.LocationUpdateService"
+            <service android:enabled="true" android:name="com.tenforwardconsulting.cordova.bgloc.LocationUpdateService"
                      android:process=":remote">
                 <intent-filter>
                     <action android:name="com.marianhello.cordova.bgloc.communication.REQUEST_PROCESSED"/>

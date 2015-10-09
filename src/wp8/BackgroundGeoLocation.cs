@@ -1,5 +1,5 @@
 ﻿using System;
-using Windows.Devices.Geolocation; 
+using Windows.Devices.Geolocation;
 using WPCordovaClassLib.Cordova;
 using WPCordovaClassLib.Cordova.Commands;
 using WPCordovaClassLib.Cordova.JSON;
@@ -48,7 +48,7 @@ namespace Cordova.Extension.Commands
         {
             var parsingSucceeded = true;
 
-            var options = JsonHelper.Deserialize<string[]>(configureArgs); 
+            var options = JsonHelper.Deserialize<string[]>(configureArgs);
 
             double stationaryRadius;
             double distanceFilter;
@@ -56,35 +56,34 @@ namespace Cordova.Extension.Commands
             UInt32 desiredAccuracy;
             bool debug;
 
-            if (!double.TryParse(options[3], out stationaryRadius))
+            if (!double.TryParse(options[0], out stationaryRadius))
             {
                 DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for stationaryRadius:{0}", options[3])));
                 parsingSucceeded = false;
             }
-            if (!double.TryParse(options[4], out distanceFilter))
+            if (!double.TryParse(options[1], out distanceFilter))
             {
                 DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for distanceFilter:{0}", options[4])));
                 parsingSucceeded = false;
             }
-            if (!UInt32.TryParse(options[5], out locationTimeout))
+            if (!UInt32.TryParse(options[2], out locationTimeout))
             {
                 DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for locationTimeout:{0}", options[5])));
                 parsingSucceeded = false;
             }
-            if (!UInt32.TryParse(options[6], out desiredAccuracy))
+            if (!UInt32.TryParse(options[3], out desiredAccuracy))
             {
                 DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for desiredAccuracy:{0}", options[6])));
                 parsingSucceeded = false;
             }
-            if (!bool.TryParse(options[7], out debug))
+            if (!bool.TryParse(options[4], out debug))
             {
                 DispatchCommandResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION, string.Format("Invalid value for debug:{0}", options[7])));
                 parsingSucceeded = false;
             }
 
             return new BackgroundGeoLocationOptions
-            { 
-                Url = options[1],
+            {
                 StationaryRadius = stationaryRadius,
                 DistanceFilterInMeters = distanceFilter,
                 LocationTimeoutInMilliseconds = locationTimeout,
@@ -119,11 +118,11 @@ namespace Cordova.Extension.Commands
 
                 // In our case this property has always a value, if left empty or below zero the default will be 100 meter but can be overridden via parameter DesiredAccuracy
                 DesiredAccuracyInMeters = BackgroundGeoLocationOptions.DesiredAccuracyInMeters
-            }; 
+            };
 
             Geolocator.PositionChanged += OnGeolocatorOnPositionChanged;
 
-            RunningInBackground = true; 
+            RunningInBackground = true;
         }
 
         private void OnGeolocatorOnPositionChanged(Geolocator sender, PositionChangedEventArgs configureCallbackTokenargs)
@@ -142,7 +141,7 @@ namespace Cordova.Extension.Commands
             }
 
             DispatchMessage(PluginResult.Status.OK, callbackJsonResult, true, ConfigureCallbackToken);
-        } 
+        }
 
         public void stop()
         {

@@ -48,9 +48,6 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
     private Boolean isEnabled = false;
 
-    private String url;
-    private String params;
-    private String headers;
     private String stationaryRadius = "30";
     private String desiredAccuracy = "100";
     private String distanceFilter = "30";
@@ -71,32 +68,27 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result = true;
-            if (params == null || headers == null) {
-                callbackContext.error("Call configure before calling start");
-            } else {
-                IntentFilter intentFilter = new IntentFilter(Constant.FILTER);
-                context.registerReceiver(mMessageReceiver, intentFilter);
 
-                updateServiceIntent.putExtra("url", url);
-                updateServiceIntent.putExtra("params", params);
-                updateServiceIntent.putExtra("headers", headers);
-                updateServiceIntent.putExtra("stationaryRadius", stationaryRadius);
-                updateServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
-                updateServiceIntent.putExtra("distanceFilter", distanceFilter);
-                updateServiceIntent.putExtra("locationTimeout", locationTimeout);
-                updateServiceIntent.putExtra("isDebugging", isDebugging);
-                updateServiceIntent.putExtra("notificationIcon", notificationIcon);
-                updateServiceIntent.putExtra("notificationTitle", notificationTitle);
-                updateServiceIntent.putExtra("notificationText", notificationText);
-                updateServiceIntent.putExtra("notificationIconColor", notificationIconColor);
-                updateServiceIntent.putExtra("stopOnTerminate", stopOnTerminate);
-                updateServiceIntent.putExtra("activity", cordova.getActivity().getClass().getCanonicalName());
-                Log.d( TAG, "Put activity " + cordova.getActivity().getClass().getCanonicalName() );
+            IntentFilter intentFilter = new IntentFilter(Constant.FILTER);
+            context.registerReceiver(mMessageReceiver, intentFilter);
 
-                activity.startService(updateServiceIntent);
-                isEnabled = true;
-                Log.d(TAG, "bg service has been started");
-            }
+            updateServiceIntent.putExtra("stationaryRadius", stationaryRadius);
+            updateServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
+            updateServiceIntent.putExtra("distanceFilter", distanceFilter);
+            updateServiceIntent.putExtra("locationTimeout", locationTimeout);
+            updateServiceIntent.putExtra("isDebugging", isDebugging);
+            updateServiceIntent.putExtra("notificationIcon", notificationIcon);
+            updateServiceIntent.putExtra("notificationTitle", notificationTitle);
+            updateServiceIntent.putExtra("notificationText", notificationText);
+            updateServiceIntent.putExtra("notificationIconColor", notificationIconColor);
+            updateServiceIntent.putExtra("stopOnTerminate", stopOnTerminate);
+            updateServiceIntent.putExtra("activity", cordova.getActivity().getClass().getCanonicalName());
+            Log.d( TAG, "Put activity " + cordova.getActivity().getClass().getCanonicalName() );
+
+            activity.startService(updateServiceIntent);
+            isEnabled = true;
+            Log.d(TAG, "bg service has been started");
+
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
             context.unregisterReceiver(mMessageReceiver);
 
@@ -108,26 +100,23 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = true;
             try {
-                this.callbackContext = callbackContext;
                 // Params.
-                //    0       1       2           3               4                5               6            7           8                9               10              11                12                  13
-                //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate, notificationIcon, notificationIconColor]
-                this.params = data.getString(0);
-                this.headers = data.getString(1);
-                this.url = data.getString(2);
-                this.stationaryRadius = data.getString(3);
-                this.distanceFilter = data.getString(4);
-                this.locationTimeout = data.getString(5);
-                this.desiredAccuracy = data.getString(6);
-                this.isDebugging = data.getString(7);
-                this.notificationTitle = data.getString(8);
-                this.notificationText = data.getString(9);
-                this.notificationIcon = data.getString(12);
-                this.notificationIconColor = data.getString(13);
-                this.stopOnTerminate = data.getString(11);
+                //    0                    1               2                 3           4          5                  6                7               8                9                    10
+                //[stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate, notificationIcon, notificationIconColor]
+                this.callbackContext = callbackContext;
+                this.stationaryRadius = data.getString(0);
+                this.distanceFilter = data.getString(1);
+                this.locationTimeout = data.getString(2);
+                this.desiredAccuracy = data.getString(3);
+                this.isDebugging = data.getString(4);
+                this.notificationTitle = data.getString(5);
+                this.notificationText = data.getString(6);
+                this.stopOnTerminate = data.getString(8);
+                this.notificationIcon = data.getString(9);
+                this.notificationIconColor = data.getString(10);
                 Log.d(TAG, "bg service configured");
             } catch (JSONException e) {
-                callbackContext.error("authToken/url required as parameters: " + e.getMessage());
+                callbackContext.error("Missing required parameters: " + e.getMessage());
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
             result = true;

@@ -23,8 +23,6 @@
     BOOL isUpdatingLocation;
     BOOL stopOnTerminate;
 
-    NSString *token;
-    NSString *url;
     UIBackgroundTaskIdentifier bgTask;
     NSDate *lastBgTaskAt;
 
@@ -88,34 +86,28 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSuspend:) name:UIApplicationDidEnterBackgroundNotification object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    
+
 }
 /**
  * configure plugin
- * @param {String} token
- * @param {String} url
  * @param {Number} stationaryRadius
  * @param {Number} distanceFilter
  * @param {Number} locationTimeout
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
-    // in iOS, we call to javascript for HTTP now so token and url should be @deprecated until Android calls out to javascript.
     // Params.
-    //    0       1       2           3               4                5               6            7           8                9               10               11
-    //[params, headers, url, stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate]
+    //    0                    1               2                 3           4          5                  6                7               8
+    //[stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate]
 
     // UNUSED ANDROID VARS
-    //params = [command.arguments objectAtIndex: 0];
-    //headers = [command.arguments objectAtIndex: 1];
-    //url = [command.arguments objectAtIndex: 2];
-    stationaryRadius    = [[command.arguments objectAtIndex: 3] intValue];
-    distanceFilter      = [[command.arguments objectAtIndex: 4] intValue];
-    locationTimeout     = [[command.arguments objectAtIndex: 5] intValue];
-    desiredAccuracy     = [self decodeDesiredAccuracy:[[command.arguments objectAtIndex: 6] intValue]];
-    isDebugging         = [[command.arguments objectAtIndex: 7] boolValue];
-    activityType        = [self decodeActivityType:[command.arguments objectAtIndex:10]];
-    stopOnTerminate     = [[command.arguments objectAtIndex: 11] boolValue];
+    stationaryRadius    = [[command.arguments objectAtIndex: 0] intValue];
+    distanceFilter      = [[command.arguments objectAtIndex: 1] intValue];
+    locationTimeout     = [[command.arguments objectAtIndex: 2] intValue];
+    desiredAccuracy     = [self decodeDesiredAccuracy:[[command.arguments objectAtIndex: 3] intValue]];
+    isDebugging         = [[command.arguments objectAtIndex: 4] boolValue];
+    activityType        = [self decodeActivityType:[command.arguments objectAtIndex:7]];
+    stopOnTerminate     = [[command.arguments objectAtIndex: 8] boolValue];
 
     self.syncCallbackId = command.callbackId;
 
@@ -123,10 +115,8 @@
     locationManager.pausesLocationUpdatesAutomatically = YES;
     locationManager.distanceFilter = distanceFilter; // meters
     locationManager.desiredAccuracy = desiredAccuracy;
-    
+
     NSLog(@"CDVBackgroundGeoLocation configure");
-    NSLog(@"  - token: %@", token);
-    NSLog(@"  - url: %@", url);
     NSLog(@"  - distanceFilter: %ld", (long)distanceFilter);
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
@@ -134,7 +124,7 @@
     NSLog(@"  - activityType: %@", [command.arguments objectAtIndex:7]);
     NSLog(@"  - debug: %d", isDebugging);
     NSLog(@"  - stopOnTerminate: %d", stopOnTerminate);
-    
+
     // ios 8 requires permissions to send local-notifications
     if (isDebugging) {
         UIApplication *app = [UIApplication sharedApplication];

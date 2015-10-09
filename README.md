@@ -277,6 +277,7 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 #### Removed
 - Android unused classes
+- All removing deprecated url, params, headers
 
 ### [0.4.3] - 2015-10-09
 #### Added
