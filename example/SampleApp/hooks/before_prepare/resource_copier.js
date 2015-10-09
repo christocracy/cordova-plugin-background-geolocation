@@ -7,10 +7,10 @@ var platformDir = {
         nameMap: {
             "Icon.png": "Icon.png",
             "Icon@2x.png": "Icon@2x.png",
-            
+
             "Icon-40.png": "Icon-40.png",
             "Icon-40@2x.png": "Icon-40@2x.png",
-            
+
             "Icon-60.png":"Icon-60.png",
             "Icon-60@2x.png":"Icon-60@2x.png",
 
@@ -19,16 +19,16 @@ var platformDir = {
 
             "Icon.png":"Icon.png",
             "Icon@2x.png":"Icon@2x.png",
-                        
+
             "Icon-72.png":"Icon-72.png",
             "Icon-72@2x.png": "Icon-72@2x.png",
-            
+
             "Icon-76.png":"Icon-76.png",
             "Icon-76@2x.png": "Icon-76@2x.png",
-            
+
             "Icon-Small.png": "Icon-Small.png",
             "Icon-Small@2x.png":"Icon-Small@2x.png",
-            
+
             "screen-iphone-portrait.png": "Default~iphone.png",
             "screen-iphone-portrait@2x.png": "Default@2x~iphone.png",
             "screen-iphone-portrait-568h@2x.png": "Default-568h@2x~iphone.png",
@@ -62,7 +62,7 @@ var path = require('path');
 var platform = process.env.CORDOVA_PLATFORMS;
 var platformConfig = platformDir[platform];
 
-var srcRoot = path.join(process.cwd(), 'config', 'res');
+var srcRoot = path.join(process.cwd(), 'res');
 var iconSrcPath = path.join(srcRoot, 'icon', platform);
 var screenSrcPath = path.join(srcRoot, 'screen', platform);
 
@@ -76,7 +76,7 @@ fs.readFile("./config.xml", function(err, data) {
     }
     var m = data.toString().match(/<name>(.*)<\/name>/);
     if (!m) {
-        throw "Resource Copier script could not determine proeject name";
+        throw "Resource Copier script could not determine project name";
     }
     projectName = m[1];
     console.log("- Copying icons and screen", platform);
@@ -154,4 +154,3 @@ function copyFile(source, target, cb) {
     }
   }
 }
-

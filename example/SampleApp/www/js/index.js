@@ -17,7 +17,7 @@
  * under the License.
  */
 var ENV = (function() {
-    
+
     var localStorage = window.localStorage;
 
     return {
@@ -67,13 +67,13 @@ var app = {
     btnHome: undefined,
     btnReset: undefined,
 
-    // Application Constructor  
+    // Application Constructor
     initialize: function() {
         this.bindEvents();
         google.maps.event.addDomListener(window, 'load', app.initializeMap);
     },
     initializeMap: function() {
-        
+
         var mapOptions = {
           center: { lat: -34.397, lng: 150.644},
           zoom: 8,
@@ -117,7 +117,7 @@ var app = {
             this.btnEnabled.addClass('btn-success');
             this.btnEnabled[0].innerHTML = 'Start';
         }
-        
+
         this.btnHome.on('click', this.onClickHome);
         this.btnReset.on('click', this.onClickReset);
         this.btnPace.on('click', this.onClickChangePace);
@@ -150,7 +150,7 @@ var app = {
         */
         var callbackFn = function(location) {
             console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
-            
+
             // Update our current-position marker.
             app.setCurrentLocation(location);
 
@@ -181,11 +181,6 @@ var app = {
 
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
-            url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to
-            params: {
-                auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-                foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-            },
             desiredAccuracy: 0,
             stationaryRadius: 50,
             distanceFilter: 50,
@@ -195,13 +190,13 @@ var app = {
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
         });
-        
+
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
         var settings = ENV.settings;
 
         if (settings.enabled == 'true') {
             bgGeo.start();
-        
+
             if (settings.aggressive == 'true') {
                 bgGeo.changePace(true);
             }
@@ -257,7 +252,7 @@ var app = {
         var bgGeo       = window.plugins.backgroundGeoLocation,
             btnEnabled  = app.btnEnabled,
             isEnabled   = ENV.toggle('enabled');
-        
+
         btnEnabled.removeClass('btn-danger');
         btnEnabled.removeClass('btn-success');
 
@@ -294,8 +289,8 @@ var app = {
         }
     },
     /**
-    * Cordova foreground geolocation watch has no stop/start detection or scaled distance-filtering to conserve HTTP requests based upon speed.  
-    * You can't leave Cordova's GeoLocation running in background or it'll kill your battery.  This is the purpose of BackgroundGeoLocation:  to intelligently 
+    * Cordova foreground geolocation watch has no stop/start detection or scaled distance-filtering to conserve HTTP requests based upon speed.
+    * You can't leave Cordova's GeoLocation running in background or it'll kill your battery.  This is the purpose of BackgroundGeoLocation:  to intelligently
     * determine start/stop of device.
     */
     onPause: function() {
@@ -340,7 +335,7 @@ var app = {
             });
         }
         var latlng = new google.maps.LatLng(location.latitude, location.longitude);
-        
+
         if (app.previousLocation) {
             var prevLocation = app.previousLocation;
             // Drop a breadcrumb of where we've been.

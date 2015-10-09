@@ -20,7 +20,7 @@
 -->
 # Cordova Hooks
 
-Cordova Hooks represent special scripts which could be added by application and plugin developers or even by your own build system  to customize cordova commands. Hook scripts could be defined by adding them to the special predefined folder (`/hooks`) or via configuration files (`config.xml` and `plugin.xml`) and run serially in the following order: 
+Cordova Hooks represent special scripts which could be added by application and plugin developers or even by your own build system  to customize cordova commands. Hook scripts could be defined by adding them to the special predefined folder (`/hooks`) or via configuration files (`config.xml` and `plugin.xml`) and run serially in the following order:
 * Application hooks from `/hooks`;
 * Application hooks from `config.xml`;
 * Plugin hooks from `plugins/.../plugin.xml`.
@@ -169,7 +169,7 @@ You can also require additional Cordova modules in your script using `context.re
 var Q = context.requireCordovaModule('q');
 ```
 
-__Note__:  new module loader script interface is used for the `.js` files defined via `config.xml` or `plugin.xml` only. 
+__Note__:  new module loader script interface is used for the `.js` files defined via `config.xml` or `plugin.xml` only.
 For compatibility reasons hook files specified via `/hooks` folders are run via Node child_process spawn, see 'Non-javascript' section below.
 
 ### Non-javascript
@@ -186,7 +186,7 @@ If a script returns a non-zero exit code, then the parent cordova command will b
 
 ## Writing hooks
 
-We highly recommend writting your hooks using Node.js so that they are
+We highly recommend writing your hooks using Node.js so that they are
 cross-platform. Some good examples are shown here:
 
 [http://devgirl.org/2013/11/12/three-hooks-your-cordovaphonegap-project-needs/](http://devgirl.org/2013/11/12/three-hooks-your-cordovaphonegap-project-needs/)

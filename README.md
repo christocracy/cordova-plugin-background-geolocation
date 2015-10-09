@@ -112,16 +112,21 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 
 ## Example Application
 
-This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
+This plugin hosts a SampleApp in ```example/SampleApp``` folder. Replace platform with one of supported platforms: android, ios or wp8. In this example we will build for Android.
 
 ```
-$ cordova create SampleApp
-$ cd SampleApp
-$ cordova plugin add cordova-plugin-mauron85-background-geolocation
-$ cordova platform add ios
-$ cordova build ios
+$ cd example/SampleApp
+$ cordova platform add android
+$ cordova build android
 
 ```
+
+Run on device
+
+```
+$ cordova run --device
+
+### iOS quirks
 
 If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.
 
@@ -275,6 +280,7 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 ### Changed
 - Changed the plugin.xml dependencies to the new NPM-based plugin syntax
+- updated SampleApp
 
 ### [0.4.2] - 2015-09-30
 #### Added
