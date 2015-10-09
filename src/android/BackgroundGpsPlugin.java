@@ -88,6 +88,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 updateServiceIntent.putExtra("distanceFilter", distanceFilter);
                 updateServiceIntent.putExtra("locationTimeout", locationTimeout);
                 updateServiceIntent.putExtra("isDebugging", isDebugging);
+                updateServiceIntent.putExtra("notificationIcon", notificationIcon);
                 updateServiceIntent.putExtra("notificationTitle", notificationTitle);
                 updateServiceIntent.putExtra("notificationText", notificationText);
                 updateServiceIntent.putExtra("stopOnTerminate", stopOnTerminate);
