@@ -72,35 +72,42 @@
                 <param name="ios-package" value="CDVBackgroundGeoLocation"/>
             </feature>
         </config-file>
-        <framework src="AudioToolbox.framework" weak="true"/>
-        <framework src="AVFoundation.framework" weak="true"/>
-        <source-file src="src/ios/CDVBackgroundGeoLocation.m"/>
-        <header-file src="src/ios/CDVBackgroundGeoLocation.h"/>
-    </platform>
+        <framework src="AudioToolbox.framework" weak="true" />
+        <framework src="AVFoundation.framework" weak="true" />
+        <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
+        <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
+     </platform>
 
-    <!-- wp8 -->
-    <platform name="wp8">
-        <config-file target="config.xml" parent="/*">
-            <feature name="BackgroundGeoLocation">
-                <param name="wp-package" value="BackgroundGeoLocation" onload="true"/>
-                <param name="onload" value="true"/>
-            </feature>
-        </config-file>
+	<!-- wp8 -->
+	<platform name="wp8">
+		<config-file target="config.xml" parent="/*">
+			<feature name="BackgroundGeoLocation">
+				<param name="wp-package" value="BackgroundGeoLocation" onload="true" />
+				<param name="onload" value="true" />
+			</feature>
+		</config-file>
 
-        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Tasks/DefaultTask">
-            <BackgroundExecution>
-                <ExecutionType Name="LocationTracking"/>
-            </BackgroundExecution>
-        </config-file>
+		<config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Tasks/DefaultTask">
+			<BackgroundExecution>
+				<ExecutionType Name="LocationTracking" />
+			</BackgroundExecution>
+		</config-file>
 
-        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-            <Capability Name="ID_CAP_LOCATION"/>
-        </config-file>
-        <source-file src="src/wp8/BackgroundGeoLocation.cs"/>
-        <source-file src="src/wp8/BackgroundGeoLocationOptions.cs"/>
-        <source-file src="src/wp8/DebugAudioNotifier.cs"/>
-        <source-file src="src/wp8/ExtensionMethods.cs"/>
-        <source-file src="src/wp8/IBackgroundGeoLocation.cs"/>
-    </platform>
+		<config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+			<Capability Name="ID_CAP_LOCATION" />
+		</config-file>
+		<source-file src="src/wp8/BackgroundGeoLocation.cs" />
+		<source-file src="src/wp8/BackgroundGeoLocationOptions.cs" />
+		<source-file src="src/wp8/DebugNotifier.cs" />
+		<source-file src="src/wp8/ExtensionMethods.cs" />
+        <source-file src="src/wp8/GeolocatorWrapper.cs" />
+        <source-file src="src/wp8/GeolocatorWrapperPositionChangedEventArgs.cs" />
+        <source-file src="src/wp8/IBackgroundGeoLocation.cs" />
+        <source-file src="src/wp8/UpdateScaledDistanceFilterResult.cs" />
+        <source-file src="src/wp8/Position.cs" />
+        <source-file src="src/wp8/PositionPath.cs" />
+        <source-file src="src/wp8/PostionUpdateDebugData.cs" />
+        <source-file src="src/wp8/StationaryManager.cs" />
+	</platform>
 
 </plugin>

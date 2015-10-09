@@ -147,8 +147,7 @@ Android **WILL** execute your configured ```callbackFn```. This is the main diff
 
 ### WP8
 
-WP8 uses ```callbackFn``` the way iOS do. On WP8, however, the plugin does not support the Stationary location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
-Keep in mind that it is **not** possible to use ```start()``` at the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.
+Keep in mind that it is **not** possible to use ```start()``` during the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and our ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.
 
 ### Config
 
@@ -161,17 +160,20 @@ The lower the number, the more power devoted to GeoLocation resulting in higher 
 #####`@param {Integer} stationaryRadius (meters)`
 
 When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
+In WP8 the frequency  of position polling (while in stationary mode) is slowed down to once every three minutes.
 
 #####`@param {Boolean} debug`
 
 When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
 
-- Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
-- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep, *[WP8]* High beep, 1 sec.
-- Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
-- Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
-- Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
-- Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
+|    | *ios* | *android* | *WP8* |
+| ------------- | ------------- | ------------- | ------------- |
+| Exit stationary region  | Calendar event notification sound  | dialtone beep-beep-beep  | triple short high tone |
+| GeoLocation recorded  | SMS sent sound  | tt short beep | single long high tone |
+| Aggressive geolocation engaged | SIRI listening sound |  | |
+| Passive geolocation engaged | SIRI stop listening sound |  |  |
+| Acquiring stationary location sound | "tick,tick,tick" sound |  | double long low tone |
+| Stationary location acquired sound | "bloom" sound | long tt beep | double short high tone |  
 
 ![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
 
@@ -210,18 +212,18 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
 #####`@param {Boolean} stopOnTerminate`
-Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app)
+Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app). This does not work in WP8.
 
+#####`@param {Integer} locationTimeout`
+
+The minimum time interval between location updates for Android and WP8, in seconds.
+See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) and the [MS doc](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.reportinterval) for more information.
 
 ### Android Config
 
 #####`@param {String} notificationText/Title`
 
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
-
-#####`@param {Integer} locationTimeout`
-
-The minimum time interval between location updates, in seconds.  See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) for more information.
 
 #####`@param {String} notificationIcon`
 
