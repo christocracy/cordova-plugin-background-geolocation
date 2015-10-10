@@ -300,7 +300,7 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 ## Changelog
 
-### [0.5.0] - Unreleased
+### [0.5.0] - 2015-10-10
 #### Changed
 - Android FusedLocationService
 - Android package names reverted
