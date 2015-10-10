@@ -77,3 +77,7 @@ body {
 #footer {
     background-color: #fedd1e;
 }
+
+.dropdown-menu li {
+    margin: 10px; 0;
+}

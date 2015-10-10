@@ -179,7 +179,7 @@ public abstract class AbstractLocationService extends Service {
     protected void broadcastLocation (Location location) {
         Log.d(TAG, "Broadcasting update message: " + location.toString());
         try {
-            String locStr = com.tenforwardconsulting.cordova.bgloc.Location.fromAndroidLocation(location).toJSONObject().toString();
+            String locStr = com.tenforwardconsulting.cordova.bgloc.LocationConverter.toJSONObject(location).toString();
             Intent intent = new Intent(Constant.FILTER);
             intent.putExtra(Constant.COMMAND, Constant.UPDATE_PROGRESS);
             intent.putExtra(Constant.DATA, locStr);

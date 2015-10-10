@@ -24,7 +24,7 @@
         <meta name="msapplication-tap-highlight" content="no" />
         <!-- WARNING: for iOS 7, remove the width=device-width and height=device-height attributes. See https://issues.apache.org/jira/browse/CB-4323 -->
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <link rel="stylesheet" type="text/css" href="css/bootstrap-min.css" />
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="css/index.css" />
         <title>BG GeoLocation</title>
         <script type="text/javascript"
@@ -36,7 +36,6 @@
         <div id="header" class="header">
             <h3>BG GeoLocation</h3>
             <p>transistorsoft.com</p>
-
         </div>
         <div id="map-canvas"></div>
 
@@ -46,11 +45,27 @@
             <button id="btn-reset" class="btn btn-default glyphicon">Reset</button>
             <button id="btn-pace" data-id="false" class="btn navbar-btn">Aggressive</button>
             <button id="btn-enabled" class="btn navbar-btn" data-id="true">Start</button>
+            <div id="btn-collect" class="btn btn-default">
+                <input type="checkbox"></input>
+                <span>Collect</span>
+            </div>
+            <!-- Single button -->
+            <div id="dd-service" class="btn-group dropup">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Provider <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                  <li><a href="#">ANDROID_DISTANCE_FILTER</a></li>
+                  <li><a href="#">ANDROID_FUSED_LOCATION</a></li>
+              </ul>
+            </div>
         </nav>
 
 
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/jquery-2.1.1.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
+        <script src="cordova.js"></script>
+        <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/md5.min.js"></script>
+        <script src="js/index.js"></script>
     </body>
 </html>

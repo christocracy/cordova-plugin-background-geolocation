@@ -25,18 +25,19 @@ var ENV = (function() {
             /**
             * state-mgmt
             */
-            enabled:    localStorage.getItem('enabled')     || 'true',
-            aggressive: localStorage.getItem('aggressive')  || 'false'
+            enabled:         localStorage.getItem('enabled')     || 'true',
+            aggressive:      localStorage.getItem('aggressive')  || 'false',
+            locationService: localStorage.getItem('locationService')  || 'ANDROID_DISTANCE_FILTER'
         },
         toggle: function(key) {
-            var value       = localStorage.getItem(key)
-                newValue    = ((new String(value)) == 'true') ? 'false' : 'true';
+            var value    = localStorage.getItem(key),
+                newValue = ((new String(value)) == 'true') ? 'false' : 'true';
 
             localStorage.setItem(key, newValue);
             return newValue;
         }
-    }
-})()
+    };
+})();
 
 var app = {
     /**
@@ -59,16 +60,25 @@ var app = {
     * @property {Array} locations List of rendered map markers of prev locations
     */
     locations: [],
+    isTracking: false,
+    postingEnabled: false,
+    postUrl: 'https://background-geolocation-console.herokuapp.com/locations',
     /**
     * @private
     */
+    btnHome: undefined,
     btnEnabled: undefined,
     btnPace: undefined,
-    btnHome: undefined,
     btnReset: undefined,
 
     // Application Constructor
     initialize: function() {
+        var salt = localStorage.getItem('salt');
+        if (!salt) {
+            salt = new Date().getTime();
+            localStorage.setItem('salt', salt);
+        }
+        this.salt = salt;
         this.bindEvents();
         google.maps.event.addDomListener(window, 'load', app.initializeMap);
     },
@@ -100,10 +110,12 @@ var app = {
         document.addEventListener('resume', this.onResume, false);
 
         // Init UI buttons
-        this.btnHome        = $('button#btn-home');
-        this.btnReset       = $('button#btn-reset');
-        this.btnPace        = $('button#btn-pace');
-        this.btnEnabled     = $('button#btn-enabled');
+        this.btnHome    = $('#btn-home');
+        this.btnReset   = $('#btn-reset');
+        this.btnPace    = $('#btn-pace');
+        this.btnEnabled = $('#btn-enabled');
+        this.btnCollect = $('#btn-collect');
+        this.ddService  = $('#dd-service .dropdown-menu');
 
         if (ENV.settings.aggressive == 'true') {
             this.btnPace.addClass('btn-danger');
@@ -118,10 +130,14 @@ var app = {
             this.btnEnabled[0].innerHTML = 'Start';
         }
 
+        this.ddService.val(ENV.settings.locationService);
+
         this.btnHome.on('click', this.onClickHome);
         this.btnReset.on('click', this.onClickReset);
         this.btnPace.on('click', this.onClickChangePace);
         this.btnEnabled.on('click', this.onClickToggleEnabled);
+        this.btnCollect.on('click', this.onCollectToggle);
+        this.ddService.on('click', this.onServiceChange);
     },
     // deviceready Event Handler
     //
@@ -129,14 +145,26 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
+        window.addEventListener('batterystatus', app.onBatteryStatus, false);
         app.configureBackgroundGeoLocation();
-        app.watchPosition();
+    },
+    onBatteryStatus: function(ev) {
+        app.battery = {
+            level: ev.level,
+            is_charging: ev.isPlugged
+        };
+        console.log('[DEBUG]: battery', app.battery);
+    },
+    stop: function () {
+
     },
     configureBackgroundGeoLocation: function() {
-        var fgGeo = window.navigator.geolocation,
-            bgGeo = window.plugins.backgroundGeoLocation;
-
-        app.onClickHome();
+        var bgGeo = window.plugins.backgroundGeoLocation;
+        var anonDevice = {
+            model: device.model,
+            platform: device.platform,
+            uuid: md5([device.uuid, this.salt].join())
+        };
 
         /**
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
@@ -154,12 +182,31 @@ var app = {
             // Update our current-position marker.
             app.setCurrentLocation(location);
 
+            // post to server
+            if (app.postingEnabled) {
+                $.ajax({
+                    url: app.postUrl,
+                    type: 'POST',
+                    data: JSON.stringify({
+                        location: {
+                            uuid: new Date().getTime(),
+                            timestamp: location.time, //new Date(location.time),
+                            battery: app.battery,
+                            coords: location
+                        },
+                        device: anonDevice
+                    }),
+                    dataType: 'json',
+                    contentType: 'application/json'
+                });
+            }
+
             // After you Ajax callback is complete, you MUST signal to the native code, which is running a background-thread, that you're done and it can gracefully kill that thread.
             yourAjaxCallback.call(this);
         };
 
         var failureFn = function(error) {
-            console.log('BackgroundGeoLocation error');
+            window.alert('BackgroundGeoLocation error');
         };
 
         // Only ios emits this stationary event
@@ -189,7 +236,7 @@ var app = {
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-            locationService: bgGeo.service.ANDROID_FUSED_LOCATION
+            locationService: bgGeo.service[ENV.settings.locationService]
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -197,13 +244,14 @@ var app = {
 
         if (settings.enabled == 'true') {
             bgGeo.start();
+            app.isTracking = true;
 
             if (settings.aggressive == 'true') {
                 bgGeo.changePace(true);
             }
         }
     },
-    onClickHome: function() {
+    onClickHome: function () {
         var fgGeo = window.navigator.geolocation;
 
         // Your app must execute AT LEAST ONE call for the current position via standard Cordova geolocation,
@@ -220,6 +268,29 @@ var app = {
             }
             app.setCurrentLocation(coords);
         });
+    },
+    onCollectToggle: function(ev) {
+        var postingEnabled,
+            $el = $(this).find(':checkbox');
+        app.postingEnabled = postingEnabled = !app.postingEnabled;
+        $el.prop('checked', postingEnabled);
+        if (postingEnabled) {
+            window.alert('Anonymized data with your position, device model and battery level will be sent.');
+        }
+    },
+    onServiceChange: function(ev) {
+        var bgGeo = window.plugins.backgroundGeoLocation,
+            locationService = $(ev.target).text();
+
+        ENV.settings.locationService = locationService;
+        localStorage.setItem('locationService', locationService);
+        if (app.isTracking) {
+            bgGeo.stop();
+            app.configureBackgroundGeoLocation();
+            bgGeo.start();
+        } else {
+            app.configureBackgroundGeoLocation();
+        }
     },
     onClickChangePace: function(value) {
         var bgGeo   = window.plugins.backgroundGeoLocation,
@@ -246,8 +317,10 @@ var app = {
         app.locations = [];
 
         // Clear Polyline.
-        app.path.setMap(null);
-        app.path = undefined;
+        if (app.path) {
+            app.path.setMap(null);
+            app.path = undefined;
+        }
     },
     onClickToggleEnabled: function(value) {
         var bgGeo       = window.plugins.backgroundGeoLocation,
@@ -261,32 +334,12 @@ var app = {
             btnEnabled.addClass('btn-danger');
             btnEnabled[0].innerHTML = 'Stop';
             bgGeo.start();
+            app.isTracking = true;
         } else {
             btnEnabled.addClass('btn-success');
             btnEnabled[0].innerHTML = 'Start';
             bgGeo.stop();
-        }
-    },
-    watchPosition: function() {
-        var fgGeo = window.navigator.geolocation;
-        if (app.watchId) {
-            app.stopPositionWatch();
-        }
-        // Watch foreground location
-        app.watchId = fgGeo.watchPosition(function(location) {
-            app.setCurrentLocation(location.coords);
-        }, function() {}, {
-            enableHighAccuracy: true,
-            maximumAge: 5000,
-            frequency: 10000,
-            timeout: 10000
-        });
-    },
-    stopPositionWatch: function() {
-        var fgGeo = window.navigator.geolocation;
-        if (app.watchId) {
-            fgGeo.clearWatch(app.watchId);
-            app.watchId = undefined;
+            app.isTracking = false;
         }
     },
     /**
@@ -296,23 +349,24 @@ var app = {
     */
     onPause: function() {
         console.log('- onPause');
-        app.stopPositionWatch();
+        // app.stopPositionWatch();
     },
     /**
     * Once in foreground, re-engage foreground geolocation watch with standard Cordova GeoLocation api
     */
     onResume: function() {
         console.log('- onResume');
-        app.watchPosition();
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         console.log('Received Event: ' + id);
     },
     setCurrentLocation: function(location) {
+        var map = app.map;
+
         if (!app.location) {
             app.location = new google.maps.Marker({
-                map: app.map,
+                map: map,
                 icon: {
                     path: google.maps.SymbolPath.CIRCLE,
                     scale: 3,
@@ -325,17 +379,17 @@ var app = {
                 fillColor: '#3366cc',
                 fillOpacity: 0.4,
                 strokeOpacity: 0,
-                map: app.map
+                map: map
             });
         }
         if (!app.path) {
             app.path = new google.maps.Polyline({
-                map: app.map,
+                map: map,
                 strokeColor: '#3366cc',
                 fillOpacity: 0.4
             });
         }
-        var latlng = new google.maps.LatLng(location.latitude, location.longitude);
+        var latlng = new google.maps.LatLng(Number(location.latitude), Number(location.longitude));
 
         if (app.previousLocation) {
             var prevLocation = app.previousLocation;
@@ -348,9 +402,14 @@ var app = {
                     strokeColor: 'green',
                     strokeWeight: 5
                 },
-                map: app.map,
+                map: map,
                 position: new google.maps.LatLng(prevLocation.latitude, prevLocation.longitude)
             }));
+        } else {
+            map.setCenter(latlng);
+            if (map.getZoom() < 15) {
+                map.setZoom(15);
+            }
         }
 
         // Update our current position marker and accuracy bubble.

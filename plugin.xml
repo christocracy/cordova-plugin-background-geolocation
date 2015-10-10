@@ -13,9 +13,6 @@
         <engine name="cordova" version=">=3.0.0"/>
     </engines>
 
-    <dependency id="cordova-plugin-geolocation"/>
-    <dependency id="cordova-plugin-dialogs"/>
-
     <js-module src="www/backgroundGeoLocation.js" name="backgroundGeoLocation">
         <clobbers target="plugins.backgroundGeoLocation"/>
     </js-module>
@@ -28,7 +25,7 @@
         <source-file src="src/android/AbstractLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/DistanceFilterLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/FusedLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
-        <source-file src="src/android/Location.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
+        <source-file src="src/android/LocationConverter.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
 
         <source-file src="res/drawable/notification_icon_small.png" target-dir="res/drawable"/>
         <source-file src="res/drawable/notification_icon_large.png" target-dir="res/drawable"/>
