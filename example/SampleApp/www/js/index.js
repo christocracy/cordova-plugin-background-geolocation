@@ -188,7 +188,8 @@ var app = {
             notificationText: 'ENABLED', // <-- android only, customize the text of the notification
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-            stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
+            stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
+            locationService: bgGeo.service.ANDROID_FUSED_LOCATION
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

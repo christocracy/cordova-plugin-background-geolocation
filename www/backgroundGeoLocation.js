@@ -9,30 +9,44 @@
  1. new method isLocationEnabled
  */
 
-var exec = require("cordova/exec");
+var exec = require('cordova/exec');
 module.exports = {
     /**
      * @property {Object} stationaryRegion
      */
     stationaryRegion: null,
+
+    /**
+     * @property {Object} service
+     */
+    service: {
+        ANDROID_DISTANCE_FILTER: 0,
+        ANDROID_FUSED_LOCATION: 1
+    },
+
     /**
      * @property {Object} config
      */
     config: {},
 
     configure: function (success, failure, config) {
-        this.config = config;
-        var stationaryRadius = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50,    // meters
-            distanceFilter = (config.distanceFilter >= 0) ? config.distanceFilter : 500,       // meters
-            locationTimeout = (config.locationTimeout >= 0) ? config.locationTimeout : 60,      // seconds
-            desiredAccuracy = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100,     // meters
-            debug = config.debug || false,
-            notificationIcon = config.notificationIcon || "notification_icon",
-            notificationTitle = config.notificationTitle || "Background tracking",
-            notificationText = config.notificationText || "ENABLED",
-            notificationIconColor = config.notificationIconColor || "#4CAF50",
-            activityType = config.activityType || "OTHER",
-            stopOnTerminate = config.stopOnTerminate || false;
+        this.config = config || {};
+        var stationaryRadius      = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50, // meters
+            distanceFilter        = (config.distanceFilter >= 0) ? config.distanceFilter   : 500,   // meters
+            locationTimeout       = (config.locationTimeout >= 0) ? config.locationTimeout : 60,    // seconds
+            desiredAccuracy       = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100,   // meters
+            debug                 = config.debug || false,
+            notificationIcon      = config.notificationIcon || 'notification_icon',
+            notificationTitle     = config.notificationTitle || 'Background tracking',
+            notificationText      = config.notificationText || 'ENABLED',
+            notificationIconColor = config.notificationIconColor || '#4CAF50',
+            activityType          = config.activityType || 'OTHER',
+            stopOnTerminate       = config.stopOnTerminate || false,
+            //Android FusedLocation config
+            locationService       = config.locationService || 0;
+            interval              = (config.interval >= 0) ? config.interval : 900000, // milliseconds
+            fastestInterval       = (config.fastestInterval >= 0) ? config.fastestInterval : 120000; // milliseconds
+
 
         exec(success || function () {
             },
@@ -51,7 +65,10 @@ module.exports = {
                 activityType,
                 stopOnTerminate,
                 notificationIcon,
-                notificationIconColor
+                notificationIconColor,
+                locationService,
+                interval,
+                fastestInterval,
             ]
         );
     },

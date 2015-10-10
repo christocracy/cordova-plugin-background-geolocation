@@ -96,7 +96,8 @@ bgGeo.configure(callbackFn, failureFn, {
     notificationIcon: 'notification_icon', // <-- android only, customize the notification icon
     activityType: 'AutomotiveNavigation',
     debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-    stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
+    stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
+    locationService: bgGeo.service.ANDROID_FUSED_LOCATION
 });
 
 // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -247,6 +248,34 @@ Add your custom *new_icon_small.png* and *new_icon_large.png* to res/drawable di
 <source-file src="res/drawable/new_icon_large.png" target-dir="res/drawable" />
 ```
 
+#####`@param {Integer} locationService`
+
+You can choose from two location providers:
+
+* ANDROID_DISTANCE_FILTER (default)
+* ANDROID_FUSED_LOCATION
+
+ANDROID_DISTANCE_FILTER is using christocracy's distance filter algorithm. This is the default service.
+ANDROID_FUSED_LOCATION is using google FusedLocation API.
+
+To configure plugin to use FusedLocation
+
+```
+bgGeo.configure(callbackFn, failureFn, {
+    //... add other config options
+    locationService: bgGeo.service.ANDROID_FUSED_LOCATION
+    //... add other config options
+});
+```
+
+#####`@param {Integer} interval`
+
+Only used for ANDROID_FUSED_LOCATION.
+
+#####`@param {Integer} fastestInterval`
+
+Only used for ANDROID_FUSED_LOCATION.
+
 ### iOS Config
 
 #####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
@@ -273,7 +302,10 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 ### [0.5.0] - Unreleased
 #### Changed
+- Android FusedLocationService
 - Android package names reverted
+- Android configuration refactored
+- WP8 merged improvements
 
 #### Removed
 - Android unused classes

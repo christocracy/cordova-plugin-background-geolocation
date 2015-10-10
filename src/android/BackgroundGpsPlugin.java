@@ -11,28 +11,24 @@ Differences to original version:
 
 package com.tenforwardconsulting.cordova.bgloc;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
+import android.text.TextUtils;
+import android.util.Log;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.json.JSONException;
-
-import android.content.BroadcastReceiver;
-
-import android.os.Build;
-import android.text.TextUtils;
-import android.provider.Settings;
-import android.provider.Settings.SettingNotFoundException;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
-import android.location.LocationManager;
-import android.util.Log;
-
+import org.json.JSONObject;
+import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
 
 public class BackgroundGpsPlugin extends CordovaPlugin {
@@ -44,44 +40,27 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     public static final String ACTION_SET_CONFIG = "setConfig";
     public static final String ACTION_LOCATION_ENABLED_CHECK = "isLocationEnabled";
 
-    private Intent updateServiceIntent;
-
+    private Config config = new Config();
     private Boolean isEnabled = false;
-
-    private String stationaryRadius = "30";
-    private String desiredAccuracy = "100";
-    private String distanceFilter = "30";
-    private String locationTimeout = "60";
-    private String isDebugging = "false";
-    private String notificationIconColor  = "#4CAF50";
-    private String notificationIcon  = "notification_icon";
-    private String notificationTitle = "Background tracking";
-    private String notificationText = "ENABLED";
-    private String stopOnTerminate = "false";
+    private Intent updateServiceIntent;
     private CallbackContext callbackContext;
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
         Activity activity = this.cordova.getActivity();
         Context context = activity.getApplicationContext();
-        Boolean result = false;
-        updateServiceIntent = new Intent(activity, LocationUpdateService.class);
 
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
-            result = true;
+            try {
+                updateServiceIntent = new Intent(activity, Class.forName(config.getLocationService()));
+            } catch (ClassNotFoundException e) {
+                callbackContext.error("Configuration error: " + e.getMessage());
+                return false;
+            }
 
             IntentFilter intentFilter = new IntentFilter(Constant.FILTER);
             context.registerReceiver(mMessageReceiver, intentFilter);
 
-            updateServiceIntent.putExtra("stationaryRadius", stationaryRadius);
-            updateServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
-            updateServiceIntent.putExtra("distanceFilter", distanceFilter);
-            updateServiceIntent.putExtra("locationTimeout", locationTimeout);
-            updateServiceIntent.putExtra("isDebugging", isDebugging);
-            updateServiceIntent.putExtra("notificationIcon", notificationIcon);
-            updateServiceIntent.putExtra("notificationTitle", notificationTitle);
-            updateServiceIntent.putExtra("notificationText", notificationText);
-            updateServiceIntent.putExtra("notificationIconColor", notificationIconColor);
-            updateServiceIntent.putExtra("stopOnTerminate", stopOnTerminate);
+            updateServiceIntent.putExtra("config", config);
             updateServiceIntent.putExtra("activity", cordova.getActivity().getClass().getCanonicalName());
             Log.d( TAG, "Put activity " + cordova.getActivity().getClass().getCanonicalName() );
 
@@ -91,35 +70,20 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
             context.unregisterReceiver(mMessageReceiver);
-
             isEnabled = false;
-            result = true;
             activity.stopService(updateServiceIntent);
             callbackContext.success();
             Log.d(TAG, "bg service has been stopped");
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
-            result = true;
             try {
-                // Params.
-                //    0                    1               2                 3           4          5                  6                7               8                9                    10
-                //[stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate, notificationIcon, notificationIconColor]
                 this.callbackContext = callbackContext;
-                this.stationaryRadius = data.getString(0);
-                this.distanceFilter = data.getString(1);
-                this.locationTimeout = data.getString(2);
-                this.desiredAccuracy = data.getString(3);
-                this.isDebugging = data.getString(4);
-                this.notificationTitle = data.getString(5);
-                this.notificationText = data.getString(6);
-                this.stopOnTerminate = data.getString(8);
-                this.notificationIcon = data.getString(9);
-                this.notificationIconColor = data.getString(10);
+                this.config = Config.fromJSONArray(data);
                 Log.d(TAG, "bg service configured");
             } catch (JSONException e) {
-                callbackContext.error("Missing required parameters: " + e.getMessage());
+                callbackContext.error("Configuration error: " + e.getMessage());
+                return false;
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
-            result = true;
             // TODO reconfigure Service
             callbackContext.success();
             Log.d(TAG, "bg service reconfigured");
@@ -130,10 +94,11 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 callbackContext.success(isLocationEnabled);
             } catch (SettingNotFoundException e) {
                 callbackContext.error("Location setting not found on this platform");
+                return false;
             }
         }
 
-        return result;
+        return true;
     }
 
     /**
@@ -143,7 +108,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     public void onDestroy() {
         Activity activity = this.cordova.getActivity();
 
-        if(isEnabled && stopOnTerminate.equalsIgnoreCase("true")) {
+        if (isEnabled && config.getStopOnTerminate()) {
             activity.stopService(updateServiceIntent);
         }
     }

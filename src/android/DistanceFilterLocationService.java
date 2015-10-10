@@ -11,61 +11,38 @@ Differences to original version:
 
 package com.tenforwardconsulting.cordova.bgloc;
 
-import java.util.List;
-import java.util.Iterator;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.annotation.TargetApi;
-
-import android.media.AudioManager;
-import android.media.ToneGenerator;
-
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
-import static android.telephony.PhoneStateListener.*;
-import android.telephony.CellLocation;
-
 import android.app.AlarmManager;
-import android.app.NotificationManager;
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
-
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.BroadcastReceiver;
-
-import android.location.Location;
+import android.graphics.Color;
 import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.SystemClock;
-
+import android.telephony.CellLocation;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.widget.Toast;;
-import org.json.JSONException;
+import android.widget.Toast;
+import java.util.List;
+import static android.telephony.PhoneStateListener.*;
+import static java.lang.Math.pow;
+import static java.lang.Math.round;
+import static java.lang.Math.abs;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 
-import static java.lang.Math.*;
-
-import com.marianhello.cordova.bgloc.Constant;
-
-public class LocationUpdateService extends Service implements LocationListener {
-    private static final String TAG = "LocationUpdateService";
+public class DistanceFilterLocationService extends com.tenforwardconsulting.cordova.bgloc.AbstractLocationService implements LocationListener {
+    private static final String TAG = "DistanceFilterLocationService";
     private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
     private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
@@ -76,38 +53,22 @@ public class LocationUpdateService extends Service implements LocationListener {
     private static final Integer MAX_STATIONARY_ACQUISITION_ATTEMPTS = 5;
     private static final Integer MAX_SPEED_ACQUISITION_ATTEMPTS = 3;
 
-    private PowerManager.WakeLock wakeLock;
-    private Location lastLocation;
+    private Boolean isMoving = false;
+    private Boolean isAcquiringStationaryLocation = false;
+    private Boolean isAcquiringSpeed = false;
+    private Integer locationAcquisitionAttempts = 0;
 
-    private float stationaryRadius;
+    private PowerManager.WakeLock wakeLock;
+
     private Location stationaryLocation;
     private PendingIntent stationaryAlarmPI;
     private PendingIntent stationaryLocationPollingPI;
     private long stationaryLocationPollingInterval;
     private PendingIntent stationaryRegionPI;
     private PendingIntent singleUpdatePI;
-
-    private Boolean isMoving = false;
-    private Boolean isAcquiringStationaryLocation = false;
-    private Boolean isAcquiringSpeed = false;
-    private Integer locationAcquisitionAttempts = 0;
-
-    private Integer desiredAccuracy = 100;
-    private Integer distanceFilter = 30;
     private Integer scaledDistanceFilter;
-    private Integer locationTimeout = 30;
-    private Boolean isDebugging;
-    private String notificationIconColor = "#4CAF50";
-    private String notificationIconColorDefault = "#4CAF50";
-    private String notificationIcon  = "notification_icon";
-    private String notificationTitle = "Background checking";
-    private String notificationText = "ENABLED";
-    private Boolean stopOnTerminate;
 
     private String activity;
-
-    private ToneGenerator toneGenerator;
-
     private Criteria criteria;
 
     private LocationManager locationManager;
@@ -117,23 +78,13 @@ public class LocationUpdateService extends Service implements LocationListener {
     public static TelephonyManager telephonyManager = null;
 
     @Override
-    public IBinder onBind(Intent intent) {
-        // TODO Auto-generated method stub
-        Log.i(TAG, "OnBind" + intent);
-        return null;
-    }
-
-    @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "OnCreate");
 
-        locationManager         = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-        alarmManager            = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        toneGenerator           = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-        connectivityManager     = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        notificationManager     = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
-        telephonyManager        = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        locationManager  = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        alarmManager     = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         // Stop-detection PI
         stationaryAlarmPI   = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
@@ -172,109 +123,12 @@ public class LocationUpdateService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "Received start id " + startId + ": " + intent);
-        if (intent != null) {
-            stationaryRadius = Float.parseFloat(intent.getStringExtra("stationaryRadius"));
-            distanceFilter = Integer.parseInt(intent.getStringExtra("distanceFilter"));
-            scaledDistanceFilter = distanceFilter;
-            desiredAccuracy = Integer.parseInt(intent.getStringExtra("desiredAccuracy"));
-            locationTimeout = Integer.parseInt(intent.getStringExtra("locationTimeout"));
-            isDebugging = Boolean.parseBoolean(intent.getStringExtra("isDebugging"));
-            notificationIconColor  = intent.getStringExtra("notificationIconColor");
-            notificationIcon  = intent.getStringExtra("notificationIcon");
-            notificationTitle = intent.getStringExtra("notificationTitle");
-            notificationText = intent.getStringExtra("notificationText");
-
-            activity = intent.getStringExtra("activity");
-            Log.d( TAG, "Got activity" + activity );
-            Class<?> activityClass = null;
-            try {
-                activityClass = Class.forName( activity );
-            } catch ( ClassNotFoundException e ) {
-                e.printStackTrace();
-            }
-
-            // Build a Notification required for running service in foreground.
-            Intent main = new Intent(this, BackgroundGpsPlugin.class);
-            main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
-
-            Bitmap largeIcon = BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(notificationIcon + "_large"));
-
-            Notification.Builder builder = new Notification.Builder(this);
-            builder.setContentTitle(notificationTitle);
-            builder.setContentText(notificationText);
-            builder.setSmallIcon(getPluginResource(notificationIcon + "_small"));
-            builder.setLargeIcon(largeIcon);
-            builder.setColor(this.parseNotificationIconColor(notificationIconColor));
-            builder.setContentIntent(pendingIntent);
-            builder.setContentIntent( PendingIntent.getActivity( this, 0,
-                new Intent( this, activityClass ), 0 ) );
-            Notification notification;
-            if (android.os.Build.VERSION.SDK_INT >= 16) {
-                notification = buildForegroundNotification(builder);
-            } else {
-                notification = buildForegroundNotificationCompat(builder);
-            }
-            notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
-            startForeground(startId, notification);
-        }
-        Log.i(TAG, "- stationaryRadius: "   + stationaryRadius);
-        Log.i(TAG, "- distanceFilter: "     + distanceFilter);
-        Log.i(TAG, "- desiredAccuracy: "    + desiredAccuracy);
-        Log.i(TAG, "- locationTimeout: "    + locationTimeout);
-        Log.i(TAG, "- isDebugging: "        + isDebugging);
-        Log.i(TAG, "- notificationIcon: "   + notificationIcon);
-        Log.i(TAG, "- notificationTitle: "  + notificationTitle);
-        Log.i(TAG, "- notificationText: "   + notificationText);
-        Log.i(TAG, "- activity: "   + activity);
-
+        super.onStartCommand(intent, flags, startId);
+        this.scaledDistanceFilter = config.getDistanceFilter();
         this.setPace(false);
 
         //We want this service to continue running until it is explicitly stopped
         return START_REDELIVER_INTENT;
-    }
-
-    public Integer getPluginResource(String resourceName) {
-        return getApplication().getResources().getIdentifier(resourceName, "drawable", getApplication().getPackageName());
-    }
-
-    private Integer parseNotificationIconColor(String color) {
-        int iconColor = 0;
-        if (color != null) {
-            try {
-                iconColor = Color.parseColor(color);
-            } catch (IllegalArgumentException e) {
-                Log.e(TAG, "couldn't parse color from android options");
-            }
-        }
-        if (iconColor != 0) {
-           return iconColor;
-        }
-        else{
-	   return Color.parseColor(this.notificationIconColorDefault);
-        }
-    }
-
-    @TargetApi(16)
-    private Notification buildForegroundNotification(Notification.Builder builder) {
-        return builder.build();
-    }
-
-    @SuppressWarnings("deprecation")
-    @TargetApi(15)
-    private Notification buildForegroundNotificationCompat(Notification.Builder builder) {
-        return builder.getNotification();
-    }
-
-    @Override
-    public boolean stopService(Intent intent) {
-        Log.i(TAG, "- Received stop: " + intent);
-        cleanUp();
-        if (isDebugging) {
-            Toast.makeText(this, "Background location tracking stopped", Toast.LENGTH_SHORT).show();
-        }
-        return super.stopService(intent);
     }
 
     /**
@@ -293,7 +147,7 @@ public class LocationUpdateService extends Service implements LocationListener {
         locationManager.removeUpdates(this);
 
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setHorizontalAccuracy(translateDesiredAccuracy(desiredAccuracy));
+        criteria.setHorizontalAccuracy(translateDesiredAccuracy(config.getDesiredAccuracy()));
         criteria.setPowerRequirement(Criteria.POWER_HIGH);
 
         if (isMoving) {
@@ -316,7 +170,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 }
             }
         } else {
-            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), locationTimeout*1000, scaledDistanceFilter, this);
+            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), config.getLocationTimeout()*1000, scaledDistanceFilter, this);
         }
     }
 
@@ -355,8 +209,8 @@ public class LocationUpdateService extends Service implements LocationListener {
      * @return The most accurate and / or timely previously detected location.
      */
     public Location getLastBestLocation() {
-        int minDistance = (int) stationaryRadius;
-        long minTime    = System.currentTimeMillis() - (locationTimeout * 1000);
+        double minDistance = config.getStationaryRadius();
+        long minTime    = System.currentTimeMillis() - (config.getLocationTimeout() * 1000);
 
         Log.i(TAG, "- fetching last best location " + minDistance + "," + minTime);
         Location bestResult = null;
@@ -393,8 +247,8 @@ public class LocationUpdateService extends Service implements LocationListener {
             setPace(false);
         }
 
-        if (isDebugging) {
-            Toast.makeText(this, "mv:"+isMoving+",acy:"+location.getAccuracy()+",v:"+location.getSpeed()+",df:"+scaledDistanceFilter, Toast.LENGTH_LONG).show();
+        if (config.isDebugging()) {
+            Toast.makeText(this, "mv:" + isMoving + ",acy:" + location.getAccuracy() + ",v:" + location.getSpeed() + ",df:" + scaledDistanceFilter, Toast.LENGTH_LONG).show();
         }
         if (isAcquiringStationaryLocation) {
             if (stationaryLocation == null || stationaryLocation.getAccuracy() > location.getAccuracy()) {
@@ -403,12 +257,12 @@ public class LocationUpdateService extends Service implements LocationListener {
             if (++locationAcquisitionAttempts == MAX_STATIONARY_ACQUISITION_ATTEMPTS) {
                 isAcquiringStationaryLocation = false;
                 startMonitoringStationaryRegion(stationaryLocation);
-                if (isDebugging) {
+                if (config.isDebugging()) {
                     startTone("long_beep");
                 }
             } else {
                 // Unacceptable stationary-location: bail-out and wait for another.
-                if (isDebugging) {
+                if (config.isDebugging()) {
                     startTone("beep");
                 }
                 return;
@@ -416,24 +270,24 @@ public class LocationUpdateService extends Service implements LocationListener {
         } else if (isAcquiringSpeed) {
             if (++locationAcquisitionAttempts == MAX_SPEED_ACQUISITION_ATTEMPTS) {
                 // Got enough samples, assume we're confident in reported speed now.  Play "woohoo" sound.
-                if (isDebugging) {
+                if (config.isDebugging()) {
                     startTone("doodly_doo");
                 }
                 isAcquiringSpeed = false;
                 scaledDistanceFilter = calculateDistanceFilter(location.getSpeed());
                 setPace(true);
             } else {
-                if (isDebugging) {
+                if (config.isDebugging()) {
                     startTone("beep");
                 }
                 return;
             }
         } else if (isMoving) {
-            if (isDebugging) {
+            if (config.isDebugging()) {
                 startTone("beep");
             }
             // Only reset stationaryAlarm when accurate speed is detected, prevents spurious locations from resetting when stopped.
-            if ( (location.getSpeed() >= 1) && (location.getAccuracy() <= stationaryRadius) ) {
+            if ( (location.getSpeed() >= 1) && (location.getAccuracy() <= config.getStationaryRadius()) ) {
                 resetStationaryAlarm();
             }
             // Calculate latest distanceFilter, if it changed by 5 m/s, we'll reconfigure our pace.
@@ -443,7 +297,7 @@ public class LocationUpdateService extends Service implements LocationListener {
                 scaledDistanceFilter = newDistanceFilter;
                 setPace(true);
             }
-            if (location.distanceTo(lastLocation) < distanceFilter) {
+            if (location.distanceTo(lastLocation) < config.getDistanceFilter()) {
                 return;
             }
         } else if (stationaryLocation != null) {
@@ -454,45 +308,22 @@ public class LocationUpdateService extends Service implements LocationListener {
         broadcastLocation(location);
     }
 
-    /**
-     * Plays debug sound
-     * @param name
-     */
-    private void startTone(String name) {
-        int tone = 0;
-        int duration = 1000;
-
-        if (name.equals("beep")) {
-            tone = ToneGenerator.TONE_PROP_BEEP;
-        } else if (name.equals("beep_beep_beep")) {
-            tone = ToneGenerator.TONE_CDMA_CONFIRM;
-        } else if (name.equals("long_beep")) {
-            tone = ToneGenerator.TONE_CDMA_ABBR_ALERT;
-        } else if (name.equals("doodly_doo")) {
-            tone = ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE;
-        } else if (name.equals("chirp_chirp_chirp")) {
-            tone = ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD;
-        } else if (name.equals("dialtone")) {
-            tone = ToneGenerator.TONE_SUP_RINGTONE;
-        }
-        toneGenerator.startTone(tone, duration);
-    }
-
     public void resetStationaryAlarm() {
         alarmManager.cancel(stationaryAlarmPI);
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + STATIONARY_TIMEOUT, stationaryAlarmPI); // Millisec * Second * Minute
     }
 
     private Integer calculateDistanceFilter(Float speed) {
-        Double newDistanceFilter = (double) distanceFilter;
+        Double newDistanceFilter = (double) config.getDistanceFilter();
         if (speed < 100) {
             float roundedDistanceFilter = (round(speed / 5) * 5);
-            newDistanceFilter = pow(roundedDistanceFilter, 2) + (double) distanceFilter;
+            newDistanceFilter = pow(roundedDistanceFilter, 2) + (double) config.getDistanceFilter();
         }
         return (newDistanceFilter.intValue() < 1000) ? newDistanceFilter.intValue() : 1000;
     }
 
     private void startMonitoringStationaryRegion(Location location) {
+        float stationaryRadius = config.getStationaryRadius();
         locationManager.removeUpdates(this);
         stationaryLocation = location;
 
@@ -520,15 +351,16 @@ public class LocationUpdateService extends Service implements LocationListener {
     }
 
     public void onPollStationaryLocation(Location location) {
+        float stationaryRadius = config.getStationaryRadius();
         if (isMoving) {
             return;
         }
-        if (isDebugging) {
+        if (config.isDebugging()) {
             startTone("beep");
         }
-    float distance = abs(location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy());
+        float distance = abs(location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy());
 
-        if (isDebugging) {
+        if (config.isDebugging()) {
             Toast.makeText(this, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
         }
 
@@ -548,7 +380,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     */
     public void onExitStationaryRegion(Location location) {
         // Filter-out spurious region-exits:  must have at least a little speed to move out of stationary-region
-        if (isDebugging) {
+        if (config.isDebugging()) {
             startTone("beep_beep_beep");
         }
         // Cancel the periodic stationary location monitor alarm.
@@ -566,7 +398,7 @@ public class LocationUpdateService extends Service implements LocationListener {
     */
     public void onCellLocationChange(CellLocation cellLocation) {
         Log.i(TAG, "- onCellLocationChange" + cellLocation.toString());
-        if (isDebugging) {
+        if (config.isDebugging()) {
             Toast.makeText(this, "Cellular location change", Toast.LENGTH_LONG).show();
             startTone("chirp_chirp_chirp");
         }
@@ -614,7 +446,7 @@ public class LocationUpdateService extends Service implements LocationListener {
          public void onReceive(Context context, Intent intent)
          {
              Log.i(TAG, "- stationaryLocationMonitorReceiver fired");
-             if (isDebugging) {
+             if (config.isDebugging()) {
                  startTone("dialtone");
              }
              criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -664,46 +496,18 @@ public class LocationUpdateService extends Service implements LocationListener {
         // TODO Auto-generated method stub
         Log.d(TAG, "- onProviderDisabled: " + provider);
     }
+
     public void onProviderEnabled(String provider) {
         // TODO Auto-generated method stub
         Log.d(TAG, "- onProviderEnabled: " + provider);
     }
+
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
         Log.d(TAG, "- onStatusChanged: " + provider + ", status: " + status);
     }
 
-    private void broadcastLocation (Location location) {
-        Log.d(TAG, "Broadcasting update message: " + location.toString());
-        try {
-            String locStr = com.tenforwardconsulting.cordova.bgloc.Location.fromAndroidLocation(location).toJSONObject().toString();
-            Intent intent = new Intent(Constant.FILTER);
-            intent.putExtra(Constant.COMMAND, Constant.UPDATE_PROGRESS);
-            intent.putExtra(Constant.DATA, locStr);
-            this.sendBroadcast(intent);
-        } catch (JSONException e) {
-            Log.w(TAG, "Failed to broadcast location");
-        }
-    }
-
-    private boolean isNetworkConnected() {
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo != null) {
-            Log.d(TAG, "Network found, type = " + networkInfo.getTypeName());
-            return networkInfo.isConnected();
-        } else {
-            Log.d(TAG, "No active network info");
-            return false;
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.w(TAG, "------------------------------------------ Destroyed Location update Service");
-        cleanUp();
-        super.onDestroy();
-    }
-    private void cleanUp() {
+    protected void cleanUp() {
         locationManager.removeUpdates(this);
         alarmManager.cancel(stationaryAlarmPI);
         alarmManager.cancel(stationaryLocationPollingPI);
