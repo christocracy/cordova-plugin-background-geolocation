@@ -6,7 +6,7 @@ Fork notice
 
 This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. It was possible be using intents.
 
-Warning: You probably have to set your cordova app to keep running by keepRunning property to true
+Warning: You probably have to set your cordova app to keep running by keepRunning property to true (this is the default now).
 
 Description
 ==============================
@@ -27,7 +27,7 @@ cordova plugin add cordova-plugin-mauron85-background-geolocation
 
 ## Registering plugin for Adobe® PhoneGap™ Build
 
-[Adobe® PhoneGap™ Build](http://build.phonegap.com) supports plugins from npm as well. To register plugin add following line into your config.xml
+[Adobe® PhoneGap™ Build](http://build.phonegap.com) supports plugins from npm as well. To register plugin add following line into your config.xml. If you're using *hydration*, you have to download and reinstall your app with every new version of the plugin, as plugins are not updated.
 
 ```
 <gap:plugin name="cordova-plugin-mauron85-background-geolocation" source="npm"/>
@@ -49,12 +49,6 @@ A full example could be:
 // after deviceready
 //
 //
-
-// Your app must execute AT LEAST ONE call for the current position via standard Cordova geolocation,
-//  in order to prompt the user for Location permission.
-window.navigator.geolocation.getCurrentPosition(function(location) {
-    console.log('Location from Phonegap');
-});
 
 var bgGeo = window.plugins.backgroundGeoLocation;
 
@@ -107,27 +101,11 @@ bgGeo.start();
 // bgGeo.stop();
 ```
 
-NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
+NOTE: On some platforms is required to enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`. Not needed on Android.
 
 ## Example Application
 
-This plugin hosts a SampleApp in ```example/SampleApp``` folder. Replace platform with one of supported platforms: android, ios or wp8. In this example we will build for Android.
-
-```
-$ cd example/SampleApp
-$ cordova platform add android
-$ cordova build android
-```
-
-Run on device
-```
-$ cordova run --device
-```
-
-### iOS quirks
-
-If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.
-
+This plugin hosts a SampleApp in [example/SampleApp](/example/SampleApp) folder. SampleApp can be also used to improve plugin in the future. Read instructions in [README.md](/example/SampleApp/README.md).
 
 ## Behaviour
 
@@ -299,6 +277,19 @@ Lot of work has been done, but scattered all over the github. My intention is to
 this version and adopt all those cool changes. You're more then welcome to pull your request here.
 
 ## Changelog
+
+### [0.5.1] - Unreleased
+#### Fixed
+- Android fixing return types
+
+#### Changed
+- SampleApp can send position to server.
+- SampleApp offline mode (IndexedDB)
+
+#### Removed
+- Android unnecessary plugins
+- Docs: removing instructions to enable cordova geolocation in foreground
+ and user accept location services
 
 ### [0.5.0] - 2015-10-10
 #### Changed
