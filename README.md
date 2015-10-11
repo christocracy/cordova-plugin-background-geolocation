@@ -85,6 +85,7 @@ bgGeo.configure(callbackFn, failureFn, {
     desiredAccuracy: 10,
     stationaryRadius: 20,
     distanceFilter: 30,
+    notificationIconColor: '#4CAF50', // <-- android only
     notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
     notificationText: 'ENABLED', // <-- android only, customize the text of the notification
     notificationIcon: 'notification_icon', // <-- android only, customize the notification icon
@@ -202,6 +203,10 @@ See [Android docs](http://developer.android.com/reference/android/location/Locat
 
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
 
+#####`@param {String} notificationIconColor`
+
+The accent color to use for notification. Defaults to **#4CAF50**
+
 #####`@param {String} notificationIcon`
 
 Optional: the filename of a custom notification icon. The icon must be located in the *res/drawable* directory. You should include a small and large icon (append "\_small" and "\_large" to the end of your image filenames). Omit the small and large when passing notificationIcon to configure. This will default to "notification_icon".
@@ -278,11 +283,13 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 
 ## Changelog
 
-### [0.5.1] - Unreleased
+### [0.5.1] - 2015-10-12
 #### Fixed
-- Android fixing return types
+- Android fix return types
+- Android fix #3 NotificationBuilder.setColor method not present in API Level <21
 
 #### Changed
+- Android replacing Notication.Builder for NotificationCompat.Builder
 - SampleApp can send position to server.
 - SampleApp offline mode (IndexedDB)
 

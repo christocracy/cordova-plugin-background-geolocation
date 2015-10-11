@@ -11,7 +11,7 @@ package com.tenforwardconsulting.cordova.bgloc;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.NotificationManager;
+import android.support.v4.app.NotificationCompat;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -42,11 +42,9 @@ public abstract class AbstractLocationService extends Service {
     protected String activity;
 
     protected Location lastLocation;
-
     protected ToneGenerator toneGenerator;
 
     private ConnectivityManager connectivityManager;
-    private NotificationManager notificationManager;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -59,7 +57,6 @@ public abstract class AbstractLocationService extends Service {
     public void onCreate() {
         super.onCreate();
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-        notificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
         connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
@@ -84,7 +81,7 @@ public abstract class AbstractLocationService extends Service {
 
             Bitmap largeIcon = BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon()));
 
-            Notification.Builder builder = new Notification.Builder(this);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
             builder.setContentTitle(config.getNotificationTitle());
             builder.setContentText(config.getNotificationText());
             builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
@@ -92,12 +89,7 @@ public abstract class AbstractLocationService extends Service {
             builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
             builder.setContentIntent(pendingIntent);
             builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, activityClass), 0));
-            Notification notification;
-            if (android.os.Build.VERSION.SDK_INT >= 16) {
-                notification = buildForegroundNotification(builder);
-            } else {
-                notification = buildForegroundNotificationCompat(builder);
-            }
+            Notification notification = builder.build();
             notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
             startForeground(startId, notification);
         }
@@ -127,17 +119,6 @@ public abstract class AbstractLocationService extends Service {
         else {
             return Color.parseColor(DEFAULT_NOTIFICATION_ICON_COLOR);
         }
-    }
-
-    @TargetApi(16)
-    private Notification buildForegroundNotification(Notification.Builder builder) {
-        return builder.build();
-    }
-
-    @SuppressWarnings("deprecation")
-    @TargetApi(15)
-    private Notification buildForegroundNotificationCompat(Notification.Builder builder) {
-        return builder.getNotification();
     }
 
     @Override
