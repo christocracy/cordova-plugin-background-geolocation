@@ -21,6 +21,7 @@ var ENV = (function() {
     var localStorage = window.localStorage;
 
     return {
+        dbName: 'locations',
         settings: {
             /**
             * state-mgmt
@@ -38,6 +39,12 @@ var ENV = (function() {
         }
     };
 })();
+
+indexed(ENV.dbName).create(function (err) {
+    if (err) {
+        console.error(err);
+    }
+});
 
 var app = {
     /**
@@ -79,6 +86,7 @@ var app = {
             localStorage.setItem('salt', salt);
         }
         this.salt = salt;
+        this.db = indexed(ENV.dbName);
         this.bindEvents();
         google.maps.event.addDomListener(window, 'load', app.initializeMap);
     },
@@ -108,6 +116,8 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
         document.addEventListener('pause', this.onPause, false);
         document.addEventListener('resume', this.onResume, false);
+        document.addEventListener("offline", this.onOffline, false);
+        document.addEventListener("online", this.onOnline, false);
 
         // Init UI buttons
         this.btnHome    = $('#btn-home');
@@ -150,10 +160,32 @@ var app = {
     },
     onBatteryStatus: function(ev) {
         app.battery = {
-            level: ev.level,
+            level: ev.level / 100,
             is_charging: ev.isPlugged
         };
         console.log('[DEBUG]: battery', app.battery);
+    },
+    onOnline: function() {
+        console.log('Online');
+        app.db.find({}, function (err, locations) {
+            if (err) {
+                console.error('[ERROR]: retrieving location data', err);
+            }
+            locations = locations || [];
+            locations.forEach(function (location) {
+                app.postLocation(location)
+                .done(function () {
+                    app.db.delete({ _id: location._id }, function (err) {
+                        if (err) {
+                            console.error('[ERROR]: deleting row %s', rowId, err);
+                        }
+                    });
+                });
+            });
+        });
+    },
+    onOffline: function() {
+        console.log('Offline');
     },
     stop: function () {
 
@@ -177,6 +209,15 @@ var app = {
         * This callback will be executed every time a geolocation is recorded in the background.
         */
         var callbackFn = function(location) {
+            var data = {
+                location: {
+                    uuid: new Date().getTime(),
+                    timestamp: location.time,
+                    battery: app.battery,
+                    coords: location
+                },
+                device: anonDevice
+            };
             console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
 
             // Update our current-position marker.
@@ -184,25 +225,17 @@ var app = {
 
             // post to server
             if (app.postingEnabled) {
-                $.ajax({
-                    url: app.postUrl,
-                    type: 'POST',
-                    data: JSON.stringify({
-                        location: {
-                            uuid: new Date().getTime(),
-                            timestamp: location.time, //new Date(location.time),
-                            battery: app.battery,
-                            coords: location
-                        },
-                        device: anonDevice
-                    }),
-                    dataType: 'json',
-                    contentType: 'application/json'
+                app.postLocation(data)
+                .fail(function () {
+                    app.persistLocation(data);
+                })
+                .always(function () {
+                    yourAjaxCallback.call(this);
                 });
+            } else {
+                // After you Ajax callback is complete, you MUST signal to the native code, which is running a background-thread, that you're done and it can gracefully kill that thread.
+                yourAjaxCallback.call(this);
             }
-
-            // After you Ajax callback is complete, you MUST signal to the native code, which is running a background-thread, that you're done and it can gracefully kill that thread.
-            yourAjaxCallback.call(this);
         };
 
         var failureFn = function(error) {
@@ -420,6 +453,22 @@ var app = {
         // Add breadcrumb to current Polyline path.
         app.path.getPath().push(latlng);
         app.previousLocation = location;
+    },
+    postLocation: function (data) {
+        return $.ajax({
+            url: app.postUrl,
+            type: 'POST',
+            data: JSON.stringify(data),
+            // dataType: 'html',
+            contentType: 'application/json'
+        });
+    },
+    persistLocation: function (location) {
+        app.db.insert(location, function (err) {
+            if (err) {
+                console.error('[ERROR]: inserting location data', err);
+            }
+        });
     }
 };
 

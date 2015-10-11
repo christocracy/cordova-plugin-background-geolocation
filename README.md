@@ -27,7 +27,7 @@ cordova plugin add cordova-plugin-mauron85-background-geolocation
 
 ## Registering plugin for Adobe® PhoneGap™ Build
 
-[Adobe® PhoneGap™ Build](http://build.phonegap.com) supports plugins from npm as well. To register plugin add following line into your config.xml. If you're using *hydration*, you have to download and reinstall your app, as plugins are not updated.
+[Adobe® PhoneGap™ Build](http://build.phonegap.com) supports plugins from npm as well. To register plugin add following line into your config.xml. If you're using *hydration*, you have to download and reinstall your app with every new version of the plugin, as plugins are not updated.
 
 ```
 <gap:plugin name="cordova-plugin-mauron85-background-geolocation" source="npm"/>
@@ -283,7 +283,8 @@ this version and adopt all those cool changes. You're more then welcome to pull 
 - Android fixing return types
 
 #### Changed
-- SampleApp updated and improved
+- SampleApp can send position to server.
+- SampleApp offline mode (IndexedDB)
 
 #### Removed
 - Android unnecessary plugins

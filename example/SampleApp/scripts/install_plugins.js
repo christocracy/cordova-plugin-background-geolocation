@@ -7,6 +7,7 @@ var pluginlist = [
     "cordova-plugin-device",
     "cordova-plugin-legacy-whitelist",
     "cordova-plugin-battery-status",
+    "cordova-plugin-network-information",
     "cordova-plugin-mauron85-background-geolocation"
 ];
 
