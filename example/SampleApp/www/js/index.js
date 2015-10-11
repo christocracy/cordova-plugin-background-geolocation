@@ -169,19 +169,26 @@ var app = {
         console.log('Online');
         app.db.find({}, function (err, locations) {
             if (err) {
-                console.error('[ERROR]: retrieving location data', err);
+                console.error('[ERROR]: while retrieving location data', err);
             }
-            locations = locations || [];
-            locations.forEach(function (location) {
+            // nice recursion to prevent burst
+            (function postOneByOne (locations) {
+                var location = locations.pop();
+                if (!location) {
+                    return;
+                }
                 app.postLocation(location)
                 .done(function () {
                     app.db.delete({ _id: location._id }, function (err) {
                         if (err) {
-                            console.error('[ERROR]: deleting row %s', rowId, err);
+                            console.error('[ERROR]: deleting row %s', location._id, err);
                         }
                     });
+                })
+                .always(function () {
+                    postOneByOne(locations);
                 });
-            });
+            })(locations || []);
         });
     },
     onOffline: function() {
@@ -221,7 +228,11 @@ var app = {
             console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
 
             // Update our current-position marker.
-            app.setCurrentLocation(location);
+            try {
+                app.setCurrentLocation(location);
+            } catch (e) {
+                console.error('[ERROR]: setting location', e.message);
+            }
 
             // post to server
             if (app.postingEnabled) {
@@ -238,8 +249,8 @@ var app = {
             }
         };
 
-        var failureFn = function(error) {
-            window.alert('BackgroundGeoLocation error');
+        var failureFn = function() {
+            window.alert('BackgroundGeoLocation err');
         };
 
         // Only ios emits this stationary event

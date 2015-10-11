@@ -32,10 +32,3 @@ $ cordova run --device
 ### iOS quirks
 
 If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.
-
-
-## Changelog
-
-### [0.5.1] - Unreleased
-#### Changed
-- Removed foreground geo location. Now using only background plugin.
