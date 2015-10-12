@@ -13,8 +13,8 @@ var filestocopy = [
 { "res/icon/android/drawable-ldpi/ic_launcher.png": "platforms/android/res/drawable-ldpi/icon.png" },
 { "res/icon/android/drawable-mdpi/ic_launcher.png": "platforms/android/res/drawable-mdpi/icon.png" },
 { "res/icon/android/drawable-xhdpi/ic_launcher.png": "platforms/android/res/drawable-xhdpi/icon.png" },
-{ "res/drawable/android/mappointer_small.png": "platforms/android/res/drawable/mappointer_small.png" },
-{ "res/drawable/android/mappointer_large.png": "platforms/android/res/drawable/mappointer_large.png" },
+{ "res/icon/android/drawable-ldpi/ic_launcher.png": "platforms/android/res/drawable-hdpi/mappointer_small.png" },
+{ "res/drawable/android/mappointer_large.png": "platforms/android/res/drawable-hdpi/mappointer_large.png" },
 // ios
 { "res/icon/ios/Icon-40.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-40.png" },
 { "res/icon/ios/Icon-40@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-40@2x.png" },
