@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
-        version="0.5.2">
+        version="0.5.3">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
     <license>Apache-2.0</license>
@@ -21,14 +21,12 @@
     <platform name="android">
         <source-file src="src/android/Config.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/Constant.java" target-dir="src/com/marianhello/cordova/bgloc"/>
+        <source-file src="src/android/ServiceProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/BackgroundGpsPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/AbstractLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/DistanceFilterLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/FusedLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/LocationConverter.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
-
-        <source-file src="res/drawable/notification_icon_small.png" target-dir="res/drawable"/>
-        <source-file src="res/drawable/notification_icon_large.png" target-dir="res/drawable"/>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:enabled="true" android:name="com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationService"

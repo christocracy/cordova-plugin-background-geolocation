@@ -51,7 +51,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             try {
-                updateServiceIntent = new Intent(activity, Class.forName(config.getLocationService()));
+                updateServiceIntent = new Intent(activity, Class.forName(config.getLocationServiceProviderClassName()));
             } catch (ClassNotFoundException e) {
                 callbackContext.error("Configuration error: " + e.getMessage());
                 return false;

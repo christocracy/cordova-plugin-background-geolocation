@@ -10,6 +10,7 @@ This is a new class
 package com.marianhello.cordova.bgloc;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.json.JSONException;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -19,22 +20,19 @@ import android.os.Parcelable;
  */
 public class Config implements Parcelable
 {
-    private static final Integer SECONDS_PER_MINUTE      = 60;
-    private static final Integer MILLISECONDS_PER_SECOND = 60;
-
-    private float stationaryRadius = 30;
-    private Integer desiredAccuracy = 100;
-    private Integer distanceFilter = 30;
+    private float stationaryRadius = 50;
+    private Integer distanceFilter = 500;
     private Integer locationTimeout = 60;
+    private Integer desiredAccuracy = 100;
     private Boolean debugging = false;
-    private String notificationIconColor = "#4CAF50";
-    private String notificationIcon  = "notification_icon";
     private String notificationTitle = "Background tracking";
     private String notificationText = "ENABLED";
+    private String notificationIconColor;
+    private String notificationIcon;
     private Boolean stopOnTerminate = false;
-    private Integer interval = SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND * 5;
-    private Integer fastestInterval = SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
-    private Integer locationService = 0;
+    private Integer interval = 900000; //milliseconds
+    private Integer fastestInterval = 120000; //milliseconds
+    private ServiceProvider serviceProvider = ServiceProvider.ANDROID_DISTANCE_FILTER;
 
     public int describeContents() {
         return 0;
@@ -99,7 +97,7 @@ public class Config implements Parcelable
         config.setStopOnTerminate(data.getBoolean(8));
         config.setNotificationIcon(data.getString(9));
         config.setNotificationIconColor(data.getString(10));
-        config.setLocationService(data.getInt(11));
+        config.setLocationServiceProvider(data.getInt(11));
         config.setInterval(data.getInt(12));
         config.setFastestInterval(data.getInt(13));
 
@@ -151,7 +149,9 @@ public class Config implements Parcelable
     }
 
     public void setNotificationIconColor(String notificationIconColor) {
-        this.notificationIconColor = notificationIconColor;
+        if (!"null".equals(notificationIconColor)) {
+            this.notificationIconColor = notificationIconColor;
+        }
     }
 
     public String getNotificationIcon() {
@@ -159,7 +159,9 @@ public class Config implements Parcelable
     }
 
     public void setNotificationIcon(String notificationIcon) {
-        this.notificationIcon = notificationIcon;
+        if (!"null".equals(notificationIcon)) {
+            this.notificationIcon = notificationIcon;
+        }
     }
 
     public String getNotificationTitle() {
@@ -186,20 +188,20 @@ public class Config implements Parcelable
         this.stopOnTerminate = stopOnTerminate;
     }
 
-    // TODO: refactor as enum
-    public String getLocationService() {
-        switch (locationService) {
-            case 0:
-                return "com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationService";
-            case 1:
-                return "com.tenforwardconsulting.cordova.bgloc.FusedLocationService";
-            default:
-                return "com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationService";
-        }
+    public ServiceProvider getLocationServiceProvider() {
+        return this.serviceProvider;
     }
 
-    public void setLocationService(Integer locationService) {
-        this.locationService = locationService;
+    public String getLocationServiceProviderClassName() {
+        return ServiceProvider.getClassName(this.serviceProvider);
+    }
+
+    public void setLocationServiceProvider(Integer providerId) {
+        this.serviceProvider = ServiceProvider.forInt(providerId);
+    }
+
+    public void setLocationServiceProvider(ServiceProvider provider) {
+        this.serviceProvider = provider;
     }
 
     public Integer getInterval() {
@@ -219,28 +221,37 @@ public class Config implements Parcelable
     }
 
     public String getLargeNotificationIcon () {
-        return this.getNotificationIcon() + "_large";
+        String iconName = getNotificationIcon();
+        if (iconName != null) {
+            iconName = iconName + "_large";
+        }
+        return iconName;
     }
 
     public String getSmallNotificationIcon () {
-        return this.getNotificationIcon() + "_small";
+        String iconName = getNotificationIcon();
+        if (iconName != null) {
+            iconName = iconName + "_small";
+        }
+        return iconName;
     }
 
     @Override
     public String toString () {
         return new StringBuffer()
-                .append("- stationaryRadius: "     + getStationaryRadius())
-                .append("- desiredAccuracy: "      + getDesiredAccuracy())
-                .append("- distanceFilter: "       + getDistanceFilter())
-                .append("- locationTimeout: "      + getLocationTimeout())
-                .append("- isDebugging: "          + isDebugging())
-                .append("- notificationIcon: "     + getNotificationIcon())
-                .append("- notificationTitle: "    + getNotificationTitle())
-                .append("- notificationText: "     + getNotificationText())
-                .append("- stopOnTerminate: "      + getStopOnTerminate())
-                .append("- locationService: "      + getLocationService())
-                .append("- interval: "             + getInterval())
-                .append("- fastestInterval: "      + getFastestInterval())
+                .append("- stationaryRadius: "      + getStationaryRadius())
+                .append("- desiredAccuracy: "       + getDesiredAccuracy())
+                .append("- distanceFilter: "        + getDistanceFilter())
+                .append("- locationTimeout: "       + getLocationTimeout())
+                .append("- debugging: "             + isDebugging())
+                .append("- notificationIcon: "      + getNotificationIcon())
+                .append("- notificationIconColor: " + getNotificationIconColor())
+                .append("- notificationTitle: "     + getNotificationTitle())
+                .append("- notificationText: "      + getNotificationText())
+                .append("- stopOnTerminate: "       + getStopOnTerminate())
+                .append("- serviceProvider: "       + ServiceProvider.getClassName(getLocationServiceProvider()))
+                .append("- interval: "              + getInterval())
+                .append("- fastestInterval: "       + getFastestInterval())
                 .toString();
     }
 }

@@ -275,8 +275,10 @@ var app = {
             desiredAccuracy: 0,
             stationaryRadius: 50,
             distanceFilter: 50,
+            notificationIcon: 'mappointer',
+            notificationIconColor: '#FEDD1E',
             notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
-            notificationText: 'ENABLED', // <-- android only, customize the text of the notification
+            notificationText: ENV.settings.locationService, // <-- android only, customize the text of the notification
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates

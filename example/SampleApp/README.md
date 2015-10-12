@@ -23,6 +23,18 @@ $ cordova platform add android
 $ cordova build android
 ```
 
+There is *after_platform_add* hook in config.xml which runs script that install all required plugins.
+
+## Development
+
+All plugins will be installed from npm at their latest version. However if you want to install your local version on cordova-plugin-background-geolocation, you can do that:
+
+```
+$ cordova plugin rm cordova-plugin-mauron85-background-geolocation
+$ cordova plugin add file:///absolute_path_to_your/cordova-plugin-background-geolocation/
+$ cordova build
+```
+
 Run on device
 
 ```

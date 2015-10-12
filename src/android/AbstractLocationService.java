@@ -36,7 +36,7 @@ import java.util.Random;
 import org.json.JSONException;
 
 public abstract class AbstractLocationService extends Service {
-    private static String TAG;
+    private static final String TAG = "AbstractLocationService";
 
     protected Config config;
     protected String activity;
@@ -72,14 +72,18 @@ public abstract class AbstractLocationService extends Service {
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
             main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-            Bitmap largeIcon = BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon()));
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
             builder.setContentTitle(config.getNotificationTitle());
             builder.setContentText(config.getNotificationText());
-            builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
-            builder.setLargeIcon(largeIcon);
-            builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
+            if (config.getNotificationIcon() != null) {
+                builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
+                builder.setLargeIcon(BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon())));
+            } else {
+                builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+            }
+            if (config.getNotificationIconColor() != null) {
+                builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
+            }
             setClickEvent(builder);
 
             Notification notification = builder.build();

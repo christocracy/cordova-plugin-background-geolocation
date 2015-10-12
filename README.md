@@ -4,7 +4,11 @@ cordova-plugin-mauron85-background-geolocation
 Fork notice
 ==============================
 
-This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. It was possible be using intents. Also it can (and should) be used as battery and data efficient **foreground** geolocation provider.
+This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. Plugin is now battery and data efficient **foreground** and background geolocation provider.
+
+In android you can now choose from two location service providers:
+* ANDROID_DISTANCE_FILTER (original christocracy's)
+* ANDROID_FUSED_LOCATION (experimental contributed by [huttj](https://github.com/huttj/cordova-plugin-background-geolocation))
 
 Warning: You probably have to set your cordova app to keep running by keepRunning property to true (this is the default now).
 
@@ -194,7 +198,6 @@ bgGeo.configure(callbackFn, failureFn, {
     stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
     locationService: bgGeo.service.ANDROID_FUSED_LOCATION
 });
-
 ```
 
 #####`@param {String} notificationText/Title`
@@ -203,30 +206,26 @@ On Android devices it is required to have a notification in the drawer because i
 
 #####`@param {String} notificationIconColor`
 
-The accent color to use for notification. Defaults to **#4CAF50**
+The accent color to use for notification.
 
 #####`@param {String} notificationIcon`
 
-Optional: the filename of a custom notification icon. The icon must be located in the *res/drawable* directory. You should include a small and large icon (append "\_small" and "\_large" to the end of your image filenames). Omit the small and large when passing notificationIcon to configure. This will default to "notification_icon".
+Optional: the filename of a custom notification icon. Your app is responsible to place icon to the *res/drawable* directory. You should include a small and large icon (append "\_small" and "\_large" to the end of your image filenames). Omit the small and large when passing notificationIcon to configure.
 
-To use custom notification icon eg. new_icon, you need to:
+To use custom notification icon eg. **new_icon**, you need to:
 
-##### 1. Configure plugin
+##### 1. In your app
+Make sure your custom icons **new_icon_small.png** and **new_icon_large.png** are copied to *res/drawable* directory. You can use **after_platform_add** hook in [config.xml](/example/SampleApp/config.xml) of your app for this. For reference check SampleApp [config.xml](/example/SampleApp/config.xml) and [scripts/resource_files.js](/example/SampleApp/scripts/resource_files.js).
+
+NOTE: Using custom icons is currently not possible with Adobe® PhoneGap™ Build, as there is no way how to copy icons into *res/drawable*.
+
+##### 2. Configure plugin
 ```
 bgGeo.configure(callbackFn, failureFn, {
     //... add other config options
     notificationIcon: 'new_icon'
     //... add other config options
 });
-```
-
-##### 2. Copy icon files
-Add your custom *new_icon_small.png* and *new_icon_large.png* to res/drawable directory.
-
-##### 3. Register icons in plugin.xml source-file.
-```
-<source-file src="res/drawable/new_icon_small.png" target-dir="res/drawable" />
-<source-file src="res/drawable/new_icon_large.png" target-dir="res/drawable" />
 ```
 
 #####`@param {Integer} locationService`
@@ -292,64 +291,6 @@ There are many works of original christocracy's plugin. The most interesting rep
 
 Lot of work has been done, but scattered all over the github. My intention is to maintain
 this version and adopt all those cool changes. You're more then welcome to pull your request here.
-
-## Changelog
-
-### [0.5.2] - 2015-10-12
-#### Fixed
-- Android fixing FusedLocationService start and crash on stop
-
-### [0.5.1] - 2015-10-12
-#### Fixed
-- Android fix return types
-- Android fix #3 NotificationBuilder.setColor method not present in API Level <21
-
-#### Changed
-- Android replacing Notication.Builder for NotificationCompat.Builder
-- SampleApp can send position to server.
-- SampleApp offline mode (IndexedDB)
-
-#### Removed
-- Android unnecessary plugins
-- Docs: removing instructions to enable cordova geolocation in foreground
- and user accept location services
-
-### [0.5.0] - 2015-10-10
-#### Changed
-- Android FusedLocationService
-- Android package names reverted
-- Android configuration refactored
-- WP8 merged improvements
-
-#### Removed
-- Android unused classes
-- All removing deprecated url, params, headers
-
-### [0.4.3] - 2015-10-09
-#### Added
-- Android Add icon color parameter
-
-#### Changed
-- Changed the plugin.xml dependencies to the new NPM-based plugin syntax
-- updated SampleApp
-
-### [0.4.2] - 2015-09-30
-#### Added
-- Android open activity when notification clicked [69989e79a8a67485fc88463eec8d69bb713c2dbe](https://github.com/erikkemperman/cordova-plugin-background-geolocation/commit/69989e79a8a67485fc88463eec8d69bb713c2dbe)
-
-#### Fixed
-- Android duplicate desiredAccuracy extra
-- Android [compilation error](https://github.com/coletivoEITA/cordova-plugin-background-geolocation/commit/813f1695144823d2a61f9733ced5b9fdedf15ff3)
-
-### [0.4.1] - 2015-09-21
-- maintenance version
-
-### [0.4.0] - 2015-03-08
-#### Added
-- Android using callbacks same as iOS
-
-#### Removed
-- Android storing position into sqlite
 
 ## Licence ##
 

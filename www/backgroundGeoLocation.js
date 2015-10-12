@@ -36,10 +36,10 @@ module.exports = {
             locationTimeout       = (config.locationTimeout >= 0) ? config.locationTimeout : 60,    // seconds
             desiredAccuracy       = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100,   // meters
             debug                 = config.debug || false,
-            notificationIcon      = config.notificationIcon || 'notification_icon',
             notificationTitle     = config.notificationTitle || 'Background tracking',
             notificationText      = config.notificationText || 'ENABLED',
-            notificationIconColor = config.notificationIconColor || '#4CAF50',
+            notificationIcon      = config.notificationIcon,
+            notificationIconColor = config.notificationIconColor,
             activityType          = config.activityType || 'OTHER',
             stopOnTerminate       = config.stopOnTerminate || false,
             //Android FusedLocation config
