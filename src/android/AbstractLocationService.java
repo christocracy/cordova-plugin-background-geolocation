@@ -76,16 +76,12 @@ public abstract class AbstractLocationService extends Service {
             builder.setContentTitle(config.getNotificationTitle());
             builder.setContentText(config.getNotificationText());
             builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
-            Log.d( TAG, "Android SDK: " + android.os.Build.VERSION.SDK_INT );
-            if (android.os.Build.VERSION.SDK_INT >= 21) {
-                // notification title and text is not shown properly when setting custom icon on SDK < 21
-                if (config.getNotificationIcon() != null) {
-                    builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
-                    builder.setLargeIcon(BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon())));
-                }
-                if (config.getNotificationIconColor() != null) {
-                    builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
-                }
+            if (config.getNotificationIcon() != null) {
+                builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
+                builder.setLargeIcon(BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon())));
+            }
+            if (config.getNotificationIconColor() != null) {
+                builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
             }
 
             setClickEvent(builder);
