@@ -205,17 +205,19 @@ bgGeo.configure(callbackFn, failureFn, {
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
 
 #####`@param {String} notificationIconColor`
+Only available for API Level >=21.
 
 The accent color to use for notification.
 
 #####`@param {String} notificationIcon`
+Only available for API Level >=21.
 
 Optional: the filename of a custom notification icon. Your app is responsible to place icon to the *res/drawable* directory. You should include a small and large icon (append "\_small" and "\_large" to the end of your image filenames). Omit the small and large when passing notificationIcon to configure.
 
 To use custom notification icon eg. **new_icon**, you need to:
 
 ##### 1. In your app
-Make sure your custom icons **new_icon_small.png** and **new_icon_large.png** are copied to *res/drawable* directory. You can use **after_platform_add** hook in [config.xml](/example/SampleApp/config.xml) of your app for this. For reference check SampleApp [config.xml](/example/SampleApp/config.xml) and [scripts/resource_files.js](/example/SampleApp/scripts/resource_files.js).
+It is your app responsibility to put icons **new_icon_small.png** and **new_icon_large.png** into *res/drawable* directory. You can automate the process  as part of **after_platform_add** hook configured via [config.xml](/example/SampleApp/config.xml). Check SampleApp [config.xml](/example/SampleApp/config.xml) and [scripts/resource_files.js](/example/SampleApp/scripts/resource_files.js) for reference.
 
 NOTE: Using custom icons is currently not possible with Adobe® PhoneGap™ Build, as there is no way how to copy icons into *res/drawable*.
 

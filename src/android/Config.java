@@ -20,8 +20,8 @@ import android.os.Parcelable;
  */
 public class Config implements Parcelable
 {
-    private float stationaryRadius = 50;
     private Integer distanceFilter = 500;
+    private float stationaryRadius = 50;
     private Integer locationTimeout = 60;
     private Integer desiredAccuracy = 100;
     private Boolean debugging = false;
@@ -192,10 +192,6 @@ public class Config implements Parcelable
         return this.serviceProvider;
     }
 
-    public String getLocationServiceProviderClassName() {
-        return ServiceProvider.getClassName(this.serviceProvider);
-    }
-
     public void setLocationServiceProvider(Integer providerId) {
         this.serviceProvider = ServiceProvider.forInt(providerId);
     }
@@ -249,7 +245,7 @@ public class Config implements Parcelable
                 .append("- notificationTitle: "     + getNotificationTitle())
                 .append("- notificationText: "      + getNotificationText())
                 .append("- stopOnTerminate: "       + getStopOnTerminate())
-                .append("- serviceProvider: "       + ServiceProvider.getClassName(getLocationServiceProvider()))
+                .append("- serviceProvider: "       + getLocationServiceProvider())
                 .append("- interval: "              + getInterval())
                 .append("- fastestInterval: "       + getFastestInterval())
                 .toString();

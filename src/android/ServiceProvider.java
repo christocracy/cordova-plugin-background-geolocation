@@ -10,7 +10,7 @@ This is a new class
 package com.marianhello.cordova.bgloc;
 
 /**
- * ServiceProviderEnum
+ * ServiceProvider
  */
 public enum ServiceProvider
 {
@@ -31,14 +31,14 @@ public enum ServiceProvider
         throw new IllegalArgumentException("Invalid ServiceProvider id: " + id);
     }
 
-    public static String getClassName (ServiceProvider provider) {
+    public static Class getClass (ServiceProvider provider) throws ClassNotFoundException {
         switch (provider) {
             case ANDROID_DISTANCE_FILTER:
-                return "com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationService";
+                return com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationService.class;
             case ANDROID_FUSED_LOCATION:
-                return "com.tenforwardconsulting.cordova.bgloc.FusedLocationService";
+                return com.tenforwardconsulting.cordova.bgloc.FusedLocationService.class;
             default:
-                return "unknown";
+                throw new ClassNotFoundException();
         }
     }
 }

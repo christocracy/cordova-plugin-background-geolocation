@@ -30,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
+import com.marianhello.cordova.bgloc.ServiceProvider;
 
 public class BackgroundGpsPlugin extends CordovaPlugin {
     private static final String TAG = "BackgroundGpsPlugin";
@@ -51,9 +52,9 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             try {
-                updateServiceIntent = new Intent(activity, Class.forName(config.getLocationServiceProviderClassName()));
+                updateServiceIntent = new Intent(activity, ServiceProvider.getClass(config.getLocationServiceProvider()));
             } catch (ClassNotFoundException e) {
-                callbackContext.error("Configuration error: " + e.getMessage());
+                callbackContext.error("Configuration error: provider not found");
                 return false;
             }
 
