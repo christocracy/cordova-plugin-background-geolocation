@@ -12,8 +12,8 @@ package com.tenforwardconsulting.cordova.bgloc;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.support.v4.app.NotificationCompat;
-import android.app.PendingIntent;
 import android.app.Service;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,11 +32,11 @@ import android.widget.Toast;
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
 
+import java.util.Random;
 import org.json.JSONException;
 
 public abstract class AbstractLocationService extends Service {
     private static String TAG;
-    private static final String DEFAULT_NOTIFICATION_ICON_COLOR = "#4CAF50";
 
     protected Config config;
     protected String activity;
@@ -67,17 +67,10 @@ public abstract class AbstractLocationService extends Service {
             config = (Config) intent.getParcelableExtra("config");
             activity = intent.getStringExtra("activity");
             Log.d( TAG, "Got activity" + activity );
-            Class<?> activityClass = null;
-            try {
-                activityClass = Class.forName( activity );
-            } catch ( ClassNotFoundException e ) {
-                e.printStackTrace();
-            }
 
             // Build a Notification required for running service in foreground.
             Intent main = new Intent(this, BackgroundGpsPlugin.class);
             main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, main,  PendingIntent.FLAG_UPDATE_CURRENT);
 
             Bitmap largeIcon = BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon()));
 
@@ -87,8 +80,8 @@ public abstract class AbstractLocationService extends Service {
             builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
             builder.setLargeIcon(largeIcon);
             builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
-            builder.setContentIntent(pendingIntent);
-            builder.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, activityClass), 0));
+            setClickEvent(builder);
+
             Notification notification = builder.build();
             notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
             startForeground(startId, notification);
@@ -104,6 +97,21 @@ public abstract class AbstractLocationService extends Service {
         return getApplication().getResources().getIdentifier(resourceName, "drawable", getApplication().getPackageName());
     }
 
+    /**
+     * Adds an onclick handler to the notification
+     */
+    protected NotificationCompat.Builder setClickEvent (NotificationCompat.Builder builder) {
+        int requestCode = new Random().nextInt();
+        Context context     = getApplicationContext();
+        String packageName  = context.getPackageName();
+        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        return builder.setContentIntent(contentIntent);
+    }
+
     private Integer parseNotificationIconColor(String color) {
         int iconColor = 0;
         if (color != null) {
@@ -113,12 +121,7 @@ public abstract class AbstractLocationService extends Service {
                 Log.e(TAG, "couldn't parse color from android options");
             }
         }
-        if (iconColor != 0) {
-            return iconColor;
-        }
-        else {
-            return Color.parseColor(DEFAULT_NOTIFICATION_ICON_COLOR);
-        }
+        return iconColor;
     }
 
     @Override

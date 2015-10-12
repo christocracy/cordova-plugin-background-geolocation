@@ -4,7 +4,7 @@ cordova-plugin-mauron85-background-geolocation
 Fork notice
 ==============================
 
-This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. It was possible be using intents.
+This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. It was possible be using intents. Also it can (and should) be used as battery and data efficient **foreground** geolocation provider.
 
 Warning: You probably have to set your cordova app to keep running by keepRunning property to true (this is the default now).
 
@@ -13,9 +13,7 @@ Description
 
 Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
-Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
-
-This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html).
+Plugin is both foreground and background geolocation provider. It is far more battery and data efficient comparing to html5 geolocation or cordova-geolocation plugin. But you can still use it together with other geolocation providers (eg. html5 navigator.geolocation).
 
 ## Installing the plugin ##
 
@@ -36,70 +34,52 @@ cordova plugin add cordova-plugin-mauron85-background-geolocation
 ## Using the plugin ##
 The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
 
-  `configure(success, fail, option)`,
-
-  `start(success, fail)`
-
-  `stop(success, fail)`.
+* `configure(success, fail, option)`
+* `start(success, fail)`
+* `stop(success, fail)`
 
 A full example could be:
 ```
-//
-//
-// after deviceready
-//
-//
+document.addEventListener('deviceready', onDeviceReady, false);
 
-var bgGeo = window.plugins.backgroundGeoLocation;
+function onDeviceReady () {
+    var bgGeo = window.plugins.backgroundGeoLocation;
 
-/**
-* This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
-*/
-var yourAjaxCallback = function(response) {
-    ////
-    // IMPORTANT:  You must execute the #finish method here to inform the native plugin that you're finished,
-    //  and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
-    // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
-    //
-    //
-    bgGeo.finish();
-};
+    /**
+    * This callback will be executed every time a geolocation is recorded in the background.
+    */
+    var callbackFn = function(location) {
+        console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
 
-/**
-* This callback will be executed every time a geolocation is recorded in the background.
-*/
-var callbackFn = function(location) {
-    console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
-    // Do your HTTP request here to POST location to your server.
-    //
-    //
-    yourAjaxCallback.call(this);
-};
+        // Do your HTTP request here to POST location to your server.
+        // jQuery.post(url, JSON.stringify(location));
 
-var failureFn = function(error) {
-    console.log('BackgroundGeoLocation error');
+        /*
+        IMPORTANT:  You must execute the #finish method here to inform the native plugin that you're finished, and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+        IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+        */
+        bgGeo.finish();
+    };
+
+    var failureFn = function(error) {
+        console.log('BackgroundGeoLocation error');
+    };
+
+    // BackgroundGeoLocation is highly configurable. See platform specific configuration options
+    bgGeo.configure(callbackFn, failureFn, {
+        desiredAccuracy: 10,
+        stationaryRadius: 20,
+        distanceFilter: 30,
+        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+        stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
+    });
+
+    // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
+    bgGeo.start();
+
+    // If you wish to turn OFF background-tracking, call the #stop method.
+    // bgGeo.stop();
 }
-
-// BackgroundGeoLocation is highly configurable.
-bgGeo.configure(callbackFn, failureFn, {
-    desiredAccuracy: 10,
-    stationaryRadius: 20,
-    distanceFilter: 30,
-    notificationIconColor: '#4CAF50', // <-- android only
-    notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
-    notificationText: 'ENABLED', // <-- android only, customize the text of the notification
-    notificationIcon: 'notification_icon', // <-- android only, customize the notification icon
-    activityType: 'AutomotiveNavigation',
-    debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-    stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-    locationService: bgGeo.service.ANDROID_FUSED_LOCATION
-});
-
-// Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
-bgGeo.start();
-
-// If you wish to turn OFF background-tracking, call the #stop method.
-// bgGeo.stop();
 ```
 
 NOTE: On some platforms is required to enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`. Not needed on Android.
@@ -199,6 +179,24 @@ See [Android docs](http://developer.android.com/reference/android/location/Locat
 
 ### Android Config
 
+Example:
+
+```
+bgGeo.configure(callbackFn, failureFn, {
+    desiredAccuracy: 10,
+    stationaryRadius: 20,
+    distanceFilter: 30,
+    notificationIconColor: '#4CAF50',
+    notificationTitle: 'Background tracking',
+    notificationText: 'ENABLED',
+    notificationIcon: 'notification_icon',
+    debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+    stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
+    locationService: bgGeo.service.ANDROID_FUSED_LOCATION
+});
+
+```
+
 #####`@param {String} notificationText/Title`
 
 On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
@@ -261,6 +259,20 @@ Only used for ANDROID_FUSED_LOCATION.
 
 ### iOS Config
 
+Example:
+
+```
+bgGeo.configure(callbackFn, failureFn, {
+    desiredAccuracy: 10,
+    stationaryRadius: 20,
+    distanceFilter: 30,
+    activityType: 'AutomotiveNavigation',
+    debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+    stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
+});
+
+```
+
 #####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
 
 Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
@@ -282,6 +294,10 @@ Lot of work has been done, but scattered all over the github. My intention is to
 this version and adopt all those cool changes. You're more then welcome to pull your request here.
 
 ## Changelog
+
+### [0.5.2] - 2015-10-12
+#### Fixed
+- Android fixing FusedLocationService start and crash on stop
 
 ### [0.5.1] - 2015-10-12
 #### Fixed

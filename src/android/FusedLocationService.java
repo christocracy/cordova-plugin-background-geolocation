@@ -18,22 +18,17 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import java.util.Random;
 import static android.telephony.PhoneStateListener.*;
 
+import com.marianhello.cordova.bgloc.Constant;
+
 public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc.AbstractLocationService implements GoogleApiClient.ConnectionCallbacks {
-
     private static final String TAG = "FusedLocationService";
-    private static final String LOCATION_UPDATE = "com.tenforwardconsulting.cordova.bgloc.LOCATION_UPDATE";
-    private static final String STOP_RECORDING  = "com.tenforwardconsulting.cordova.bgloc.STOP_RECORDING";
-    private static final String START_RECORDING = "com.tenforwardconsulting.cordova.bgloc.START_RECORDING";
-
-    private long lastUpdateTime = 0l;
 
     private PendingIntent locationUpdatePI;
     private GoogleApiClient locationClientAPI;
-    private Criteria criteria;
 
+    private long lastUpdateTime = 0l;
     private boolean running = false;
     private boolean enabled = false;
     private boolean startRecordingOnConnect = true;
@@ -44,40 +39,17 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
         Log.i(TAG, "OnCreate");
         Log.d(TAG, "RUNNING JOSHUA'S MOD!!!!!!!!!!!!!!!");
 
-        toneGenerator           = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         // Location Update PI
-        Intent locationUpdateIntent = new Intent(LOCATION_UPDATE);
+        Intent locationUpdateIntent = new Intent(Constant.LOCATION_UPDATE);
         locationUpdatePI = PendingIntent.getBroadcast(this, 9001, locationUpdateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        registerReceiver(locationUpdateReceiver, new IntentFilter(LOCATION_UPDATE));
+        registerReceiver(locationUpdateReceiver, new IntentFilter(Constant.LOCATION_UPDATE));
 
         // Receivers for start/stop recording
-        registerReceiver(startRecordingReceiver, new IntentFilter(START_RECORDING));
-        registerReceiver(stopRecordingReceiver, new IntentFilter(STOP_RECORDING));
+        registerReceiver(startRecordingReceiver, new IntentFilter(Constant.START_RECORDING));
+        registerReceiver(stopRecordingReceiver, new IntentFilter(Constant.STOP_RECORDING));
 
-        // Location criteria
-
-        criteria = new Criteria();
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setSpeedRequired(true);
-        criteria.setCostAllowed(true);
-    }
-
-    /**
-     * Adds an onclick handler to the notification
-     */
-    private Notification.Builder setClickEvent (Notification.Builder notification) {
-        Context context     = getApplicationContext();
-        String packageName  = context.getPackageName();
-        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(packageName);
-
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        int requestCode = new Random().nextInt();
-
-        PendingIntent contentIntent = PendingIntent.getActivity(context, requestCode, launchIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
-        return notification.setContentIntent(contentIntent);
+        startRecording();
     }
 
     /**
@@ -93,9 +65,7 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
             if (location != null) {
                 Log.d(TAG, "- locationUpdateReceiver" + location.toString());
 
-                // Go ahead and cache, push to server
                 lastLocation = location;
-
                 broadcastLocation(location);
             }
         }
@@ -189,17 +159,6 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
     @Override
     public void onConnectionSuspended(int cause) {
         // locationClientAPI.connect();
-    }
-
-    @TargetApi(16)
-    private Notification buildForegroundNotification(Notification.Builder builder) {
-        return builder.build();
-    }
-
-    @SuppressWarnings("deprecation")
-    @TargetApi(15)
-    private Notification buildForegroundNotificationCompat(Notification.Builder builder) {
-        return builder.getNotification();
     }
 
     /**
