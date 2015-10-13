@@ -1,5 +1,9 @@
 ## Changelog
 
+### [0.5.4] - 2015-10-13
+#### Changed
+- Android only cosmetic changes, but we need stable base
+
 ### [0.5.3] - 2015-10-12
 #### Changed
 - Android not setting any default notificationIcon and notificationIconColor.
