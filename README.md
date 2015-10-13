@@ -107,7 +107,7 @@ On iOS the plugin will execute your configured ```callbackFn```. You may manuall
 
 ### Android
 
-Android **WILL** execute your configured ```callbackFn```. This is the main difference from original christocracy plugin. Android is using intents to do so. Read more about Android implementation in the wiki.
+Android **WILL** execute your configured ```callbackFn```. This is the main difference from original christocracy plugin. Android is using intents to do so. Read more about Android implementation in the [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-implementation).
 
 ### WP8
 
