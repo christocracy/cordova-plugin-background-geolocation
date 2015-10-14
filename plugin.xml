@@ -14,7 +14,7 @@
     </engines>
 
     <js-module src="www/backgroundGeoLocation.js" name="backgroundGeoLocation">
-        <clobbers target="plugins.backgroundGeoLocation"/>
+        <clobbers target="backgroundGeoLocation"/>
     </js-module>
 
     <!-- android -->

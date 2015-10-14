@@ -10,7 +10,8 @@
  */
 
 var exec = require('cordova/exec');
-module.exports = {
+
+var backgroundGeoLocation = {
     /**
      * @property {Object} stationaryRegion
      */
@@ -177,3 +178,9 @@ module.exports = {
         return destination;
     }
 };
+
+/* @Deprecated */
+window.plugins = window.plugins || {};
+window.plugins.backgroundGeoLocation = backgroundGeoLocation;
+
+module.exports = backgroundGeoLocation;

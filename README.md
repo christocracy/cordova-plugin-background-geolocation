@@ -44,7 +44,6 @@ NOTE: If you're using *hydration*, you have to download and reinstall your app w
 document.addEventListener('deviceready', onDeviceReady, false);
 
 function onDeviceReady () {
-    var bgGeo = window.plugins.backgroundGeoLocation;
 
     /**
     * This callback will be executed every time a geolocation is recorded in the background.
@@ -59,7 +58,7 @@ function onDeviceReady () {
         IMPORTANT:  You must execute the #finish method here to inform the native plugin that you're finished, and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
         IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
         */
-        bgGeo.finish();
+        backgroundGeoLocation.finish();
     };
 
     var failureFn = function(error) {
@@ -67,7 +66,7 @@ function onDeviceReady () {
     };
 
     // BackgroundGeoLocation is highly configurable. See platform specific configuration options
-    bgGeo.configure(callbackFn, failureFn, {
+    backgroundGeoLocation.configure(callbackFn, failureFn, {
         desiredAccuracy: 10,
         stationaryRadius: 20,
         distanceFilter: 30,
@@ -76,10 +75,10 @@ function onDeviceReady () {
     });
 
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
-    bgGeo.start();
+    backgroundGeoLocation.start();
 
     // If you wish to turn OFF background-tracking, call the #stop method.
-    // bgGeo.stop();
+    // backgroundGeoLocation.stop();
 }
 ```
 
@@ -152,6 +151,19 @@ Parameter | Type | Platform     | Description
 `option.fastestInterval` | `Number` | Android | Fastest rate in milliseconds at which your app can handle location updates. @see [android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()) Valid only for ANDROID_FUSED_LOCATION.
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects ios GPS algorithm. @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
+Success callback will be called with location object, which tries to mimic w3c [Coordinates interface](http://dev.w3.org/geo/api/spec-source.html#coordinates_interface)
+
+Parameter | Type | Description
+--------- | ---- | -----------
+`time` | Number | Return the UTC time of this fix, in milliseconds since January 1, 1970.
+`latitude` | Number | Get the latitude, in degrees.
+`longitude` | Number | Get the longitude, in degrees.
+`accuracy` | Number | Get the estimated accuracy of this location, in meters.
+`speed` | Number | Get the speed if it is available, in meters/second over ground.
+`altitude` | Number | Get the altitude if available, in meters above the WGS 84 reference ellipsoid.
+`bearing` | Number | Get the bearing, in degrees.
+
+
 ### backgroundGeoLocation.start(success, fail)
 
 Start background gelocation.
@@ -175,7 +187,7 @@ Parameter | Type | Platform | Description
 #### Android:
 
 ```javascript
-bgGeo.configure(callbackFn, failureFn, {
+backgroundGeoLocation.configure(callbackFn, failureFn, {
     desiredAccuracy: 10,
     stationaryRadius: 20,
     distanceFilter: 30,
@@ -185,14 +197,14 @@ bgGeo.configure(callbackFn, failureFn, {
     notificationIcon: 'notification_icon',
     debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
     stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-    locationService: bgGeo.service.ANDROID_FUSED_LOCATION
+    locationService: backgroundGeoLocation.service.ANDROID_FUSED_LOCATION
 });
 ```
 
 #### iOS:
 
 ```javascript
-bgGeo.configure(callbackFn, failureFn, {
+backgroundGeoLocation.configure(callbackFn, failureFn, {
     desiredAccuracy: 10,
     stationaryRadius: 20,
     distanceFilter: 30,
@@ -232,7 +244,7 @@ On Android devices it is required to have a notification in the drawer because i
 #### `notificationIcon`
 **Note:** Only available for API Level >=21.
 
-To use custom notification icon eg. **new_icon**, you need to put icons **new_icon_small.png** and **new_icon_large.png** into *res/drawable* directory. You can automate the process  as part of **after_platform_add** hook configured via [config.xml](/example/SampleApp/config.xml). Check SampleApp [config.xml](/example/SampleApp/config.xml) and [scripts/resource_files.js](/example/SampleApp/scripts/resource_files.js) for reference.
+To use custom notification icon eg. **new_icon**, you need to put icons **new_icon_small.png** and **new_icon_large.png** into *res/drawable* directory **of your app**. You can automate the process  as part of **after_platform_add** hook configured via [config.xml](/example/SampleApp/config.xml). Check SampleApp [config.xml](/example/SampleApp/config.xml) and [scripts/resource_files.js](/example/SampleApp/scripts/resource_files.js) for reference.
 
 NOTE: Using custom icons is currently not possible with Adobe® PhoneGap™ Build, as there is no way how to copy icons into *res/drawable*.
 

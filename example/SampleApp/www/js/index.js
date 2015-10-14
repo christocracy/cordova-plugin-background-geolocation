@@ -198,7 +198,6 @@ var app = {
 
     },
     configureBackgroundGeoLocation: function() {
-        var bgGeo = window.plugins.backgroundGeoLocation;
         var anonDevice = {
             model: device.model,
             platform: device.platform,
@@ -209,7 +208,7 @@ var app = {
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
         */
         var yourAjaxCallback = function(response) {
-            bgGeo.finish();
+            backgroundGeoLocation.finish();
         };
 
         /**
@@ -254,7 +253,7 @@ var app = {
         };
 
         // Only ios emits this stationary event
-        bgGeo.onStationary(function(location) {
+        backgroundGeoLocation.onStationary(function(location) {
             if (!app.stationaryRadius) {
                 app.stationaryRadius = new google.maps.Circle({
                     fillColor: '#cc0000',
@@ -271,7 +270,7 @@ var app = {
         });
 
         // BackgroundGeoLocation is highly configurable.
-        bgGeo.configure(callbackFn, failureFn, {
+        backgroundGeoLocation.configure(callbackFn, failureFn, {
             desiredAccuracy: 0,
             stationaryRadius: 50,
             distanceFilter: 50,
@@ -282,18 +281,18 @@ var app = {
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-            locationService: bgGeo.service[ENV.settings.locationService]
+            locationService: backgroundGeoLocation.service[ENV.settings.locationService]
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
         var settings = ENV.settings;
 
         if (settings.enabled == 'true') {
-            bgGeo.start();
+            backgroundGeoLocation.start();
             app.isTracking = true;
 
             if (settings.aggressive == 'true') {
-                bgGeo.changePace(true);
+                backgroundGeoLocation.changePace(true);
             }
         }
     },
@@ -325,22 +324,20 @@ var app = {
         }
     },
     onServiceChange: function(ev) {
-        var bgGeo = window.plugins.backgroundGeoLocation,
-            locationService = $(ev.target).text();
+        var locationService = $(ev.target).text();
 
         ENV.settings.locationService = locationService;
         localStorage.setItem('locationService', locationService);
         if (app.isTracking) {
-            bgGeo.stop();
+            backgroundGeoLocation.stop();
             app.configureBackgroundGeoLocation();
-            bgGeo.start();
+            backgroundGeoLocation.start();
         } else {
             app.configureBackgroundGeoLocation();
         }
     },
     onClickChangePace: function(value) {
-        var bgGeo   = window.plugins.backgroundGeoLocation,
-            btnPace = app.btnPace;
+        var btnPace = app.btnPace;
 
         btnPace.removeClass('btn-success');
         btnPace.removeClass('btn-danger');
@@ -348,10 +345,10 @@ var app = {
         var isAggressive = ENV.toggle('aggressive');
         if (isAggressive == 'true') {
             btnPace.addClass('btn-danger');
-            bgGeo.changePace(true);
+            backgroundGeoLocation.changePace(true);
         } else {
             btnPace.addClass('btn-success');
-            bgGeo.changePace(false);
+            backgroundGeoLocation.changePace(false);
         }
     },
     onClickReset: function() {
@@ -369,8 +366,7 @@ var app = {
         }
     },
     onClickToggleEnabled: function(value) {
-        var bgGeo       = window.plugins.backgroundGeoLocation,
-            btnEnabled  = app.btnEnabled,
+        var btnEnabled  = app.btnEnabled,
             isEnabled   = ENV.toggle('enabled');
 
         btnEnabled.removeClass('btn-danger');
@@ -379,12 +375,12 @@ var app = {
         if (isEnabled == 'true') {
             btnEnabled.addClass('btn-danger');
             btnEnabled[0].innerHTML = 'Stop';
-            bgGeo.start();
+            backgroundGeoLocation.start();
             app.isTracking = true;
         } else {
             btnEnabled.addClass('btn-success');
             btnEnabled[0].innerHTML = 'Start';
-            bgGeo.stop();
+            backgroundGeoLocation.stop();
             app.isTracking = false;
         }
     },
