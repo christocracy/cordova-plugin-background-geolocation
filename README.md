@@ -152,7 +152,7 @@ Parameter | Type | Platform     | Description
 `option.fastestInterval` | `Number` | Android | Only for ANDROID_FUSED_LOCATION. Get the fastest interval of LocationRequest request, in milliseconds. @see [android docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval())
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects ios GPS algorithm. @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
-### backgroundGeoLocation.start()
+### backgroundGeoLocation.start(success, fail)
 
 Start background gelocation.
 
@@ -161,7 +161,7 @@ Parameter | Type | Platform | Description
 `success` | `Function` | all | success callback
 `fail` | `Function` | all | failure callback
 
-### backgroundGeoLocation.stop()
+### backgroundGeoLocation.stop(success, fail)
 
 Stop background geolocation.
 
