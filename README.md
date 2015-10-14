@@ -151,17 +151,17 @@ Parameter | Type | Platform     | Description
 `option.fastestInterval` | `Number` | Android | Fastest rate in milliseconds at which your app can handle location updates. @see [android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()) Valid only for ANDROID_FUSED_LOCATION.
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects ios GPS algorithm. @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
-Success callback will be called with location object, which tries to mimic w3c [Coordinates interface](http://dev.w3.org/geo/api/spec-source.html#coordinates_interface)
+Success callback will be called with one argument - location object, which tries to mimic w3c [Coordinates interface](http://dev.w3.org/geo/api/spec-source.html#coordinates_interface).
 
-Parameter | Type | Description
---------- | ---- | -----------
-`time` | Number | Return the UTC time of this fix, in milliseconds since January 1, 1970.
-`latitude` | Number | Get the latitude, in degrees.
-`longitude` | Number | Get the longitude, in degrees.
-`accuracy` | Number | Get the estimated accuracy of this location, in meters.
-`speed` | Number | Get the speed if it is available, in meters/second over ground.
-`altitude` | Number | Get the altitude if available, in meters above the WGS 84 reference ellipsoid.
-`bearing` | Number | Get the bearing, in degrees.
+Callback parameter | Type | Description
+------------------ | ---- | -----------
+`time` | `Number` | Return the UTC time of this fix, in milliseconds since January 1, 1970.
+`latitude` | `Number` | Get the latitude, in degrees.
+`longitude` | `Number` | Get the longitude, in degrees.
+`accuracy` | `Number` | Get the estimated accuracy of this location, in meters.
+`speed` | `Number` | Get the speed if it is available, in meters/second over ground.
+`altitude` | `Number` | Get the altitude if available, in meters above the WGS 84 reference ellipsoid.
+`bearing` | `Number` | Get the bearing, in degrees.
 
 
 ### backgroundGeoLocation.start(success, fail)
