@@ -15,12 +15,16 @@
     "url": "git+https://github.com/mauron85/cordova-plugin-background-geolocation.git"
   },
   "keywords": [
-    "phonegap",
-    "background geolocation",
+    "gps",
+    "location",
+    "geolocation",
+    "background",
     "ecosystem:cordova",
     "cordova-android",
     "cordova-ios",
-    "cordova-wp8"
+    "cordova-wp8",
+    "cordova",
+    "phonegap"
   ],
   "engines": [
     {

@@ -2,7 +2,7 @@
 
 ## Fork notice
 
-This is fork of [christocracy cordova-backgroud-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. Plugin is now battery and data efficient **foreground** and background geolocation provider.
+This is fork of [christocracy cordova-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation). The main change is in Android version. Posting positions to url was replaced by callbacks, so now it works same as in iOS. Plugin is now battery and data efficient **foreground** and background geolocation provider.
 
 In android you can choose from two location service providers:
 * ANDROID_DISTANCE_FILTER (original christocracy's)
