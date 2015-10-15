@@ -40,6 +40,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
     public static final String ACTION_CONFIGURE = "configure";
     public static final String ACTION_SET_CONFIG = "setConfig";
     public static final String ACTION_LOCATION_ENABLED_CHECK = "isLocationEnabled";
+    public static final String ACTION_SHOW_LOCATION_SETTINGS = "showLocationSettings";
 
     private Config config = new Config();
     private Boolean isEnabled = false;
@@ -60,10 +61,11 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
             IntentFilter intentFilter = new IntentFilter(Constant.FILTER);
             context.registerReceiver(mMessageReceiver, intentFilter);
+            String canonicalName = activity.getClass().getCanonicalName();
 
             updateServiceIntent.putExtra("config", config);
-            updateServiceIntent.putExtra("activity", cordova.getActivity().getClass().getCanonicalName());
-            Log.d( TAG, "Put activity " + cordova.getActivity().getClass().getCanonicalName() );
+            updateServiceIntent.putExtra("activity", canonicalName);
+            Log.d( TAG, "Put activity " + canonicalName);
 
             activity.startService(updateServiceIntent);
             isEnabled = true;
@@ -97,6 +99,8 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
                 callbackContext.error("Location setting not found on this platform");
                 return false;
             }
+        } else if (ACTION_SHOW_LOCATION_SETTINGS.equalsIgnoreCase(action)) {
+            showLocationSettings();
         }
 
         return true;
@@ -112,6 +116,11 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
         if (isEnabled && config.getStopOnTerminate()) {
             activity.stopService(updateServiceIntent);
         }
+    }
+
+    public void showLocationSettings() {
+        Intent settingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        cordova.getActivity().startActivity(settingsIntent);
     }
 
     public static boolean isLocationEnabled(Context context) throws SettingNotFoundException {

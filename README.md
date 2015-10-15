@@ -164,23 +164,29 @@ Callback parameter | Type | Description
 `bearing` | `Number` | Get the bearing, in degrees.
 
 
-### backgroundGeoLocation.start(success, fail)
+### backgroundGeoLocation.start()
 
 Start background gelocation.
 
-Parameter | Type | Platform | Description
---------- | ---- | -------- | -----------
-`success` | `Function` | all | success callback
-`fail` | `Function` | all | failure callback
-
-### backgroundGeoLocation.stop(success, fail)
+### backgroundGeoLocation.stop()
 
 Stop background geolocation.
 
-Parameter | Type | Platform | Description
---------- | ---- | -------- | -----------
-`success` | `Function` | all | success callback
-`fail` | `Function` | all | failure callback
+### backgroundGeoLocation.isLocationEnabled(success, fail)
+
+Check if location services are enabled.
+Note: Android only
+
+Success callback
+
+Callback parameter | Type | Description
+------------------ | ---- | -----------
+`enabled` | `Boolean` | true when location services are enabled
+
+### backgroundGeoLocation.showLocationSettings()
+
+Show settings to allow configuration of current location sources.
+Note: Android only
 
 ### Example config
 

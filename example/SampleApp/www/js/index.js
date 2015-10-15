@@ -158,6 +158,14 @@ var app = {
         window.addEventListener('batterystatus', app.onBatteryStatus, false);
         app.configureBackgroundGeoLocation();
     },
+    onLocationCheck: function (enabled) {
+        if (!enabled) {
+            var showSettings = window.confirm('No location provider enabled. Should I open location setting?');
+            if (showSettings === true) {
+                backgroundGeoLocation.showLocationSettings();
+            }
+        }
+    },
     onBatteryStatus: function(ev) {
         app.battery = {
             level: ev.level / 100,
@@ -193,9 +201,6 @@ var app = {
     },
     onOffline: function() {
         console.log('Offline');
-    },
-    stop: function () {
-
     },
     configureBackgroundGeoLocation: function() {
         var anonDevice = {
@@ -288,8 +293,7 @@ var app = {
         var settings = ENV.settings;
 
         if (settings.enabled == 'true') {
-            backgroundGeoLocation.start();
-            app.isTracking = true;
+            app.startTracking();
 
             if (settings.aggressive == 'true') {
                 backgroundGeoLocation.changePace(true);
@@ -329,9 +333,9 @@ var app = {
         ENV.settings.locationService = locationService;
         localStorage.setItem('locationService', locationService);
         if (app.isTracking) {
-            backgroundGeoLocation.stop();
+            app.stopTracking();
             app.configureBackgroundGeoLocation();
-            backgroundGeoLocation.start();
+            app.startTracking();
         } else {
             app.configureBackgroundGeoLocation();
         }
@@ -375,13 +379,11 @@ var app = {
         if (isEnabled == 'true') {
             btnEnabled.addClass('btn-danger');
             btnEnabled[0].innerHTML = 'Stop';
-            backgroundGeoLocation.start();
-            app.isTracking = true;
+            app.startTracking();
         } else {
             btnEnabled.addClass('btn-success');
             btnEnabled[0].innerHTML = 'Start';
-            backgroundGeoLocation.stop();
-            app.isTracking = false;
+            app.stopTracking();
         }
     },
     /**
@@ -402,6 +404,15 @@ var app = {
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         console.log('Received Event: ' + id);
+    },
+    startTracking: function () {
+        backgroundGeoLocation.start();
+        app.isTracking = true;
+        backgroundGeoLocation.isLocationEnabled(app.onLocationCheck);
+    },
+    stopTracking: function () {
+        backgroundGeoLocation.stop();
+        app.isTracking = false;
     },
     setCurrentLocation: function(location) {
         var map = app.map;

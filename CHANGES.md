@@ -1,5 +1,12 @@
 ## Changelog
 
+### [0.6.0] - unreleased
+#### Changed
+- deprecating window.plugins clobber
+
+#### Added
+- Android only new fnc showLocationSettings
+
 ### [0.5.4] - 2015-10-13
 #### Changed
 - Android only cosmetic changes, but we need stable base
