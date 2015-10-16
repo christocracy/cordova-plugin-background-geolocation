@@ -69,7 +69,8 @@ var app = {
     locations: [],
     isTracking: false,
     postingEnabled: false,
-    postUrl: 'https://background-geolocation-console.herokuapp.com/locations',
+    // thank you IBM Bluemix
+    postUrl: 'http://134.168.19.148:8080/locations',
     /**
     * @private
     */
@@ -157,9 +158,10 @@ var app = {
         app.receivedEvent('deviceready');
         window.addEventListener('batterystatus', app.onBatteryStatus, false);
         app.configureBackgroundGeoLocation();
+        backgroundGeoLocation.watchLocationMode(app.onLocationCheck);
     },
     onLocationCheck: function (enabled) {
-        if (!enabled) {
+        if (app.isTracking && !enabled) {
             var showSettings = window.confirm('No location provider enabled. Should I open location setting?');
             if (showSettings === true) {
                 backgroundGeoLocation.showLocationSettings();
@@ -205,6 +207,7 @@ var app = {
     configureBackgroundGeoLocation: function() {
         var anonDevice = {
             model: device.model,
+            version: device.version,
             platform: device.platform,
             uuid: md5([device.uuid, this.salt].join())
         };
@@ -225,7 +228,8 @@ var app = {
                     uuid: new Date().getTime(),
                     timestamp: location.time,
                     battery: app.battery,
-                    coords: location
+                    coords: location,
+                    service_provider: ENV.settings.locationService
                 },
                 device: anonDevice
             };

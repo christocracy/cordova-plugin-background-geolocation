@@ -173,20 +173,35 @@ Start background gelocation.
 Stop background geolocation.
 
 ### backgroundGeoLocation.isLocationEnabled(success, fail)
-
-Check if location services are enabled.
 Note: Android only
+
+One time check for status location services. In case or error fail callback will be executed.
 
 Success callback
 
 Callback parameter | Type | Description
 ------------------ | ---- | -----------
-`enabled` | `Boolean` | true when location services are enabled
+`enabled` | `Boolean` | true/false (true when location services are enabled)
 
 ### backgroundGeoLocation.showLocationSettings()
+Note: Android only
 
 Show settings to allow configuration of current location sources.
+
+### backgroundGeoLocation.watchLocationMode(success, fail)
 Note: Android only
+
+When location mode change will call success callback. In case or error fail callback will be executed.
+
+Callback parameter | Type | Description
+------------------ | ---- | -----------
+`enabled` | `Boolean` | true/false (true when location services are enabled)
+
+### backgroundGeoLocation.stopWatchingLocationMode()
+Note: Android only
+
+Stop watching for location mode changes.
+
 
 ### Example config
 

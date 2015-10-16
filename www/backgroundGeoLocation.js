@@ -148,6 +148,20 @@ var backgroundGeoLocation = {
             'showLocationSettings', []);
     },
 
+    watchLocationMode: function(callbackFn) {
+        exec(callbackFn || function() {},
+            function() {},
+            'BackgroundGeoLocation',
+            'watchLocationMode', []);
+    },
+
+    stopWatchingLocationMode: function() {
+        exec(function() {},
+            function() {},
+            'BackgroundGeoLocation',
+            'stopWatchingLocationMode', []);
+    },
+
     apply: function(destination, source) {
         source = source || {};
         for (var property in source) {

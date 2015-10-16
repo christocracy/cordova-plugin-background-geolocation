@@ -3,9 +3,10 @@
 ### [0.6.0] - unreleased
 #### Changed
 - deprecating window.plugins clobber
+- SampleApp updates
 
 #### Added
-- Android only new fnc showLocationSettings
+- Android showLocationSettings and watchLocationMode
 
 ### [0.5.4] - 2015-10-13
 #### Changed
