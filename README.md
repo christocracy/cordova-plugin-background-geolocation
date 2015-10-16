@@ -191,7 +191,9 @@ Show settings to allow configuration of current location sources.
 ### backgroundGeoLocation.watchLocationMode(success, fail)
 Note: Android only
 
-When location mode change will call success callback. In case or error fail callback will be executed.
+This method can be used to detect user changes in location services settings.
+If user enable or disable location services then success callback will be executed.
+In case or error (SettingNotFoundException) fail callback will be executed.
 
 Callback parameter | Type | Description
 ------------------ | ---- | -----------
