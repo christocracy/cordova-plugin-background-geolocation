@@ -266,6 +266,9 @@ NOTE: Using custom icons is currently not possible with Adobe® PhoneGap™ Buil
 
 **Note:** For iOS  in addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
 
+## Geofencing
+There is nice cordova plugin [cordova-plugin-geofence](https://github.com/cowbell/cordova-plugin-geofence), which does exactly that. Let's keep this plugin lightweight as much as possible.
+
 ## Development
 
 There are many works of original christocracy's plugin. The most interesting repos I've found are:
