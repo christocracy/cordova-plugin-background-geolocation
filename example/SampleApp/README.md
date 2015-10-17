@@ -4,7 +4,7 @@ Example Background GeoLocation app.
 Help to make this plugin better
 ==============================
 
-Enable in app **Collect** feature, to send your position, battery level and basic device info to [background-geolocation-console](http://134.168.19.148:8080).
+Enable in app **Collect** feature, to send your position, battery level and basic device info to [background-geolocation-console](https://bgconsole.mybluemix.net/).
 This data can be used to improve plugin in the future.
 
 No ip address or device.uuid is stored on server. The device.uuid is anonymized before sent.

@@ -70,7 +70,7 @@ var app = {
     isTracking: false,
     postingEnabled: false,
     // thank you IBM Bluemix
-    postUrl: 'http://134.168.19.148:8080/locations',
+    postUrl: 'https://bgconsole.mybluemix.net/locations',
     /**
     * @private
     */
