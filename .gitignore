@@ -1,4 +1,5 @@
 .idea
 .DS_Store
+npm-debug.log
 example/SampleApp/platforms
 example/SampleApp/plugins
