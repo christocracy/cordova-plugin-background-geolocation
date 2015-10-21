@@ -45,7 +45,8 @@ var backgroundGeoLocation = {
             stopOnTerminate       = config.stopOnTerminate || false,
             //Android FusedLocation config
             locationService       = config.locationService || this.service.ANDROID_DISTANCE_FILTER,
-            interval              = (config.interval >= 0) ? config.interval         : 900000, // milliseconds
+            //@Deprecated use locationTimeout instead
+            interval              = (config.interval >= 0) ? config.interval : locationTimeout * 1000; // milliseconds
             fastestInterval       = (config.fastestInterval >= 0) ? config.fastestInterval  : 120000; // milliseconds
 
 
@@ -70,13 +71,13 @@ var backgroundGeoLocation = {
             ]
         );
     },
-    start: function(success, failure, config) {
+    start: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'start', []);
     },
-    stop: function(success, failure, config) {
+    stop: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
@@ -148,9 +149,12 @@ var backgroundGeoLocation = {
             'showLocationSettings', []);
     },
 
-    watchLocationMode: function(callbackFn) {
-        exec(callbackFn || function() {},
-            function() {},
+    watchLocationMode: function(success, failure) {
+        if (typeof(success) !== 'function') {
+             throw 'BackgroundGeolocation#watchLocationMode requires a success callback';
+        }
+        exec(success,
+            failure || function() {},
             'BackgroundGeoLocation',
             'watchLocationMode', []);
     },
@@ -160,6 +164,30 @@ var backgroundGeoLocation = {
             function() {},
             'BackgroundGeoLocation',
             'stopWatchingLocationMode', []);
+    },
+
+    getLocations: function(success, failure) {
+        if (typeof(success) !== 'function') {
+             throw 'BackgroundGeolocation#getLocations requires a success callback';
+        }
+        exec(success,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getLocations', []);
+    },
+
+    deleteLocation: function(locationId, success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'deleteLocation', [locationId]);
+    },
+
+    deleteAllLocations: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'deleteAllLocations', []);
     },
 
     apply: function(destination, source) {

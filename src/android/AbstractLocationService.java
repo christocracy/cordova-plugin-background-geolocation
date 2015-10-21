@@ -16,14 +16,14 @@ import android.app.Service;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.BroadcastReceiver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -31,6 +31,9 @@ import android.widget.Toast;
 
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
+import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
+import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 
 import java.util.Random;
 import org.json.JSONException;
@@ -43,8 +46,22 @@ public abstract class AbstractLocationService extends Service {
 
     protected Location lastLocation;
     protected ToneGenerator toneGenerator;
+    protected Boolean mainActivityDestroyed = false;
 
-    private ConnectivityManager connectivityManager;
+    private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle data = intent.getExtras();
+            switch (data.getInt(Constant.ACTION)) {
+                case Constant.ACTION_ACTIVITY_KILLED:
+                    Log.w(TAG, "Main activity was killed!");
+                    mainActivityDestroyed = data.getBoolean(Constant.DATA);
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -57,7 +74,6 @@ public abstract class AbstractLocationService extends Service {
     public void onCreate() {
         super.onCreate();
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-        connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
     }
 
     @Override
@@ -69,9 +85,6 @@ public abstract class AbstractLocationService extends Service {
             Log.d( TAG, "Got activity" + activity );
 
             // Build a Notification required for running service in foreground.
-            Intent main = new Intent(this, BackgroundGpsPlugin.class);
-            main.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
             builder.setContentTitle(config.getNotificationTitle());
             builder.setContentText(config.getNotificationText());
@@ -135,7 +148,7 @@ public abstract class AbstractLocationService extends Service {
         if (config.isDebugging()) {
             Toast.makeText(this, "Background location tracking stopped", Toast.LENGTH_SHORT).show();
         }
-        return super.stopService(intent);
+        return super.stopService(intent); // not needed???
     }
 
     protected abstract void cleanUp();
@@ -164,12 +177,12 @@ public abstract class AbstractLocationService extends Service {
         toneGenerator.startTone(tone, duration);
     }
 
-    protected void broadcastLocation (Location location) {
+    protected void broadcastLocation (LocationProxy location) {
         Log.d(TAG, "Broadcasting update message: " + location.toString());
         try {
-            String locStr = com.tenforwardconsulting.cordova.bgloc.LocationConverter.toJSONObject(location).toString();
-            Intent intent = new Intent(Constant.FILTER);
-            intent.putExtra(Constant.COMMAND, Constant.UPDATE_PROGRESS);
+            String locStr = location.toJSONObject().toString();
+            Intent intent = new Intent(Constant.ACTION_FILTER);
+            intent.putExtra(Constant.ACTION, Constant.ACTION_LOCATION_UPDATE);
             intent.putExtra(Constant.DATA, locStr);
             this.sendBroadcast(intent);
         } catch (JSONException e) {
@@ -177,20 +190,37 @@ public abstract class AbstractLocationService extends Service {
         }
     }
 
-    public boolean isNetworkConnected() {
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo != null) {
-            Log.d(TAG, "Network found, type = " + networkInfo.getTypeName());
-            return networkInfo.isConnected();
+    protected void persistLocation (LocationProxy location) {
+        LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
+
+        if (dao.persistLocation(location)) {
+            Log.d(TAG, "Persisted Location: " + location);
         } else {
-            Log.d(TAG, "No active network info");
-            return false;
+            Log.w(TAG, "Failed to persist location");
         }
+    }
+
+    protected void handleLocation (Location location) {
+        Boolean isDebugging = config.isDebugging();
+        LocationProxy bgLocation = LocationProxy.fromAndroidLocation(location);
+        bgLocation.setServiceProvider(config.getServiceProvider());
+
+        if (config.getStopOnTerminate() == false) {
+            if (mainActivityDestroyed) {
+                persistLocation(bgLocation);
+            } else if (isDebugging) {
+                bgLocation.setDebug(isDebugging);
+                persistLocation(bgLocation);
+            }
+        }
+
+        broadcastLocation(bgLocation); //broadcast at all circumstances
     }
 
     @Override
     public void onDestroy() {
         Log.w(TAG, "------------------------------------------ Destroyed Location update Service");
+        toneGenerator.release();
         cleanUp();
         super.onDestroy();
     }

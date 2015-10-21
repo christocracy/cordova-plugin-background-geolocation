@@ -20,19 +20,20 @@ import android.os.Parcelable;
  */
 public class Config implements Parcelable
 {
-    private Integer distanceFilter = 500;
     private float stationaryRadius = 50;
+    private Integer distanceFilter = 500;
     private Integer locationTimeout = 60;
     private Integer desiredAccuracy = 100;
     private Boolean debugging = false;
     private String notificationTitle = "Background tracking";
     private String notificationText = "ENABLED";
-    private String notificationIconColor;
-    private String notificationIcon;
+    private String activityType; //not used
     private Boolean stopOnTerminate = false;
+    private String notificationIcon;
+    private String notificationIconColor;
+    private ServiceProvider serviceProvider = ServiceProvider.ANDROID_DISTANCE_FILTER;
     private Integer interval = 900000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
-    private ServiceProvider serviceProvider = ServiceProvider.ANDROID_DISTANCE_FILTER;
 
     public int describeContents() {
         return 0;
@@ -41,15 +42,17 @@ public class Config implements Parcelable
     // write your object's data to the passed-in Parcel
     public void writeToParcel(Parcel out, int flags) {
         out.writeFloat(getStationaryRadius());
-        out.writeInt(getDesiredAccuracy());
         out.writeInt(getDistanceFilter());
         out.writeInt(getLocationTimeout());
+        out.writeInt(getDesiredAccuracy());
         out.writeValue(isDebugging());
-        out.writeString(getNotificationIconColor());
-        out.writeString(getNotificationIcon());
         out.writeString(getNotificationTitle());
         out.writeString(getNotificationText());
+        out.writeString(getActivityType());
         out.writeValue(getStopOnTerminate());
+        out.writeString(getNotificationIcon());
+        out.writeString(getNotificationIconColor());
+        out.writeInt(getServiceProvider().asInt());
         out.writeInt(getInterval());
         out.writeInt(getFastestInterval());
     }
@@ -71,37 +74,19 @@ public class Config implements Parcelable
 
     private Config(Parcel in) {
         setStationaryRadius(in.readFloat());
-        setDesiredAccuracy(in.readInt());
         setDistanceFilter(in.readInt());
         setLocationTimeout(in.readInt());
+        setDesiredAccuracy(in.readInt());
         setDebugging((Boolean) in.readValue(null));
-        setNotificationIconColor(in.readString());
-        setNotificationIcon(in.readString());
         setNotificationTitle(in.readString());
         setNotificationText(in.readString());
+        setActivityType(in.readString());
         setStopOnTerminate((Boolean) in.readValue(null));
+        setNotificationIcon(in.readString());
+        setNotificationIconColor(in.readString());
+        setServiceProvider(in.readInt());
         setInterval(in.readInt());
         setFastestInterval(in.readInt());
-    }
-
-
-    public static Config fromJSONArray (JSONArray data) throws JSONException {
-        Config config = new Config();
-        config.setStationaryRadius((float) data.getDouble(0));
-        config.setDistanceFilter(data.getInt(1));
-        config.setLocationTimeout(data.getInt(2));
-        config.setDesiredAccuracy(data.getInt(3));
-        config.setDebugging(data.getBoolean(4));
-        config.setNotificationTitle(data.getString(5));
-        config.setNotificationText(data.getString(6));
-        config.setStopOnTerminate(data.getBoolean(8));
-        config.setNotificationIcon(data.getString(9));
-        config.setNotificationIconColor(data.getString(10));
-        config.setLocationServiceProvider(data.getInt(11));
-        config.setInterval(data.getInt(12));
-        config.setFastestInterval(data.getInt(13));
-
-        return config;
     }
 
     public float getStationaryRadius() {
@@ -188,15 +173,15 @@ public class Config implements Parcelable
         this.stopOnTerminate = stopOnTerminate;
     }
 
-    public ServiceProvider getLocationServiceProvider() {
+    public ServiceProvider getServiceProvider() {
         return this.serviceProvider;
     }
 
-    public void setLocationServiceProvider(Integer providerId) {
+    public void setServiceProvider(Integer providerId) {
         this.serviceProvider = ServiceProvider.forInt(providerId);
     }
 
-    public void setLocationServiceProvider(ServiceProvider provider) {
+    public void setServiceProvider(ServiceProvider provider) {
         this.serviceProvider = provider;
     }
 
@@ -232,6 +217,14 @@ public class Config implements Parcelable
         return iconName;
     }
 
+    private void setActivityType(String activityType) {
+        this.activityType = activityType;
+    }
+
+    private String getActivityType() {
+        return activityType;
+    }
+
     @Override
     public String toString () {
         return new StringBuffer()
@@ -245,9 +238,29 @@ public class Config implements Parcelable
                 .append("- notificationTitle: "     + getNotificationTitle())
                 .append("- notificationText: "      + getNotificationText())
                 .append("- stopOnTerminate: "       + getStopOnTerminate())
-                .append("- serviceProvider: "       + getLocationServiceProvider())
+                .append("- serviceProvider: "       + getServiceProvider())
                 .append("- interval: "              + getInterval())
                 .append("- fastestInterval: "       + getFastestInterval())
                 .toString();
+    }
+
+    public static Config fromJSONArray (JSONArray data) throws JSONException {
+        Config config = new Config();
+        config.setStationaryRadius((float) data.getDouble(0));
+        config.setDistanceFilter(data.getInt(1));
+        config.setLocationTimeout(data.getInt(2));
+        config.setDesiredAccuracy(data.getInt(3));
+        config.setDebugging(data.getBoolean(4));
+        config.setNotificationTitle(data.getString(5));
+        config.setNotificationText(data.getString(6));
+        config.setActivityType(data.getString(7));
+        config.setStopOnTerminate(data.getBoolean(8));
+        config.setNotificationIcon(data.getString(9));
+        config.setNotificationIconColor(data.getString(10));
+        config.setServiceProvider(data.getInt(11));
+        config.setInterval(data.getInt(12));
+        config.setFastestInterval(data.getInt(13));
+
+        return config;
     }
 }

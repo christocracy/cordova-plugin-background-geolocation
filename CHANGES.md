@@ -1,5 +1,14 @@
 ## Changelog
 
+### [0.7.0] - 2015-10-21
+#### Changed
+- Android deprecating config option.interval
+- Android allow run in background for FusedLocationService (wakeLock)
+- Android will try to persist locations when main activity is killed
+- Android new methods: (getLocations, deleteLocation, deleteAllLocations)
+- Android stop exporting implicit intents (security)
+- SampleApp updates
+
 ### [0.6.0] - 2015-10-17
 #### Changed
 - deprecating window.plugins clobber

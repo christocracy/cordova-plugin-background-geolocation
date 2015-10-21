@@ -22,6 +22,10 @@ public enum ServiceProvider
         this.id = id;
     }
 
+    public int asInt() {
+        return this.id;
+    }
+
     public static ServiceProvider forInt (int id) {
         for (ServiceProvider provider : values()) {
             if (provider.id == id) {

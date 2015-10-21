@@ -12,20 +12,25 @@ import android.location.Location;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationListener;
 import static android.telephony.PhoneStateListener.*;
 
 import com.marianhello.cordova.bgloc.Constant;
 
-public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc.AbstractLocationService implements GoogleApiClient.ConnectionCallbacks {
+public class FusedLocationService extends AbstractLocationService implements GoogleApiClient.ConnectionCallbacks,
+    GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = "FusedLocationService";
 
-    private PendingIntent locationUpdatePI;
+    private PowerManager.WakeLock wakeLock;
+
     private GoogleApiClient locationClientAPI;
 
     private long lastUpdateTime = 0l;
@@ -33,59 +38,59 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
     private boolean enabled = false;
     private boolean startRecordingOnConnect = true;
 
+    private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle data = intent.getExtras();
+            switch (data.getInt(Constant.ACTION)) {
+                case Constant.ACTION_START_RECORDING:
+                    startRecording();
+                    break;
+                case Constant.ACTION_STOP_RECORDING:
+                    stopRecording();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "OnCreate");
         Log.d(TAG, "RUNNING JOSHUA'S MOD!!!!!!!!!!!!!!!");
 
-        toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-        // Location Update PI
-        Intent locationUpdateIntent = new Intent(Constant.LOCATION_UPDATE);
-        locationUpdatePI = PendingIntent.getBroadcast(this, 9001, locationUpdateIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        registerReceiver(locationUpdateReceiver, new IntentFilter(Constant.LOCATION_UPDATE));
+        // Receiver for actions
+        registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
 
-        // Receivers for start/stop recording
-        registerReceiver(startRecordingReceiver, new IntentFilter(Constant.START_RECORDING));
-        registerReceiver(stopRecordingReceiver, new IntentFilter(Constant.STOP_RECORDING));
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+
+        wakeLock.acquire();
 
         startRecording();
     }
 
-    /**
-     * Broadcast receiver for receiving a single-update from LocationManager.
-     */
-    private BroadcastReceiver locationUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "- locationUpdateReceiver TRIGGERED!!!!!!!!!!");
-            String key = FusedLocationProviderApi.KEY_LOCATION_CHANGED;
-            Location location = (Location)intent.getExtras().get(key);
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d(TAG, "- onLocationChanged" + location.toString());
 
-            if (location != null) {
-                Log.d(TAG, "- locationUpdateReceiver" + location.toString());
-
-                lastLocation = location;
-                broadcastLocation(location);
-            }
+        if (config.isDebugging()) {
+            Toast.makeText(FusedLocationService.this, "acy:" + location.getAccuracy() + ",v:" + location.getSpeed() + ",df:" + config.getDistanceFilter(), Toast.LENGTH_LONG).show();
         }
-    };
 
-    private BroadcastReceiver startRecordingReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "- START_RECORDING RECEIVER");
-            startRecording();
-        }
-    };
+        // if (lastLocation != null && location.distanceTo(lastLocation) < config.getDistanceFilter()) {
+        //     return;
+        // }
 
-    private BroadcastReceiver stopRecordingReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "- STOP_RECORDING RECEIVER");
-            stopRecording();
+        if (config.isDebugging()) {
+            startTone("beep");
         }
-    };
+
+        lastLocation = location;
+        handleLocation(location);
+    }
 
     private void enable() {
         this.enabled = true;
@@ -126,7 +131,7 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
                     .setFastestInterval(config.getFastestInterval())
                     .setInterval(config.getInterval())
                     .setSmallestDisplacement(config.getStationaryRadius());
-            LocationServices.FusedLocationApi.requestLocationUpdates(locationClientAPI, locationRequest, locationUpdatePI);
+            LocationServices.FusedLocationApi.requestLocationUpdates(locationClientAPI, locationRequest, this);
             this.running = true;
             Log.d(TAG, "- locationUpdateReceiver NOW RECORDING!!!!!!!!!!");
         } else {
@@ -138,7 +143,7 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
         if (locationClientAPI == null) {
             connectToPlayAPI();
         } else if (locationClientAPI.isConnected()) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(locationClientAPI, locationUpdatePI);
+            LocationServices.FusedLocationApi.removeLocationUpdates(locationClientAPI, this);
             this.running = false;
             Log.d(TAG, "- locationUpdateReceiver NO LONGER RECORDING!!!!!!!!!!");
         } else {
@@ -159,6 +164,12 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
     @Override
     public void onConnectionSuspended(int cause) {
         // locationClientAPI.connect();
+        Log.i(TAG, "connection to Google Play Services suspended");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.e(TAG, "connection to Google Play Services failed");
     }
 
     /**
@@ -202,12 +213,10 @@ public class FusedLocationService extends com.tenforwardconsulting.cordova.bgloc
 
     protected void cleanUp() {
         // this.disable();
-        toneGenerator.release();
-        unregisterReceiver(locationUpdateReceiver);
-        unregisterReceiver(startRecordingReceiver);
-        unregisterReceiver(stopRecordingReceiver);
+        unregisterReceiver(actionReceiver);
         locationClientAPI.disconnect();
         stopForeground(true);
+        wakeLock.release();
     }
 
     //@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)

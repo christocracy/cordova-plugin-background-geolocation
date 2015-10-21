@@ -16,7 +16,7 @@ Cross-platform background geolocation for Cordova / PhoneGap with battery-saving
 
 Plugin is both foreground and background geolocation provider. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But you can still use it together with other geolocation providers (eg. html5 navigator.geolocation).
 
-## Installing the plugin ##
+## Installing the plugin
 
 As Cordova is [shifting towards npm](http://cordova.apache.org/announcements/2015/04/21/plugins-release-and-move-to-npm.html), this plugin can be installed from npm:
 
@@ -55,7 +55,8 @@ function onDeviceReady () {
         // jQuery.post(url, JSON.stringify(location));
 
         /*
-        IMPORTANT:  You must execute the #finish method here to inform the native plugin that you're finished, and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+        IMPORTANT:  You must execute the finish method here to inform the native plugin that you're finished,
+        and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
         IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
         */
         backgroundGeoLocation.finish();
@@ -90,7 +91,7 @@ This plugin hosts a SampleApp in [example/SampleApp](/example/SampleApp) folder.
 
 ## Behaviour
 
-The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to decrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius. iOS has a nice system [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses [LocationManager#addProximityAlert](http://developer.android.com/reference/android/location/LocationManager.html). Windows Phone does not have such a API.
+The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to decrease its power usage and accuracy by setting up a circular stationary-region of configurable `stationaryRadius`. iOS has a nice system [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses [LocationManager#addProximityAlert](http://developer.android.com/reference/android/location/LocationManager.html). Windows Phone does not have such a API.
 
 When the plugin detects your user has moved beyond his stationary-region, it engages the native platform's geolocation system for aggressive monitoring according to the configured `desiredAccuracy`, `distanceFilter` and `locationTimeout`.  The plugin attempts to intelligently scale `distanceFilter` based upon the current reported speed.  Each time `distanceFilter` is determined to have changed by 5m/s, it recalculates it by squaring the speed rounded-to-nearest-five and adding `distanceFilter` (I arbitrarily came up with that formula.  Better ideas?).
 
@@ -127,6 +128,8 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
+**NOTE:** `distanceFilter` is elastically auto-calculated by the plugin:  When speed increases, distanceFilter increases;  when speed decreases, so does distanceFilter.
+
 ## API
 
 ### backgroundGeoLocation.configure(success, fail, option)
@@ -136,25 +139,28 @@ Parameter | Type | Platform     | Description
 `success` | `Function` | all | Callback to be executed every time a geolocation is recorded in the background.
 `fail` | `Function` | all | Callback to be executed every time a geolocation error occurs.
 `option` | `JSON Object` | all |
-`option.desiredAccuracy` | `Number` | all | Desired accuracy in meters. Posible values [0, 10, 100, 1000]. The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings.  1000 results in lowest power drain and least accurate readings.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy)
+`option.desiredAccuracy` | `Number` | all | Desired accuracy in meters. Posible values [0, 10, 100, 1000]. The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings.  1000 results in lowest power drain and least accurate readings. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy)
 `option.stationaryRadius` | `Number` | all | Stationary radius in meters. When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.
 `option.debug` | `Boolean` | all | When enabled, the plugin will emit sounds for life-cycle events of background-geolocation! See debugging sounds table.
-`option.distanceFilter` | `Number` | all | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).<br>**NOTE:** distanceFilter is elastically auto-calculated by the plugin:  When speed increases, distanceFilter increases;  when speed decreases, so does distanceFilter.
+`option.distanceFilter` | `Number` | all | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).
 `option.stopOnTerminate` | `Boolean` | iOS, Android | Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).
-`option.locationTimeout` | `Number` | Android, WP8 | The minimum time interval between location updates in seconds. See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) and the [MS doc](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.reportinterval) for more information.
+`option.locationTimeout` | `Number` | Android, WP8 | The minimum time interval between location updates in seconds. **@see** [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) and the [MS doc](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.reportinterval) for more information.
 `option.notificationTitle` | `String` optional | Android | Custom notification title in the drawer.
 `option.notificationText` | `String` optional | Android | Custom notification text in the drawer.
 `option.notificationIconColor` | `String` optional| Android | The accent color to use for notification. Eg. **#4CAF50**.
-`option.notificationIcon` | `String` optional | Android | The filename of a custom notification icon. See android quirks. **Note:** Only available for API Level >=21.
+`option.notificationIcon` | `String` optional | Android | The filename of a custom notification icon. See android quirks. **NOTE:** Only available for API Level >=21.
 `option.locationService` | `Number` | Android | You can choose from two location providers: **ANDROID_DISTANCE_FILTER** (default) using christocracy's distance filter algorithm.  **ANDROID_FUSED_LOCATION** - using google FusedLocation API
-`option.interval` | `Number` | Android | Rate in milliseconds at which your app prefers to receive location updates. Note that the location updates may be faster than this rate if another app is receiving updates at a faster rate, or slower than this rate, or there may be no updates at all. @see [android docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getInterval()) Valid only for ANDROID_FUSED_LOCATION.
-`option.fastestInterval` | `Number` | Android | Fastest rate in milliseconds at which your app can handle location updates. @see [android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()) Valid only for ANDROID_FUSED_LOCATION.
-`option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects ios GPS algorithm. @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
+`option.interval` | `Number` | Android | **@Deprecated** use `locationTimeout` instead.
+`option.fastestInterval` | `Number` | Android | Fastest rate in milliseconds at which your app can handle location updates. **@see** [android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()) Valid only for ANDROID_FUSED_LOCATION.
+`option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
 Success callback will be called with one argument - location object, which tries to mimic w3c [Coordinates interface](http://dev.w3.org/geo/api/spec-source.html#coordinates_interface).
 
 Callback parameter | Type | Description
 ------------------ | ---- | -----------
+`locationId` | `Number` | ID of location as stored in DB (or null)
+`serviceProvider` | `String` | Service provider
+`debug` | `Boolean` | true if location recorded as part of debug
 `time` | `Number` | Return the UTC time of this fix, in milliseconds since January 1, 1970.
 `latitude` | `Number` | Get the latitude, in degrees.
 `longitude` | `Number` | Get the longitude, in degrees.
@@ -173,37 +179,67 @@ Start background gelocation.
 Stop background geolocation.
 
 ### backgroundGeoLocation.isLocationEnabled(success, fail)
-Note: Android only
+NOTE: Android only
 
 One time check for status location services. In case or error fail callback will be executed.
 
-Success callback
-
-Callback parameter | Type | Description
------------------- | ---- | -----------
+Success callback parameter | Type | Description
+-------------------------- | ---- | -----------
 `enabled` | `Boolean` | true/false (true when location services are enabled)
 
 ### backgroundGeoLocation.showLocationSettings()
-Note: Android only
+NOTE: Android only
 
 Show settings to allow configuration of current location sources.
 
 ### backgroundGeoLocation.watchLocationMode(success, fail)
-Note: Android only
+NOTE: Android only
 
-This method can be used to detect user changes in location services settings.
+Method can be used to detect user changes in location services settings.
 If user enable or disable location services then success callback will be executed.
 In case or error (SettingNotFoundException) fail callback will be executed.
 
-Callback parameter | Type | Description
------------------- | ---- | -----------
+Success callback parameter | Type | Description
+-------------------------- | ---- | -----------
 `enabled` | `Boolean` | true/false (true when location services are enabled)
 
 ### backgroundGeoLocation.stopWatchingLocationMode()
-Note: Android only
+NOTE: Android only
 
 Stop watching for location mode changes.
 
+### backgroundGeoLocation.getLocations(success, fail)
+NOTE: Android only
+
+Method will return all stored locations.
+
+Success callback parameter | Type | Description
+-------------------------- | ---- | -----------
+`locations` | `Array` | collection of stored locations
+
+Locations are stored when:
+
+1. ```config.stopOnTerminate``` is false and main activity was killed by the system
+
+2. ```config.stopOnTerminate``` is false and ```option.debug``` is true
+
+Debug locations can be filtered:
+
+```javascript
+[].filter.call(locations, function(location) {
+    return location.debug === false;
+});
+```
+
+### backgroundGeoLocation.deleteLocation(locationId, success, fail)
+NOTE: Android only
+
+Delete stored location by given locationId.
+
+### backgroundGeoLocation.deleteAllLocations(success, fail)
+NOTE: Android only
+
+Delete all stored locations.
 
 ### Example config
 
@@ -252,7 +288,7 @@ Since the plugin uses **iOS** significant-changes API, the plugin cannot detect 
 Keep in mind that it is **not** possible to use ```start()``` during the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and our ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.
 
 #### `stationaryRadius`
-In **WP8** the frequency  of position polling (while in stationary mode) is slowed down to once every three minutes.
+In **WP8** the frequency of position polling (while in stationary mode) is slowed down to once every three minutes.
 
 #### `desiredAccuracy`
 
@@ -262,14 +298,17 @@ In Windows Phone, the underlying GeoLocator you can choose to use 'DesiredAccura
 
 Android **WILL** execute your configured ```callbackFn```. This is the main difference from original christocracy plugin. Android is using intents to do so. Read more about Android implementation in the [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-implementation).
 
-On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it
+On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.
+
+If main activity is killed by the system and ```stopOnTerminate``` option is false, plugin will store locations into database. Stored locations can be retrieved later with ```getAllLocations``` method. Locations are also stored, when ```debug``` option is **true**. However in this case all stored locations, are flagged with ```debug: true``` and can be easily filtered.
 
 #### `notificationIcon`
-**Note:** Only available for API Level >=21.
+**NOTE:** Only available for API Level >=21.
 
 To use custom notification icon eg. **new_icon**, you need to put icons **new_icon_small.png** and **new_icon_large.png** into *res/drawable* directory **of your app**. You can automate the process  as part of **after_platform_add** hook configured via [config.xml](/example/SampleApp/config.xml). Check SampleApp [config.xml](/example/SampleApp/config.xml) and [scripts/resource_files.js](/example/SampleApp/scripts/resource_files.js) for reference.
 
 NOTE: Using custom icons is currently not possible with Adobe® PhoneGap™ Build, as there is no way how to copy icons into *res/drawable*.
+The workaround for payed plans is to create private res only plugin using [secondary-icon](https://github.com/kentmw/secondary-icon).
 
 ## Debugging sounds
 |    | *ios* | *android* | *WP8* |
@@ -281,7 +320,7 @@ NOTE: Using custom icons is currently not possible with Adobe® PhoneGap™ Buil
 | Acquiring stationary location sound | "tick,tick,tick" sound |  | double long low tone |
 | Stationary location acquired sound | "bloom" sound | long tt beep | double short high tone |  
 
-**Note:** For iOS  in addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
+**NOTE:** For iOS  in addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
 
 ## Geofencing
 There is nice cordova plugin [cordova-plugin-geofence](https://github.com/cowbell/cordova-plugin-geofence), which does exactly that. Let's keep this plugin lightweight as much as possible.

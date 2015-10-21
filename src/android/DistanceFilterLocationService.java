@@ -26,6 +26,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
@@ -82,6 +83,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         super.onCreate();
         Log.i(TAG, "OnCreate");
 
+        connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         locationManager  = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         alarmManager     = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -108,7 +110,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         //telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
         //
 
-        PowerManager pm         = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
 
         wakeLock.acquire();
@@ -305,7 +307,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         }
         // Go ahead and cache, push to server
         lastLocation = location;
-        broadcastLocation(location);
+        handleLocation(location);
     }
 
     public void resetStationaryAlarm() {
@@ -483,6 +485,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
     };
     /**
     * TODO Experimental, hoping to implement some sort of "significant changes" system here like ios based upon cell-tower changes.
+    * more info: http://webcache.googleusercontent.com/search?q=cache:5g4p4geLWYsJ:www.anddev.org/networking-database-problems-f29/phonestatelistener-oncelllocationchanged-in-standby-mode-t6596.html
     */
     private PhoneStateListener phoneStateListener = new PhoneStateListener() {
         @Override
@@ -507,11 +510,21 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         Log.d(TAG, "- onStatusChanged: " + provider + ", status: " + status);
     }
 
+    public boolean isNetworkConnected() {
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        if (networkInfo != null) {
+            Log.d(TAG, "Network found, type = " + networkInfo.getTypeName());
+            return networkInfo.isConnected();
+        } else {
+            Log.d(TAG, "No active network info");
+            return false;
+        }
+    }
+
     protected void cleanUp() {
         locationManager.removeUpdates(this);
         alarmManager.cancel(stationaryAlarmPI);
         alarmManager.cancel(stationaryLocationPollingPI);
-        toneGenerator.release();
 
         unregisterReceiver(stationaryAlarmReceiver);
         unregisterReceiver(singleUpdateReceiver);

@@ -158,6 +158,7 @@ var app = {
         app.receivedEvent('deviceready');
         window.addEventListener('batterystatus', app.onBatteryStatus, false);
         app.configureBackgroundGeoLocation();
+        backgroundGeoLocation.getLocations(app.postStoredLocations);
         backgroundGeoLocation.watchLocationMode(app.onLocationCheck);
     },
     onLocationCheck: function (enabled) {
@@ -193,10 +194,8 @@ var app = {
                         if (err) {
                             console.error('[ERROR]: deleting row %s', location._id, err);
                         }
+                        postOneByOne(locations);
                     });
-                })
-                .always(function () {
-                    postOneByOne(locations);
                 });
             })(locations || []);
         });
@@ -204,13 +203,16 @@ var app = {
     onOffline: function() {
         console.log('Offline');
     },
-    configureBackgroundGeoLocation: function() {
-        var anonDevice = {
+    getDeviceInfo: function () {
+        return {
             model: device.model,
             version: device.version,
             platform: device.platform,
             uuid: md5([device.uuid, this.salt].join())
         };
+    },
+    configureBackgroundGeoLocation: function() {
+        var anonDevice = app.getDeviceInfo();
 
         /**
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
@@ -280,7 +282,7 @@ var app = {
 
         // BackgroundGeoLocation is highly configurable.
         backgroundGeoLocation.configure(callbackFn, failureFn, {
-            desiredAccuracy: 0,
+            desiredAccuracy: 10,
             stationaryRadius: 50,
             distanceFilter: 50,
             notificationIcon: 'mappointer',
@@ -493,6 +495,51 @@ var app = {
                 console.error('[ERROR]: inserting location data', err);
             }
         });
+    },
+    postStoredLocations: function (locations) {
+        var anonDevice, filtered;
+
+        filtered = [].filter.call(locations, function(location) {
+            return location.debug === false;
+        });
+
+        if (!filtered || filtered.length === 0) {
+            return;
+        }
+
+        anonDevice = app.getDeviceInfo();
+
+        (function postOneByOne (locations) {
+            var location = locations.pop();
+            if (!location) {
+                return;
+            }
+            var data = {
+                location: {
+                    uuid: new Date().getTime(),
+                    timestamp: location.time,
+                    battery: {},
+                    coords: location,
+                    service_provider: 'SQLITE'
+                },
+                device: anonDevice
+            };
+
+            app.postLocation(data).done(function () {
+                backgroundGeoLocation.deleteLocation(location.locationId,
+                    function () {
+                        console.log('[DEBUG]: location %s deleted', location.locationId);
+                        postOneByOne(locations);
+                    },
+                    function (err) {
+                        if (err) {
+                            console.error('[ERROR]: deleting locationId %s', location.locationId, err);
+                        }
+                        postOneByOne(locations);
+                    }
+                );
+            });
+        })(filtered || []);
     }
 };
 
