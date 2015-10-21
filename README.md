@@ -181,7 +181,7 @@ Stop background geolocation.
 ### backgroundGeoLocation.isLocationEnabled(success, fail)
 NOTE: Android only
 
-One time check for status location services. In case or error fail callback will be executed.
+One time check for status of location services. In case or error fail callback will be executed.
 
 Success callback parameter | Type | Description
 -------------------------- | ---- | -----------
@@ -190,7 +190,7 @@ Success callback parameter | Type | Description
 ### backgroundGeoLocation.showLocationSettings()
 NOTE: Android only
 
-Show settings to allow configuration of current location sources.
+Show system settings to allow configuration of current location sources.
 
 ### backgroundGeoLocation.watchLocationMode(success, fail)
 NOTE: Android only
