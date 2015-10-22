@@ -40,12 +40,6 @@ var ENV = (function() {
     };
 })();
 
-indexed(ENV.dbName).create(function (err) {
-    if (err) {
-        console.error(err);
-    }
-});
-
 var app = {
     /**
     * @property {google.maps.Map} map
@@ -86,8 +80,8 @@ var app = {
             salt = new Date().getTime();
             localStorage.setItem('salt', salt);
         }
+        this.online = false;
         this.salt = salt;
-        this.db = indexed(ENV.dbName);
         this.bindEvents();
         google.maps.event.addDomListener(window, 'load', app.initializeMap);
     },
@@ -152,14 +146,22 @@ var app = {
     },
     // deviceready Event Handler
     //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicitly call 'app.receivedEvent(...);'
+    // The scope of 'this' is the event.
     onDeviceReady: function() {
-        app.receivedEvent('deviceready');
+        app.ready = true;
+        indexed(ENV.dbName).create(function (err) {
+            if (err) {
+                console.error(err);
+            }
+        });
+        app.db = indexed(ENV.dbName);
         window.addEventListener('batterystatus', app.onBatteryStatus, false);
         app.configureBackgroundGeoLocation();
-        backgroundGeoLocation.getLocations(app.postStoredLocations);
+        backgroundGeoLocation.getLocations(app.postLocationsWasKilled);
         backgroundGeoLocation.watchLocationMode(app.onLocationCheck);
+        if (app.online && app.wasNotReady) {
+            app.postLocationsWasOffline()
+        }
     },
     onLocationCheck: function (enabled) {
         if (app.isTracking && !enabled) {
@@ -178,30 +180,16 @@ var app = {
     },
     onOnline: function() {
         console.log('Online');
-        app.db.find({}, function (err, locations) {
-            if (err) {
-                console.error('[ERROR]: while retrieving location data', err);
-            }
-            // nice recursion to prevent burst
-            (function postOneByOne (locations) {
-                var location = locations.pop();
-                if (!location) {
-                    return;
-                }
-                app.postLocation(location)
-                .done(function () {
-                    app.db.delete({ _id: location._id }, function (err) {
-                        if (err) {
-                            console.error('[ERROR]: deleting row %s', location._id, err);
-                        }
-                        postOneByOne(locations);
-                    });
-                });
-            })(locations || []);
-        });
+        app.online = true;
+        if (!app.ready) {
+            app.wasNotReady = true;
+            return;
+        }
+        app.postLocationsWasOffline();
     },
     onOffline: function() {
         console.log('Offline');
+        app.online = false;
     },
     getDeviceInfo: function () {
         return {
@@ -277,7 +265,6 @@ var app = {
             var center = new google.maps.LatLng(location.latitude, location.longitude);
             app.stationaryRadius.setRadius(radius);
             app.stationaryRadius.setCenter(center);
-
         });
 
         // BackgroundGeoLocation is highly configurable.
@@ -409,10 +396,6 @@ var app = {
     onResume: function() {
         console.log('- onResume');
     },
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
-        console.log('Received Event: ' + id);
-    },
     startTracking: function () {
         backgroundGeoLocation.start();
         app.isTracking = true;
@@ -482,6 +465,29 @@ var app = {
         app.path.getPath().push(latlng);
         app.previousLocation = location;
     },
+    postLocationsWasOffline: function () {
+        app.db.find({}, function (err, locations) {
+            if (err) {
+                console.error('[ERROR]: while retrieving location data', err);
+            }
+            // nice recursion to prevent burst
+            (function postOneByOne (locations) {
+                var location = locations.pop();
+                if (!location) {
+                    return;
+                }
+                app.postLocation(location)
+                .done(function () {
+                    app.db.delete({ _id: location._id }, function (err) {
+                        if (err) {
+                            console.error('[ERROR]: deleting row %s', location._id, err);
+                        }
+                        postOneByOne(locations);
+                    });
+                });
+            })(locations || []);
+        });
+    },
     postLocation: function (data) {
         return $.ajax({
             url: app.postUrl,
@@ -498,7 +504,7 @@ var app = {
             }
         });
     },
-    postStoredLocations: function (locations) {
+    postLocationsWasKilled: function (locations) {
         var anonDevice, filtered;
 
         filtered = [].filter.call(locations, function(location) {

@@ -70,6 +70,7 @@
 
     <platform name="ios">
         <!-- required background modes:  App registers for location updates -->
+        <dependency id="cordova-plugin-geolocation" />
 
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
             <string>This app requires background location tracking</string>

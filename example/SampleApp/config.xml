@@ -20,6 +20,7 @@
         <allow-intent href="market:*" />
     </platform>
     <platform name="ios">
+        <dependency id="cordova-plugin-indexeddb" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
