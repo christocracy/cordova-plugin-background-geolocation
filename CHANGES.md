@@ -1,5 +1,10 @@
 ## Changelog
 
+### [0.7.2] - 2015-10-21
+#### Fixed
+- iOS fixing plugin dependencies (build)
+- iOS related fixes for SampleApp
+
 ### [0.7.1] - 2015-10-21
 #### Changed
 - Android ANDROID_FUSED_LOCATION ditching setSmallestDisplacement(stationaryRadius) (seems buggy)
