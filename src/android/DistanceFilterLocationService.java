@@ -25,18 +25,12 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
-import android.telephony.CellLocation;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 import java.util.List;
-import static android.telephony.PhoneStateListener.*;
 import static java.lang.Math.pow;
 import static java.lang.Math.round;
 import static java.lang.Math.abs;
@@ -74,19 +68,15 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
 
     private LocationManager locationManager;
     private AlarmManager alarmManager;
-    private ConnectivityManager connectivityManager;
     private NotificationManager notificationManager;
-    public static TelephonyManager telephonyManager = null;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "OnCreate");
 
-        connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
         locationManager  = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         alarmManager     = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
 
         // Stop-detection PI
         stationaryAlarmPI   = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
@@ -103,12 +93,6 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         // One-shot PI (TODO currently unused)
         singleUpdatePI = PendingIntent.getBroadcast(this, 0, new Intent(SINGLE_LOCATION_UPDATE_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
         registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
-
-        ////
-        // DISABLED
-        // Listen to Cell-tower switches (NOTE does not operate while suspended)
-        //telephonyManager.listen(phoneStateListener, LISTEN_CELL_LOCATION);
-        //
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -396,23 +380,6 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
     }
 
     /**
-    * TODO Experimental cell-tower change system; something like ios significant changes.
-    */
-    public void onCellLocationChange(CellLocation cellLocation) {
-        Log.i(TAG, "- onCellLocationChange" + cellLocation.toString());
-        if (config.isDebugging()) {
-            Toast.makeText(this, "Cellular location change", Toast.LENGTH_LONG).show();
-            startTone("chirp_chirp_chirp");
-        }
-        if (!isMoving && stationaryLocation != null) {
-            criteria.setAccuracy(Criteria.ACCURACY_FINE);
-            criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
-            criteria.setPowerRequirement(Criteria.POWER_HIGH);
-            locationManager.requestSingleUpdate(criteria, singleUpdatePI);
-        }
-    }
-
-    /**
     * Broadcast receiver for receiving a single-update from LocationManager.
     */
     private BroadcastReceiver singleUpdateReceiver = new BroadcastReceiver() {
@@ -438,6 +405,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
             setPace(false);
         }
     };
+
     /**
      * Broadcast receiver to handle stationaryMonitor alarm, fired at low frequency while monitoring stationary-region.
      * This is required because latest Android proximity-alerts don't seem to operate while suspended.  Regularly polling
@@ -457,6 +425,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
              locationManager.requestSingleUpdate(criteria, singleUpdatePI);
          }
      };
+
     /**
     * Broadcast receiver which detects a user has exit his circular stationary-region determined by the greater of stationaryLocation.getAccuracy() OR stationaryRadius
     */
@@ -483,17 +452,6 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
             }
         }
     };
-    /**
-    * TODO Experimental, hoping to implement some sort of "significant changes" system here like ios based upon cell-tower changes.
-    * more info: http://webcache.googleusercontent.com/search?q=cache:5g4p4geLWYsJ:www.anddev.org/networking-database-problems-f29/phonestatelistener-oncelllocationchanged-in-standby-mode-t6596.html
-    */
-    private PhoneStateListener phoneStateListener = new PhoneStateListener() {
-        @Override
-        public void onCellLocationChanged(CellLocation location)
-        {
-            onCellLocationChange(location);
-        }
-    };
 
     public void onProviderDisabled(String provider) {
         // TODO Auto-generated method stub
@@ -508,17 +466,6 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
         Log.d(TAG, "- onStatusChanged: " + provider + ", status: " + status);
-    }
-
-    public boolean isNetworkConnected() {
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-        if (networkInfo != null) {
-            Log.d(TAG, "Network found, type = " + networkInfo.getTypeName());
-            return networkInfo.isConnected();
-        } else {
-            Log.d(TAG, "No active network info");
-            return false;
-        }
     }
 
     protected void cleanUp() {

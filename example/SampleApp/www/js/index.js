@@ -285,6 +285,7 @@ var app = {
             desiredAccuracy: 10,
             stationaryRadius: 50,
             distanceFilter: 50,
+            locationTimeout: 30,
             notificationIcon: 'mappointer',
             notificationIconColor: '#FEDD1E',
             notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
@@ -292,7 +293,8 @@ var app = {
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-            locationService: backgroundGeoLocation.service[ENV.settings.locationService]
+            locationService: backgroundGeoLocation.service[ENV.settings.locationService],
+            fastestInterval: 5000
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

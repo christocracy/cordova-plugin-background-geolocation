@@ -25,6 +25,13 @@ var backgroundGeoLocation = {
         ANDROID_FUSED_LOCATION: 1
     },
 
+    accuracy: {
+        HIGH: 0,
+        MEDIUM: 100,
+        LOW: 1000,
+        PASSIVE: 10000
+    },
+
     /**
      * @property {Object} config
      */
@@ -35,7 +42,7 @@ var backgroundGeoLocation = {
         var stationaryRadius      = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50, // meters
             distanceFilter        = (config.distanceFilter >= 0) ? config.distanceFilter   : 500, // meters
             locationTimeout       = (config.locationTimeout >= 0) ? config.locationTimeout  : 60, // seconds
-            desiredAccuracy       = (config.desiredAccuracy >= 0) ? config.desiredAccuracy  : 100, // meters
+            desiredAccuracy       = (config.desiredAccuracy >= 0) ? config.desiredAccuracy  : this.accuracy.MEDIUM,
             debug                 = config.debug || false,
             notificationTitle     = config.notificationTitle || 'Background tracking',
             notificationText      = config.notificationText || 'ENABLED',
