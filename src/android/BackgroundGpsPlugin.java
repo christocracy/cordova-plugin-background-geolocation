@@ -125,6 +125,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
             Log.d( TAG, "Put activity " + canonicalName);
 
             activity.startService(updateServiceIntent);
+            // TODO: call success/fail callback
 
             isEnabled = true;
             Log.d(TAG, "bg service has been started");
@@ -160,12 +161,15 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
             }
         } else if (ACTION_SHOW_LOCATION_SETTINGS.equals(action)) {
             showLocationSettings();
+            // TODO: call success/fail callback
         } else if (REGISTER_MODE_CHANGED_RECEIVER.equals(action)) {
             this.locationModeChangeCallbackContext = callbackContext;
             context.registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+            // TODO: call success/fail callback
         } else if (UNREGISTER_MODE_CHANGED_RECEIVER.equals(action)) {
             context.unregisterReceiver(locationModeChangeReceiver);
             this.locationModeChangeCallbackContext = null;
+            // TODO: call success/fail callback
         } else if (ACTION_GET_ALL_LOCATIONS.equals(action)) {
             try {
                 callbackContext.success(this.getAllLocations());

@@ -54,7 +54,7 @@ public abstract class AbstractLocationService extends Service {
             Bundle data = intent.getExtras();
             switch (data.getInt(Constant.ACTION)) {
                 case Constant.ACTION_ACTIVITY_KILLED:
-                    Log.w(TAG, "Main activity was killed!");
+                    Log.w(TAG, "Main activity was killed! Start persisting locations from now.");
                     mainActivityDestroyed = data.getBoolean(Constant.DATA);
                     break;
                 default:
@@ -207,6 +207,7 @@ public abstract class AbstractLocationService extends Service {
 
         if (config.getStopOnTerminate() == false) {
             if (mainActivityDestroyed) {
+                Log.d(TAG, "Persisting location. Reason: Main activity was killed.");
                 persistLocation(bgLocation);
             } else if (isDebugging) {
                 bgLocation.setDebug(isDebugging);

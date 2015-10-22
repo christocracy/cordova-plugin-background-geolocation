@@ -1,5 +1,9 @@
 ## Changelog
 
+### [0.7.1] - 2015-10-21
+#### Changed
+- Android ANDROID_FUSED_LOCATION ditching setSmallestDisplacement(stationaryRadius) (seems buggy)
+
 ### [0.7.0] - 2015-10-21
 #### Changed
 - Android deprecating config option.interval

@@ -126,14 +126,16 @@ public class FusedLocationService extends AbstractLocationService implements Goo
         if (locationClientAPI == null) {
             connectToPlayAPI();
         } else if (locationClientAPI.isConnected()) {
+            Integer priority = translateDesiredAccuracy(config.getDesiredAccuracy());
             LocationRequest locationRequest = LocationRequest.create()
-                    .setPriority(translateDesiredAccuracy(config.getDesiredAccuracy())) // this.accuracy
+                    .setPriority(priority) // this.accuracy
                     .setFastestInterval(config.getFastestInterval())
-                    .setInterval(config.getInterval())
-                    .setSmallestDisplacement(config.getStationaryRadius());
+                    .setInterval(config.getInterval());
+                    // .setSmallestDisplacement(config.getStationaryRadius());
             LocationServices.FusedLocationApi.requestLocationUpdates(locationClientAPI, locationRequest, this);
             this.running = true;
-            Log.d(TAG, "- locationUpdateReceiver NOW RECORDING!!!!!!!!!!");
+            Log.d(TAG, "- locationUpdateReceiver NOW RECORDING!!!!!!!!!! with priority: "
+                + priority + ", fastestInterval: " + config.getFastestInterval() + ", interval: " + config.getInterval() + ", smallestDisplacement: " + config.getStationaryRadius());
         } else {
             locationClientAPI.connect();
         }
