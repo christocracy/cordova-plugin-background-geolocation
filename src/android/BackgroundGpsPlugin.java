@@ -202,6 +202,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
 
         if (isEnabled) {
             if (config.getStopOnTerminate()) {
+                Log.d(TAG, "Stopping bg service");
                 activity.stopService(updateServiceIntent);
             } else {
                 //todo: send info to location service
