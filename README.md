@@ -8,6 +8,8 @@ On Android you can choose from two location service providers:
 * ANDROID_DISTANCE_FILTER (original christocracy's)
 * ANDROID_FUSED_LOCATION (experimental contributed by [huttj](https://github.com/huttj/cordova-plugin-background-geolocation))
 
+See wiki [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers) for more information about providers.
+
 Warning: You probably have to set your cordova app to keep running by **keepRunning** property to true (this is the default now).
 
 ## Description
@@ -149,9 +151,9 @@ Parameter | Type | Platform     | Description
 `option.notificationText` | `String` optional | Android | Custom notification text in the drawer.
 `option.notificationIconColor` | `String` optional| Android | The accent color to use for notification. Eg. **#4CAF50**.
 `option.notificationIcon` | `String` optional | Android | The filename of a custom notification icon. See android quirks. **NOTE:** Only available for API Level >=21.
-`option.locationService` | `Number` | Android | You can choose from two location providers: **ANDROID_DISTANCE_FILTER** (default) using christocracy's distance filter algorithm.  **ANDROID_FUSED_LOCATION** - using google FusedLocation API
-`option.interval` | `Number` | Android | **@Deprecated** use `locationTimeout` instead.
-`option.fastestInterval` | `Number` | Android | Fastest rate in milliseconds at which your app can handle location updates. **@see** [android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()) Valid only for ANDROID_FUSED_LOCATION.
+`option.locationService` | `Number` | Android | Set location service provider **@see** [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers)
+`option.interval` | `Number` | Android | ANDROID_FUSED_LOCATION only. Rate in milliseconds at which your app prefers to receive location updates. @see [android docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getInterval())
+`option.fastestInterval` | `Number` | Android | ANDROID_FUSED_LOCATION only. Fastest rate in milliseconds at which your app can handle location updates. **@see** [android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()).
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
 Success callback will be called with one argument - location object, which tries to mimic w3c [Coordinates interface](http://dev.w3.org/geo/api/spec-source.html#coordinates_interface).
