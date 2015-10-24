@@ -111,6 +111,7 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
         if (ACTION_START.equals(action) && !isEnabled) {
             try {
                 updateServiceIntent = new Intent(activity, ServiceProvider.getClass(config.getServiceProvider()));
+                updateServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
             } catch (ClassNotFoundException e) {
                 callbackContext.error("Configuration error: provider not found");
                 return false;

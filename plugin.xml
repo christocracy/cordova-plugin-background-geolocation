@@ -37,18 +37,12 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 
-            <receiver android:name="com.marianhello.cordova.bgloc.LocationReceiver">
-                <intent-filter>
-                    <action android:name="com.marianhello.cordova.bgloc." />
-                </intent-filter>
-            </receiver>
-
             <service android:enabled="true" android:exported="false" android:name="com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationService"
-                     android:process=":remote">
+                     android:process=":remote" android:stopWithTask="false">
             </service>
 
             <service android:enabled="true" android:exported="false" android:name="com.tenforwardconsulting.cordova.bgloc.FusedLocationService"
-                     android:process=":remote">
+                     android:process=":remote" android:stopWithTask="false">
             </service>
         </config-file>
 

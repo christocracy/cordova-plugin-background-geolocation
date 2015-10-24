@@ -107,7 +107,7 @@ public abstract class AbstractLocationService extends Service {
         Log.i(TAG, "- activity: "   + activity);
 
         //We want this service to continue running until it is explicitly stopped
-        return START_REDELIVER_INTENT;
+        return START_STICKY;
     }
 
     public Integer getPluginResource(String resourceName) {
