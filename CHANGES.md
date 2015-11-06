@@ -1,6 +1,6 @@
 ## Changelog
 
-### [0.7.3] - unreleased
+### [0.7.3] - 2015-11-06
 #### Fixed
 - Android issue #11
 
