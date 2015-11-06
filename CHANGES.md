@@ -1,5 +1,9 @@
 ## Changelog
 
+### [0.7.3] - unreleased
+#### Fixed
+- Android issue #11
+
 ### [0.7.2] - 2015-10-21
 #### Fixed
 - iOS fixing plugin dependencies (build)

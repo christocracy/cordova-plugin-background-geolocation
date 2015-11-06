@@ -197,7 +197,9 @@ public class BackgroundGpsPlugin extends CordovaPlugin {
      * Override method in CordovaPlugin.
      * Checks to see if it should turn off
      */
+     @Override
     public void onDestroy() {
+        super.onDestroy();
         Log.d(TAG, "Main Activity destroyed!!!");
         Activity activity = this.cordova.getActivity();
 
