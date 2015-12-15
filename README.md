@@ -309,10 +309,6 @@ If main activity is killed by the system and ```stopOnTerminate``` option is fal
 Plugin should work with custom ROMS at least ANDROID_DISTANCE_FILTER. But ANDROID_FUSED_LOCATION provider depends on Google Play Services.
 Usually ROMs don't include Google Play Services libraries. Strange bugs may occur, like no GPS locations (only from network and passive) and other. When posting issue report, please mention that you're using custom ROM.
 
-#### Intel XDK
-
-Plugin will not work in XDK emulator ('Unimplemented API Emulation: BackgroundGeoLocation.start' in emulator). But will work on real device.
-
 #### `notificationIcon`
 **NOTE:** Only available for API Level >=21.
 
@@ -320,6 +316,10 @@ To use custom notification icon eg. **new_icon**, you need to put icons **new_ic
 
 NOTE: Using custom icons is currently not possible with Adobe® PhoneGap™ Build, as there is no way how to copy icons into *res/drawable*.
 The workaround for payed plans is to create private res only plugin using [secondary-icon](https://github.com/kentmw/secondary-icon).
+
+### Intel XDK
+
+Plugin will not work in XDK emulator ('Unimplemented API Emulation: BackgroundGeoLocation.start' in emulator). But will work on real device.
 
 ## Debugging sounds
 |    | *ios* | *android* | *WP8* |
