@@ -1,6 +1,6 @@
 ## Changelog
 
-### [0.8.1] - unreleased
+### [0.8.1] - 2015-12-15
 #### Fixed
 - Android fixing #9
 
