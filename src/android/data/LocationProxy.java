@@ -20,69 +20,69 @@ public class LocationProxy {
         this.location = location;
     }
 
-	public Long getLocationId() {
-		return locationId;
-	}
+    public Long getLocationId() {
+        return locationId;
+    }
 
-	public void setLocationId(Long locationId) {
-		this.locationId = locationId;
-	}
+    public void setLocationId(Long locationId) {
+        this.locationId = locationId;
+    }
 
-	public double getLatitude() {
-		return location.getLatitude();
-	}
+    public double getLatitude() {
+        return location.getLatitude();
+    }
 
     public void setLatitude(double latitude) {
-		location.setLatitude(latitude);
-	}
+        location.setLatitude(latitude);
+    }
 
-	public long getTime() {
-		return location.getTime();
-	}
+    public long getTime() {
+        return location.getTime();
+    }
 
     public void setTime(long time) {
-		location.setTime(time);
-	}
+        location.setTime(time);
+    }
 
-	public double getLongitude() {
-		return location.getLongitude();
-	}
+    public double getLongitude() {
+        return location.getLongitude();
+    }
 
-	public void setLongitude(double longitude) {
-		location.setLongitude(longitude);
-	}
+    public void setLongitude(double longitude) {
+        location.setLongitude(longitude);
+    }
 
-	public float getAccuracy() {
-		return location.getAccuracy();
-	}
+    public float getAccuracy() {
+        return location.getAccuracy();
+    }
 
-	public void setAccuracy(float accuracy) {
-		location.setAccuracy(accuracy);
-	}
+    public void setAccuracy(float accuracy) {
+        location.setAccuracy(accuracy);
+    }
 
-	public float getSpeed() {
-		return location.getSpeed();
-	}
+    public float getSpeed() {
+        return location.getSpeed();
+    }
 
-	public void setSpeed(float speed) {
-		location.setSpeed(speed);
-	}
+    public void setSpeed(float speed) {
+        location.setSpeed(speed);
+    }
 
-	public float getBearing() {
-		return location.getBearing();
-	}
+    public float getBearing() {
+        return location.getBearing();
+    }
 
-	public void setBearing(float bearing) {
-		location.setBearing(bearing);
-	}
+    public void setBearing(float bearing) {
+        location.setBearing(bearing);
+    }
 
-	public double getAltitude() {
-		return location.getAltitude();
-	}
+    public double getAltitude() {
+        return location.getAltitude();
+    }
 
-	public void setAltitude(double altitude) {
-		location.setAltitude(altitude);
-	}
+    public void setAltitude(double altitude) {
+        location.setAltitude(altitude);
+    }
 
     public Boolean getDebug() {
         return debug;
@@ -117,18 +117,18 @@ public class LocationProxy {
     }
 
     public JSONObject toJSONObject() throws JSONException {
-		JSONObject json = new JSONObject();
+        JSONObject json = new JSONObject();
         json.put("locationId", getLocationId());
-		json.put("time", getTime());
-		json.put("latitude", getLatitude());
-		json.put("longitude", getLongitude());
-		json.put("accuracy", getAccuracy());
-		json.put("speed", getSpeed());
-		json.put("altitude", getAltitude());
-		json.put("bearing", getBearing());
+        json.put("time", getTime());
+        json.put("latitude", getLatitude());
+        json.put("longitude", getLongitude());
+        json.put("accuracy", getAccuracy());
+        json.put("speed", getSpeed());
+        json.put("altitude", getAltitude());
+        json.put("bearing", getBearing());
         json.put("serviceProvider", getServiceProvider());
         json.put("debug", getDebug());
 
-		return json;
-	}
+        return json;
+  	}
 }

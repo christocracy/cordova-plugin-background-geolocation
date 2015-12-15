@@ -1,5 +1,13 @@
 ## Changelog
 
+### [0.8.0] - unreleased
+#### Fixed
+- Android persist location when main activity was killed
+
+#### Changed
+- Android persisting position when debug is on
+
+
 ### [0.7.3] - 2015-11-06
 #### Fixed
 - Android issue #11

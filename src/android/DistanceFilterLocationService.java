@@ -117,6 +117,14 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         return START_REDELIVER_INTENT;
     }
 
+    public void startRecording() {
+        Log.d(TAG, "- startRecording not implemented yet");
+    }
+
+    public void stopRecording() {
+        Log.d(TAG, "- stopRecording not implemented yet");
+    }
+
     /**
      *
      * @param value set true to engage "aggressive", battery-consuming tracking, false for stationary-region tracking

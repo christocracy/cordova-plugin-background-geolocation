@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Criteria;
 import android.location.Location;
 import android.media.AudioManager;
@@ -34,35 +33,12 @@ public class FusedLocationService extends AbstractLocationService implements Goo
     private GoogleApiClient locationClientAPI;
 
     private long lastUpdateTime = 0l;
-    private boolean running = false;
-    private boolean enabled = false;
     private boolean startRecordingOnConnect = true;
-
-    private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle data = intent.getExtras();
-            switch (data.getInt(Constant.ACTION)) {
-                case Constant.ACTION_START_RECORDING:
-                    startRecording();
-                    break;
-                case Constant.ACTION_STOP_RECORDING:
-                    stopRecording();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "OnCreate");
-        Log.d(TAG, "RUNNING JOSHUA'S MOD!!!!!!!!!!!!!!!");
-
-        // Receiver for actions
-        registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
@@ -90,14 +66,6 @@ public class FusedLocationService extends AbstractLocationService implements Goo
 
         lastLocation = location;
         handleLocation(location);
-    }
-
-    private void enable() {
-        this.enabled = true;
-    }
-
-    private void disable() {
-        this.enabled = false;
     }
 
     public void startRecording() {
@@ -133,7 +101,6 @@ public class FusedLocationService extends AbstractLocationService implements Goo
                     .setInterval(config.getInterval());
                     // .setSmallestDisplacement(config.getStationaryRadius());
             LocationServices.FusedLocationApi.requestLocationUpdates(locationClientAPI, locationRequest, this);
-            this.running = true;
             Log.d(TAG, "- locationUpdateReceiver NOW RECORDING!!!!!!!!!! with priority: "
                 + priority + ", fastestInterval: " + config.getFastestInterval() + ", interval: " + config.getInterval() + ", smallestDisplacement: " + config.getStationaryRadius());
         } else {
@@ -146,7 +113,6 @@ public class FusedLocationService extends AbstractLocationService implements Goo
             connectToPlayAPI();
         } else if (locationClientAPI.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(locationClientAPI, this);
-            this.running = false;
             Log.d(TAG, "- locationUpdateReceiver NO LONGER RECORDING!!!!!!!!!!");
         } else {
             locationClientAPI.connect();
@@ -214,8 +180,6 @@ public class FusedLocationService extends AbstractLocationService implements Goo
     }
 
     protected void cleanUp() {
-        // this.disable();
-        unregisterReceiver(actionReceiver);
         locationClientAPI.disconnect();
         stopForeground(true);
         wakeLock.release();

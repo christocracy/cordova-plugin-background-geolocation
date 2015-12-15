@@ -18,6 +18,7 @@ public abstract class Constant
     public static final String ACTION = "ACTION";
     public static final String ACTION_FILTER = "com.tenforwardconsulting.cordova.bgloc.ACTION";
     public static final String LOCATION_UPDATE_FILTER = "com.tenforwardconsulting.cordova.bgloc.LOCATION_UPDATE";
+    public static final String LOCATION_SENT_INDICATOR = "LOCATION_SENT";
     public static final int ACTION_LOCATION_UPDATE = 0;
     public static final int ACTION_STOP_RECORDING = 1;
     public static final int ACTION_START_RECORDING = 2;

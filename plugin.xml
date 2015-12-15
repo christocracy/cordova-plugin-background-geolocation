@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
-        version="0.7.3">
+        version="0.8.0">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
     <license>Apache-2.0</license>
@@ -22,7 +22,7 @@
         <source-file src="src/android/Config.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/Constant.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/ServiceProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/BackgroundGpsPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
+        <source-file src="src/android/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/AbstractLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/DistanceFilterLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/FusedLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
@@ -56,10 +56,11 @@
         </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="com.tenforwardconsulting.cordova.bgloc.BackgroundGpsPlugin"/>
+                <param name="android-package" value="com.tenforwardconsulting.cordova.bgloc.BackgroundGeolocationPlugin"/>
             </feature>
         </config-file>
         <framework src="com.google.android.gms:play-services-location:+" />
+        <framework src="com.android.support:support-v4:+" />
     </platform>
 
     <platform name="ios">

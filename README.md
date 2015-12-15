@@ -222,8 +222,8 @@ Success callback parameter | Type | Description
 Locations are stored when:
 
 1. ```config.stopOnTerminate``` is false and main activity was killed by the system
-
-2. ```config.stopOnTerminate``` is false and ```option.debug``` is true
+or
+2. ```option.debug``` is true
 
 Debug locations can be filtered:
 

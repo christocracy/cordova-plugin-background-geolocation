@@ -10,12 +10,14 @@ This is a new class
 package com.tenforwardconsulting.cordova.bgloc;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.Notification;
 import android.support.v4.app.NotificationCompat;
 import android.app.Service;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.BroadcastReceiver;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -46,16 +48,17 @@ public abstract class AbstractLocationService extends Service {
 
     protected Location lastLocation;
     protected ToneGenerator toneGenerator;
-    protected Boolean mainActivityDestroyed = false;
 
     private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle data = intent.getExtras();
             switch (data.getInt(Constant.ACTION)) {
-                case Constant.ACTION_ACTIVITY_KILLED:
-                    Log.w(TAG, "Main activity was killed! Start persisting locations from now.");
-                    mainActivityDestroyed = data.getBoolean(Constant.DATA);
+                case Constant.ACTION_START_RECORDING:
+                    startRecording();
+                    break;
+                case Constant.ACTION_STOP_RECORDING:
+                    stopRecording();
                     break;
                 default:
                     break;
@@ -74,6 +77,9 @@ public abstract class AbstractLocationService extends Service {
     public void onCreate() {
         super.onCreate();
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+
+        // Receiver for actions
+        registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
     }
 
     @Override
@@ -152,6 +158,10 @@ public abstract class AbstractLocationService extends Service {
 
     protected abstract void cleanUp();
 
+    protected abstract void startRecording();
+
+    protected abstract void stopRecording();
+
     /**
      * Plays debug sound
      * @param name
@@ -176,19 +186,6 @@ public abstract class AbstractLocationService extends Service {
         toneGenerator.startTone(tone, duration);
     }
 
-    protected void broadcastLocation (LocationProxy location) {
-        Log.d(TAG, "Broadcasting update message: " + location.toString());
-        try {
-            String locStr = location.toJSONObject().toString();
-            Intent intent = new Intent(Constant.ACTION_FILTER);
-            intent.putExtra(Constant.ACTION, Constant.ACTION_LOCATION_UPDATE);
-            intent.putExtra(Constant.DATA, locStr);
-            this.sendBroadcast(intent);
-        } catch (JSONException e) {
-            Log.w(TAG, "Failed to broadcast location");
-        }
-    }
-
     protected void persistLocation (LocationProxy location) {
         LocationDAO dao = DAOFactory.createLocationDAO(this.getApplicationContext());
 
@@ -200,27 +197,47 @@ public abstract class AbstractLocationService extends Service {
     }
 
     protected void handleLocation (Location location) {
-        Boolean isDebugging = config.isDebugging();
-        LocationProxy bgLocation = LocationProxy.fromAndroidLocation(location);
+        final LocationProxy bgLocation = LocationProxy.fromAndroidLocation(location);
         bgLocation.setServiceProvider(config.getServiceProvider());
 
-        if (config.getStopOnTerminate() == false) {
-            if (mainActivityDestroyed) {
-                Log.d(TAG, "Persisting location. Reason: Main activity was killed.");
-                persistLocation(bgLocation);
-            } else if (isDebugging) {
-                bgLocation.setDebug(isDebugging);
-                persistLocation(bgLocation);
-            }
+        if (config.isDebugging()) {
+            bgLocation.setDebug(true);
+            persistLocation(bgLocation);
         }
 
-        broadcastLocation(bgLocation); //broadcast at all circumstances
+        Log.d(TAG, "Broadcasting update message: " + bgLocation.toString());
+        try {
+            String locStr = bgLocation.toJSONObject().toString();
+            Intent intent = new Intent(Constant.ACTION_FILTER);
+            intent.putExtra(Constant.ACTION, Constant.ACTION_LOCATION_UPDATE);
+            intent.putExtra(Constant.DATA, locStr);
+            this.sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
+                // @SuppressLint("NewApi")
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    Log.d(TAG, "Final Result Receiver");
+                    Bundle results = getResultExtras(true);
+                    if (results.getString(Constant.LOCATION_SENT_INDICATOR) == null) {
+                        Log.w(TAG, "Main activity seems to be killed");
+                        if (!config.isDebugging() && config.getStopOnTerminate() == false) {
+                            Log.d(TAG, "Persisting location. Reason: Main activity was killed.");
+                            persistLocation(bgLocation);
+                        }
+                    }
+              }
+            }, null, Activity.RESULT_OK, null, null);
+        } catch (JSONException e) {
+            Log.w(TAG, "Failed to broadcast location");
+        }
+
+        // broadcastLocation(bgLocation); //broadcast at all circumstances
     }
 
     @Override
     public void onDestroy() {
-        Log.w(TAG, "------------------------------------------ Destroyed Location update Service");
+        Log.w(TAG, "Destroyed Location update Service");
         toneGenerator.release();
+        unregisterReceiver(actionReceiver);
         cleanUp();
         super.onDestroy();
     }
