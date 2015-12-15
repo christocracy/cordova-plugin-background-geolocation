@@ -163,18 +163,18 @@ Callback parameter | Type | Description
 `locationId` | `Number` | ID of location as stored in DB (or null)
 `serviceProvider` | `String` | Service provider
 `debug` | `Boolean` | true if location recorded as part of debug
-`time` | `Number` | Return the UTC time of this fix, in milliseconds since January 1, 1970.
-`latitude` | `Number` | Get the latitude, in degrees.
-`longitude` | `Number` | Get the longitude, in degrees.
-`accuracy` | `Number` | Get the estimated accuracy of this location, in meters.
-`speed` | `Number` | Get the speed if it is available, in meters/second over ground.
-`altitude` | `Number` | Get the altitude if available, in meters above the WGS 84 reference ellipsoid.
-`bearing` | `Number` | Get the bearing, in degrees.
+`time` | `Number` |UTC time of this fix, in milliseconds since January 1, 1970.
+`latitude` | `Number` | latitude, in degrees.
+`longitude` | `Number` | longitude, in degrees.
+`accuracy` | `Number` | estimated accuracy of this location, in meters.
+`speed` | `Number` | speed if it is available, in meters/second over ground.
+`altitude` | `Number` | altitude if available, in meters above the WGS 84 reference ellipsoid.
+`bearing` | `Number` | bearing, in degrees.
 
 
 ### backgroundGeoLocation.start()
 
-Start background gelocation.
+Start background geolocation.
 
 ### backgroundGeoLocation.stop()
 
@@ -183,7 +183,7 @@ Stop background geolocation.
 ### backgroundGeoLocation.isLocationEnabled(success, fail)
 NOTE: Android only
 
-One time check for status of location services. In case or error fail callback will be executed.
+One time check for status of location services. In case of error, fail callback will be executed.
 
 Success callback parameter | Type | Description
 -------------------------- | ---- | -----------
@@ -308,6 +308,10 @@ If main activity is killed by the system and ```stopOnTerminate``` option is fal
 
 Plugin should work with custom ROMS at least ANDROID_DISTANCE_FILTER. But ANDROID_FUSED_LOCATION provider depends on Google Play Services.
 Usually ROMs don't include Google Play Services libraries. Strange bugs may occur, like no GPS locations (only from network and passive) and other. When posting issue report, please mention that you're using custom ROM.
+
+#### Intel XDK
+
+Plugin will not work in XDK emulator ('Unimplemented API Emulation: BackgroundGeoLocation.start' in emulator). But will work on real device.
 
 #### `notificationIcon`
 **NOTE:** Only available for API Level >=21.
