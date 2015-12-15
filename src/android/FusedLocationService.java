@@ -184,12 +184,4 @@ public class FusedLocationService extends AbstractLocationService implements Goo
         stopForeground(true);
         wakeLock.release();
     }
-
-    //@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        this.stopRecording();
-        this.stopSelf();
-        super.onTaskRemoved(rootIntent);
-    }
 }

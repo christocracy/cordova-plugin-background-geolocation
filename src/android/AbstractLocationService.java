@@ -242,10 +242,12 @@ public abstract class AbstractLocationService extends Service {
         super.onDestroy();
     }
 
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    // @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        this.stopSelf();
+        if (config.getStopOnTerminate()) {
+          this.stopSelf();
+        }
         super.onTaskRemoved(rootIntent);
     }
 }

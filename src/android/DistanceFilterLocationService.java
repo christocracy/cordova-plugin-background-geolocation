@@ -496,11 +496,4 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         stopForeground(true);
         wakeLock.release();
     }
-
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        this.stopSelf();
-        super.onTaskRemoved(rootIntent);
-    }
 }
