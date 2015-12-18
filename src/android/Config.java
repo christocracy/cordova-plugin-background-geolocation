@@ -244,6 +244,20 @@ public class Config implements Parcelable
                 .toString();
     }
 
+    public Parcel toParcel () {
+        Parcel parcel = Parcel.obtain();
+        this.writeToParcel(parcel, 0);
+        parcel.setDataPosition(0);
+        return parcel;
+    }
+
+    public static Config fromByteArray (byte[] byteArray) {
+        Parcel parcel = Parcel.obtain();
+        parcel.unmarshall(byteArray, 0, byteArray.length);
+        parcel.setDataPosition(0);
+        return Config.CREATOR.createFromParcel(parcel);
+    }
+
     public static Config fromJSONArray (JSONArray data) throws JSONException {
         Config config = new Config();
         config.setStationaryRadius((float) data.getDouble(0));

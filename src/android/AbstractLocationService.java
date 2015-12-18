@@ -12,6 +12,7 @@ package com.tenforwardconsulting.cordova.bgloc;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Notification;
+import android.app.AlarmManager;
 import android.support.v4.app.NotificationCompat;
 import android.app.Service;
 import android.app.PendingIntent;
@@ -28,11 +29,13 @@ import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
+import com.marianhello.cordova.bgloc.ServiceProvider;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
@@ -45,6 +48,7 @@ public abstract class AbstractLocationService extends Service {
 
     protected Config config;
     protected String activity;
+    private Boolean isActionReceiverRegistered = false;
 
     protected Location lastLocation;
     protected ToneGenerator toneGenerator;
@@ -79,13 +83,14 @@ public abstract class AbstractLocationService extends Service {
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
 
         // Receiver for actions
-        registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
+        registerActionReceiver();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
         if (intent != null) {
+            // config = Config.fromByteArray(intent.getByteArrayExtra("config"));
             config = (Config) intent.getParcelableExtra("config");
             activity = intent.getStringExtra("activity");
             Log.d(TAG, "Got activity: " + activity);
@@ -229,25 +234,55 @@ public abstract class AbstractLocationService extends Service {
         } catch (JSONException e) {
             Log.w(TAG, "Failed to broadcast location");
         }
+    }
 
-        // broadcastLocation(bgLocation); //broadcast at all circumstances
+    public Intent registerActionReceiver () {
+        if (isActionReceiverRegistered) { return null; }
+
+        isActionReceiverRegistered = true;
+        return registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
+    }
+
+    public void unregisterActionReceiver () {
+        if (!isActionReceiverRegistered) { return; }
+
+        unregisterReceiver(actionReceiver);
+        isActionReceiverRegistered = false;
+    }
+
+    public void startDelayed () {
+        Class serviceProviderClass = null;
+        AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+
+        try {
+            Intent serviceIntent = new Intent(this, ServiceProvider.getClass(config.getServiceProvider()));
+            serviceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+            serviceIntent.putExtra("config", config.toParcel().marshall());
+            serviceIntent.putExtra("activity", activity);
+            PendingIntent pintent = PendingIntent.getService(this, 0, serviceIntent, 0);
+            alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5 * 1000, pintent);
+        } catch (ClassNotFoundException e) {
+            Log.e(TAG, "Service restart failed");
+        }
     }
 
     @Override
     public void onDestroy() {
         Log.w(TAG, "Destroyed Location update Service");
         toneGenerator.release();
-        unregisterReceiver(actionReceiver);
+        unregisterActionReceiver();
         cleanUp();
+        stopForeground(true);
         super.onDestroy();
     }
 
     // @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        unregisterReceiver(actionReceiver);
+        Log.d(TAG, "Task has been removed");
+        unregisterActionReceiver();
         if (config.getStopOnTerminate()) {
-          this.stopSelf();
+            stopSelf();
         }
         super.onTaskRemoved(rootIntent);
     }

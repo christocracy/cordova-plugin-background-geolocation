@@ -58,7 +58,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     private Boolean isEnabled = false;
     private Boolean isActionReceiverRegistered = false;
     private Boolean isLocationModeChangeReceiverRegistered = false;
-    private Intent updateServiceIntent;
+    private Intent locationServiceIntent;
     private CallbackContext callbackContext;
     private CallbackContext locationModeChangeCallbackContext;
 
@@ -232,13 +232,14 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Log.d(TAG, "Starting bg service");
         Log.d(TAG, "Put activity " + canonicalName);
 
-        updateServiceIntent = new Intent(activity, serviceProviderClass);
-        updateServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
-        updateServiceIntent.putExtra("config", config);
-        updateServiceIntent.putExtra("activity", canonicalName);
+        locationServiceIntent = new Intent(activity, serviceProviderClass);
+        locationServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+        // locationServiceIntent.putExtra("config", config.toParcel().marshall());
+        locationServiceIntent.putExtra("config", config);
+        locationServiceIntent.putExtra("activity", canonicalName);
         isEnabled = true;
 
-        return activity.startService(updateServiceIntent);
+        return activity.startService(locationServiceIntent);
     }
 
     public boolean stopBackgroundService () {
@@ -247,39 +248,39 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Log.d(TAG, "Stopping bg service");
         Activity activity = this.cordova.getActivity();
         isEnabled = false;
-        return activity.stopService(updateServiceIntent);
+        return activity.stopService(locationServiceIntent);
     }
 
     public Intent registerActionReceiver () {
-      if (isActionReceiverRegistered) { return null; }
+        if (isActionReceiverRegistered) { return null; }
 
-      Context context = this.cordova.getActivity().getApplicationContext();
-      isActionReceiverRegistered = true;
-      return context.registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
+        Context context = this.cordova.getActivity().getApplicationContext();
+        isActionReceiverRegistered = true;
+        return context.registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
     }
 
     public Intent registerLocationModeChangeReceiver () {
-      if (isLocationModeChangeReceiverRegistered) { return null; }
+        if (isLocationModeChangeReceiverRegistered) { return null; }
 
-      Context context = this.cordova.getActivity().getApplicationContext();
-      isLocationModeChangeReceiverRegistered = true;
-      return context.registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+        Context context = this.cordova.getActivity().getApplicationContext();
+        isLocationModeChangeReceiverRegistered = true;
+        return context.registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
     }
 
     public void unregisterActionReceiver () {
-      if (!isActionReceiverRegistered) { return; }
+        if (!isActionReceiverRegistered) { return; }
 
-      Context context = this.cordova.getActivity().getApplicationContext();
-      context.unregisterReceiver(actionReceiver);
-      isActionReceiverRegistered = false;
+        Context context = this.cordova.getActivity().getApplicationContext();
+        context.unregisterReceiver(actionReceiver);
+        isActionReceiverRegistered = false;
     }
 
     public void unregisterLocationModeChangeReceiver () {
-      if (!isLocationModeChangeReceiverRegistered) { return; }
+        if (!isLocationModeChangeReceiverRegistered) { return; }
 
-      Context context = this.cordova.getActivity().getApplicationContext();
-      context.unregisterReceiver(locationModeChangeReceiver);
-      isLocationModeChangeReceiverRegistered = false;
+        Context context = this.cordova.getActivity().getApplicationContext();
+        context.unregisterReceiver(locationModeChangeReceiver);
+        isLocationModeChangeReceiverRegistered = false;
     }
 
     public void cleanUp() {

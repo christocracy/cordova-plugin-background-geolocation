@@ -42,7 +42,6 @@ public class FusedLocationService extends AbstractLocationService implements Goo
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-
         wakeLock.acquire();
 
         startRecording();
@@ -181,7 +180,6 @@ public class FusedLocationService extends AbstractLocationService implements Goo
 
     protected void cleanUp() {
         locationClientAPI.disconnect();
-        stopForeground(true);
         wakeLock.release();
     }
 }
