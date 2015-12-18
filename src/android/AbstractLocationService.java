@@ -47,7 +47,6 @@ public abstract class AbstractLocationService extends Service {
     private static final String TAG = "AbstractLocationService";
 
     protected Config config;
-    protected String activity;
     private Boolean isActionReceiverRegistered = false;
 
     protected Location lastLocation;
@@ -92,8 +91,6 @@ public abstract class AbstractLocationService extends Service {
         if (intent != null) {
             // config = Config.fromByteArray(intent.getByteArrayExtra("config"));
             config = (Config) intent.getParcelableExtra("config");
-            activity = intent.getStringExtra("activity");
-            Log.d(TAG, "Got activity: " + activity);
             Log.i(TAG, "Config: " + config.toString());
 
             // Build a Notification required for running service in foreground.
@@ -149,22 +146,6 @@ public abstract class AbstractLocationService extends Service {
         }
         return iconColor;
     }
-
-    @Override
-    public boolean stopService(Intent intent) {
-        Log.i(TAG, "- Received stop: " + intent);
-        cleanUp();
-        if (config.isDebugging()) {
-            Toast.makeText(this, "Background location tracking stopped", Toast.LENGTH_SHORT).show();
-        }
-        return super.stopService(intent); // not needed???
-    }
-
-    protected abstract void cleanUp();
-
-    protected abstract void startRecording();
-
-    protected abstract void stopRecording();
 
     /**
      * Plays debug sound
@@ -258,12 +239,28 @@ public abstract class AbstractLocationService extends Service {
             Intent serviceIntent = new Intent(this, ServiceProvider.getClass(config.getServiceProvider()));
             serviceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
             serviceIntent.putExtra("config", config.toParcel().marshall());
-            serviceIntent.putExtra("activity", activity);
             PendingIntent pintent = PendingIntent.getService(this, 0, serviceIntent, 0);
             alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5 * 1000, pintent);
         } catch (ClassNotFoundException e) {
             Log.e(TAG, "Service restart failed");
         }
+    }
+
+    protected abstract void cleanUp();
+
+    protected abstract void startRecording();
+
+    protected abstract void stopRecording();
+
+
+    @Override
+    public boolean stopService(Intent intent) {
+        Log.i(TAG, "- Received stop: " + intent);
+        cleanUp();
+        if (config.isDebugging()) {
+            Toast.makeText(this, "Background location tracking stopped", Toast.LENGTH_SHORT).show();
+        }
+        return super.stopService(intent); // not needed???
     }
 
     @Override

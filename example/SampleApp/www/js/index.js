@@ -281,7 +281,8 @@ var app = {
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
             locationService: backgroundGeoLocation.service[ENV.settings.locationService],
-            fastestInterval: 5000
+            fastestInterval: 5000,
+            activitiesInterval: 10000
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

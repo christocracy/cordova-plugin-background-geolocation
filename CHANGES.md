@@ -1,5 +1,9 @@
 ## Changelog
 
+### [0.9.0] - unreleased
+#### Changed
+- Android ANDROID_FUSED_LOCATION using ActivityRecognition (saving battery)
+
 ### [0.8.3] - 2015-12-18
 #### Fixed
 - Android fixing crash on exit

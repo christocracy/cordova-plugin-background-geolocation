@@ -14,10 +14,13 @@ package com.marianhello.cordova.bgloc;
  */
 public abstract class Constant
 {
+    private static final String P_NAME = "com.tenforwardconsulting.cordova.bgloc";
+
     public static final String DATA = "DATA";
     public static final String ACTION = "ACTION";
-    public static final String ACTION_FILTER = "com.tenforwardconsulting.cordova.bgloc.ACTION";
-    public static final String LOCATION_UPDATE_FILTER = "com.tenforwardconsulting.cordova.bgloc.LOCATION_UPDATE";
+    public static final String ACTION_FILTER = P_NAME + ".cordova.bgloc.ACTION";
+    public static final String LOCATION_UPDATE_FILTER = P_NAME + ".cordova.bgloc.LOCATION_UPDATE";
+    public static final String DETECTED_ACTIVITY_UPDATE = P_NAME + ".DETECTED_ACTIVITY_UPDATE";
     public static final String LOCATION_SENT_INDICATOR = "LOCATION_SENT";
     public static final int ACTION_LOCATION_UPDATE = 0;
     public static final int ACTION_STOP_RECORDING = 1;

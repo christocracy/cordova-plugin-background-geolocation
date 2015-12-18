@@ -228,15 +228,12 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         if (isEnabled) { return null; }
 
         Activity activity = this.cordova.getActivity();
-        String canonicalName = activity.getClass().getCanonicalName();
         Log.d(TAG, "Starting bg service");
-        Log.d(TAG, "Put activity " + canonicalName);
 
         locationServiceIntent = new Intent(activity, serviceProviderClass);
         locationServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
         // locationServiceIntent.putExtra("config", config.toParcel().marshall());
         locationServiceIntent.putExtra("config", config);
-        locationServiceIntent.putExtra("activity", canonicalName);
         isEnabled = true;
 
         return activity.startService(locationServiceIntent);

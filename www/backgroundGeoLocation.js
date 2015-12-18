@@ -50,12 +50,11 @@ var backgroundGeoLocation = {
             notificationIconColor = config.notificationIconColor,
             activityType          = config.activityType || 'OTHER',
             stopOnTerminate       = config.stopOnTerminate || false,
-            //Android FusedLocation config
             locationService       = config.locationService || this.service.ANDROID_DISTANCE_FILTER,
-            //@Deprecated use locationTimeout instead
-            interval              = (config.interval >= 0) ? config.interval : locationTimeout * 1000; // milliseconds
-            fastestInterval       = (config.fastestInterval >= 0) ? config.fastestInterval  : 120000; // milliseconds
-
+            //Android FusedLocation config
+            interval              = (config.interval >= 0) ? config.interval : locationTimeout * 1000, // milliseconds
+            fastestInterval       = (config.fastestInterval >= 0) ? config.fastestInterval : 120000, // milliseconds
+            activitiesInterval    = config.activitiesInterval || 1000;
 
         exec(success || function() {},
             failure || function() {},
@@ -75,6 +74,7 @@ var backgroundGeoLocation = {
                 locationService,
                 interval,
                 fastestInterval,
+                activitiesInterval
             ]
         );
     },
