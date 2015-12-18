@@ -286,6 +286,7 @@ public class Config implements Parcelable
         config.setServiceProvider(data.getInt(11));
         config.setInterval(data.getInt(12));
         config.setFastestInterval(data.getInt(13));
+        config.setActivitiesInterval(data.getInt(14));
 
         return config;
     }
