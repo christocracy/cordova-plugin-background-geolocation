@@ -228,19 +228,19 @@ public class Config implements Parcelable
     @Override
     public String toString () {
         return new StringBuffer()
-                .append("- stationaryRadius: "      + getStationaryRadius())
-                .append("- desiredAccuracy: "       + getDesiredAccuracy())
-                .append("- distanceFilter: "        + getDistanceFilter())
-                .append("- locationTimeout: "       + getLocationTimeout())
-                .append("- debugging: "             + isDebugging())
-                .append("- notificationIcon: "      + getNotificationIcon())
-                .append("- notificationIconColor: " + getNotificationIconColor())
-                .append("- notificationTitle: "     + getNotificationTitle())
-                .append("- notificationText: "      + getNotificationText())
-                .append("- stopOnTerminate: "       + getStopOnTerminate())
-                .append("- serviceProvider: "       + getServiceProvider())
-                .append("- interval: "              + getInterval())
-                .append("- fastestInterval: "       + getFastestInterval())
+                .append("stationaryRadius: "       + getStationaryRadius())
+                .append(" desiredAccuracy: "       + getDesiredAccuracy())
+                .append(" distanceFilter: "        + getDistanceFilter())
+                .append(" locationTimeout: "       + getLocationTimeout())
+                .append(" debugging: "             + isDebugging())
+                .append(" notificationIcon: "      + getNotificationIcon())
+                .append(" notificationIconColor: " + getNotificationIconColor())
+                .append(" notificationTitle: "     + getNotificationTitle())
+                .append(" notificationText: "      + getNotificationText())
+                .append(" stopOnTerminate: "       + getStopOnTerminate())
+                .append(" serviceProvider: "       + getServiceProvider())
+                .append(" interval: "              + getInterval())
+                .append(" fastestInterval: "       + getFastestInterval())
                 .toString();
     }
 

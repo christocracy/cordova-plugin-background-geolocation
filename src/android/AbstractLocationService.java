@@ -88,7 +88,8 @@ public abstract class AbstractLocationService extends Service {
         if (intent != null) {
             config = (Config) intent.getParcelableExtra("config");
             activity = intent.getStringExtra("activity");
-            Log.d( TAG, "Got activity" + activity );
+            Log.d(TAG, "Got activity: " + activity);
+            Log.i(TAG, "Config: " + config.toString());
 
             // Build a Notification required for running service in foreground.
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -109,11 +110,9 @@ public abstract class AbstractLocationService extends Service {
             notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
             startForeground(startId, notification);
         }
-        Log.i(TAG, config.toString());
-        Log.i(TAG, "- activity: "   + activity);
 
         //We want this service to continue running until it is explicitly stopped
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     public Integer getPluginResource(String resourceName) {
@@ -219,9 +218,10 @@ public abstract class AbstractLocationService extends Service {
                     Bundle results = getResultExtras(true);
                     if (results.getString(Constant.LOCATION_SENT_INDICATOR) == null) {
                         Log.w(TAG, "Main activity seems to be killed");
-                        if (!config.isDebugging() && config.getStopOnTerminate() == false) {
-                            Log.d(TAG, "Persisting location. Reason: Main activity was killed.");
+                        if (config.getStopOnTerminate() == false) {
+                            bgLocation.setDebug(false);
                             persistLocation(bgLocation);
+                            Log.d(TAG, "Persisting location. Reason: Main activity was killed.");
                         }
                     }
               }
@@ -245,6 +245,7 @@ public abstract class AbstractLocationService extends Service {
     // @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
+        unregisterReceiver(actionReceiver);
         if (config.getStopOnTerminate()) {
           this.stopSelf();
         }

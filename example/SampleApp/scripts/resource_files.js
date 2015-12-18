@@ -16,20 +16,20 @@ var filestocopy = [
 { "res/icon/android/drawable-ldpi/ic_launcher.png": "platforms/android/res/drawable-hdpi/mappointer_small.png" },
 { "res/drawable/android/mappointer_large.png": "platforms/android/res/drawable-hdpi/mappointer_large.png" },
 // ios
-{ "res/icon/ios/Icon-40.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-40.png" },
-{ "res/icon/ios/Icon-40@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-40@2x.png" },
-{ "res/icon/ios/Icon-60.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-60.png" },
-{ "res/icon/ios/Icon-60@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-60@2x.png" },
-{ "res/icon/ios/Icon-72.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-72.png" },
-{ "res/icon/ios/Icon-72@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-72@2x.png" },
-{ "res/icon/ios/Icon-76.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-76.png" },
-{ "res/icon/ios/Icon-76@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-76@2x.png" },
-{ "res/icon/ios/Icon-Small-50.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-50.png" },
-{ "res/icon/ios/Icon-Small-50@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-50@2x.png" },
-{ "res/icon/ios/Icon-Small.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-Small.png" },
-{ "res/icon/ios/Icon-Small@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon-Small@2x.png" },
-{ "res/icon/ios/Icon.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon.png" },
-{ "res/icon/ios/Icon@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/Icon@2x.png" }
+{ "res/icon/ios/Icon-40.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-40.png" },
+{ "res/icon/ios/Icon-40@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-40@2x.png" },
+{ "res/icon/ios/Icon-60.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-60.png" },
+{ "res/icon/ios/Icon-60@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-60@2x.png" },
+{ "res/icon/ios/Icon-72.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-72.png" },
+{ "res/icon/ios/Icon-72@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-72@2x.png" },
+{ "res/icon/ios/Icon-76.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-76.png" },
+{ "res/icon/ios/Icon-76@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-76@2x.png" },
+{ "res/icon/ios/Icon-Small-50.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-50.png" },
+{ "res/icon/ios/Icon-Small-50@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-50@2x.png" },
+{ "res/icon/ios/Icon-Small.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-Small.png" },
+{ "res/icon/ios/Icon-Small@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-Small@2x.png" },
+{ "res/icon/ios/Icon.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon.png" },
+{ "res/icon/ios/Icon@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon@2x.png" }
 ];
 
 var fs = require('fs');

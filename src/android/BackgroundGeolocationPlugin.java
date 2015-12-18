@@ -73,14 +73,15 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                         PluginResult result = new PluginResult(PluginResult.Status.OK, location);
                         result.setKeepCallback(true);
                         callbackContext.sendPluginResult(result);
+                        results.putString(Constant.LOCATION_SENT_INDICATOR, "OK");
                     } catch (JSONException e) {
                         Log.w(TAG, "Error converting message to json");
                         PluginResult result = new PluginResult(PluginResult.Status.JSON_EXCEPTION);
                         result.setKeepCallback(true);
                         callbackContext.sendPluginResult(result);
+                        results.putString(Constant.LOCATION_SENT_INDICATOR, "ERROR");
                     }
 
-                    results.putString(Constant.LOCATION_SENT_INDICATOR, "OK");
                     break;
                 default:
                     break;
@@ -222,14 +223,24 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
      */
      @Override
     public void onDestroy() {
-        super.onDestroy();
         Log.d(TAG, "Main Activity destroyed!!!");
         Activity activity = this.cordova.getActivity();
+
+        this.cleanUp();
 
         if (isEnabled && config.getStopOnTerminate()) {
             Log.d(TAG, "Stopping bg service");
             activity.stopService(updateServiceIntent);
+            isEnabled = false;
         }
+
+        super.onDestroy();
+    }
+
+    public void cleanUp() {
+        Context context = this.cordova.getActivity().getApplicationContext();
+        context.unregisterReceiver(actionReceiver);
+        context.unregisterReceiver(locationModeChangeReceiver);
     }
 
     public void showLocationSettings() {
