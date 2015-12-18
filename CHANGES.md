@@ -1,6 +1,6 @@
 ## Changelog
 
-### [0.9.0] - unreleased
+### [0.9.0] - 2015-12-18
 #### Changed
 - Android ANDROID_FUSED_LOCATION using ActivityRecognition (saving battery)
 
