@@ -16,6 +16,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ComponentName;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -55,6 +56,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
 
     private Config config = new Config();
     private Boolean isEnabled = false;
+    private Boolean isActionReceiverRegistered = false;
+    private Boolean isLocationModeChangeReceiverRegistered = false;
     private Intent updateServiceIntent;
     private CallbackContext callbackContext;
     private CallbackContext locationModeChangeCallbackContext;
@@ -121,29 +124,15 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                 return true;
             }
 
-            updateServiceIntent = new Intent(activity, serviceProviderClass);
-            updateServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
-
-            context.registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
-            String canonicalName = activity.getClass().getCanonicalName();
-
-            updateServiceIntent.putExtra("config", config);
-            updateServiceIntent.putExtra("activity", canonicalName);
-            Log.d( TAG, "Put activity " + canonicalName);
-
-            activity.startService(updateServiceIntent);
+            registerActionReceiver();
+            startBackgroundService(serviceProviderClass);
             // TODO: call success/fail callback
-
-            isEnabled = true;
-            Log.d(TAG, "bg service has been started");
 
             return true;
         } else if (ACTION_STOP.equals(action)) {
-            context.unregisterReceiver(actionReceiver);
-            isEnabled = false;
-            activity.stopService(updateServiceIntent);
+            unregisterActionReceiver();
+            stopBackgroundService();
             callbackContext.success();
-            Log.d(TAG, "bg service has been stopped");
 
             return true;
         } else if (ACTION_CONFIGURE.equals(action)) {
@@ -180,12 +169,12 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             return true;
         } else if (REGISTER_MODE_CHANGED_RECEIVER.equals(action)) {
             this.locationModeChangeCallbackContext = callbackContext;
-            context.registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+            registerLocationModeChangeReceiver();
             // TODO: call success/fail callback
 
             return true;
         } else if (UNREGISTER_MODE_CHANGED_RECEIVER.equals(action)) {
-            context.unregisterReceiver(locationModeChangeReceiver);
+            unregisterLocationModeChangeReceiver();
             this.locationModeChangeCallbackContext = null;
             // TODO: call success/fail callback
 
@@ -226,21 +215,77 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Log.d(TAG, "Main Activity destroyed!!!");
         Activity activity = this.cordova.getActivity();
 
-        this.cleanUp();
+        cleanUp();
 
-        if (isEnabled && config.getStopOnTerminate()) {
-            Log.d(TAG, "Stopping bg service");
-            activity.stopService(updateServiceIntent);
-            isEnabled = false;
+        if (config.getStopOnTerminate()) {
+            stopBackgroundService();
         }
 
         super.onDestroy();
     }
 
+    public ComponentName startBackgroundService (Class serviceProviderClass) {
+        if (isEnabled) { return null; }
+
+        Activity activity = this.cordova.getActivity();
+        String canonicalName = activity.getClass().getCanonicalName();
+        Log.d(TAG, "Starting bg service");
+        Log.d(TAG, "Put activity " + canonicalName);
+
+        updateServiceIntent = new Intent(activity, serviceProviderClass);
+        updateServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+        updateServiceIntent.putExtra("config", config);
+        updateServiceIntent.putExtra("activity", canonicalName);
+        isEnabled = true;
+
+        return activity.startService(updateServiceIntent);
+    }
+
+    public boolean stopBackgroundService () {
+        if (!isEnabled) { return false; }
+
+        Log.d(TAG, "Stopping bg service");
+        Activity activity = this.cordova.getActivity();
+        isEnabled = false;
+        return activity.stopService(updateServiceIntent);
+    }
+
+    public Intent registerActionReceiver () {
+      if (isActionReceiverRegistered) { return null; }
+
+      Context context = this.cordova.getActivity().getApplicationContext();
+      isActionReceiverRegistered = true;
+      return context.registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
+    }
+
+    public Intent registerLocationModeChangeReceiver () {
+      if (isLocationModeChangeReceiverRegistered) { return null; }
+
+      Context context = this.cordova.getActivity().getApplicationContext();
+      isLocationModeChangeReceiverRegistered = true;
+      return context.registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+    }
+
+    public void unregisterActionReceiver () {
+      if (!isActionReceiverRegistered) { return; }
+
+      Context context = this.cordova.getActivity().getApplicationContext();
+      context.unregisterReceiver(actionReceiver);
+      isActionReceiverRegistered = false;
+    }
+
+    public void unregisterLocationModeChangeReceiver () {
+      if (!isLocationModeChangeReceiverRegistered) { return; }
+
+      Context context = this.cordova.getActivity().getApplicationContext();
+      context.unregisterReceiver(locationModeChangeReceiver);
+      isLocationModeChangeReceiverRegistered = false;
+    }
+
     public void cleanUp() {
         Context context = this.cordova.getActivity().getApplicationContext();
-        context.unregisterReceiver(actionReceiver);
-        context.unregisterReceiver(locationModeChangeReceiver);
+        unregisterActionReceiver();
+        unregisterLocationModeChangeReceiver();
     }
 
     public void showLocationSettings() {

@@ -1,5 +1,9 @@
 ## Changelog
 
+### [0.8.3] - 2015-12-18
+#### Fixed
+- Android fixing crash on exit
+
 ### [0.8.2] - 2015-12-18
 #### Fixed
 - Android fixing #9 - immediate bg service crash
