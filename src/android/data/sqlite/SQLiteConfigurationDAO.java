@@ -84,13 +84,9 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
   }
 
   public boolean persistConfiguration(Config config) {
-    Boolean hasConfig = (retrieveConfiguration() == null) ? false : true;
     SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
     db.beginTransaction();
-    if (hasConfig) {
-      Log.d(TAG, "Has config deleting row");
-      db.delete(ConfigurationEntry.TABLE_NAME, null, null);
-    }
+    db.delete(ConfigurationEntry.TABLE_NAME, null, null);
     long rowId = db.insert(ConfigurationEntry.TABLE_NAME, ConfigurationEntry.COLUMN_NAME_NULLABLE, getContentValues(config));
     Log.d(TAG, "After insert, rowId = " + rowId);
     db.setTransactionSuccessful();
