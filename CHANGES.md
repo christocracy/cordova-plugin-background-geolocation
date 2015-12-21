@@ -1,5 +1,13 @@
 ## Changelog
 
+### [1.0.0] - unreleased
+#### Changed
+- Android notificationIcon option split into small and large
+- Android bugfixing
+
+#### Added
+- Android startOnBoot
+
 ### [0.9.1] - 2015-12-18
 #### Fixed
 - Android ANDROID_FUSED_LOCATION fix config setActivitiesInterval

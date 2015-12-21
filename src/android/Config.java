@@ -15,6 +15,9 @@ import org.json.JSONException;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONObject;
+import org.json.JSONException;
+
 /**
  * Config class
  */
@@ -27,14 +30,16 @@ public class Config implements Parcelable
     private Boolean debugging = false;
     private String notificationTitle = "Background tracking";
     private String notificationText = "ENABLED";
+    private String notificationIconLarge;
+    private String notificationIconSmall;
+    private String notificationIconColor;
     private String activityType; //not used
     private Boolean stopOnTerminate = false;
-    private String notificationIcon;
-    private String notificationIconColor;
-    private ServiceProvider serviceProvider = ServiceProvider.ANDROID_DISTANCE_FILTER;
+    private ServiceProviderEnum serviceProvider = ServiceProviderEnum.ANDROID_DISTANCE_FILTER;
     private Integer interval = 600000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
     private Integer activitiesInterval = 1000; //milliseconds
+    private Boolean startOnBoot = false;
 
     public int describeContents() {
         return 0;
@@ -49,10 +54,12 @@ public class Config implements Parcelable
         out.writeValue(isDebugging());
         out.writeString(getNotificationTitle());
         out.writeString(getNotificationText());
+        out.writeString(getLargeNotificationIcon());
+        out.writeString(getSmallNotificationIcon());
+        out.writeString(getNotificationIconColor());
         out.writeString(getActivityType());
         out.writeValue(getStopOnTerminate());
-        out.writeString(getNotificationIcon());
-        out.writeString(getNotificationIconColor());
+        out.writeValue(getStartOnBoot());
         out.writeInt(getServiceProvider().asInt());
         out.writeInt(getInterval());
         out.writeInt(getFastestInterval());
@@ -82,10 +89,12 @@ public class Config implements Parcelable
         setDebugging((Boolean) in.readValue(null));
         setNotificationTitle(in.readString());
         setNotificationText(in.readString());
+        setLargeNotificationIcon(in.readString());
+        setSmallNotificationIcon(in.readString());
+        setNotificationIconColor(in.readString());
         setActivityType(in.readString());
         setStopOnTerminate((Boolean) in.readValue(null));
-        setNotificationIcon(in.readString());
-        setNotificationIconColor(in.readString());
+        setStartOnBoot((Boolean) in.readValue(null));
         setServiceProvider(in.readInt());
         setInterval(in.readInt());
         setFastestInterval(in.readInt());
@@ -142,16 +151,6 @@ public class Config implements Parcelable
         }
     }
 
-    public String getNotificationIcon() {
-        return notificationIcon;
-    }
-
-    public void setNotificationIcon(String notificationIcon) {
-        if (!"null".equals(notificationIcon)) {
-            this.notificationIcon = notificationIcon;
-        }
-    }
-
     public String getNotificationTitle() {
         return notificationTitle;
     }
@@ -168,6 +167,22 @@ public class Config implements Parcelable
         this.notificationText = notificationText;
     }
 
+    public String getLargeNotificationIcon () {
+        return notificationIconLarge;
+    }
+
+    public void setLargeNotificationIcon (String icon) {
+        this.notificationIconLarge = icon;
+    }
+
+    public String getSmallNotificationIcon () {
+        return notificationIconSmall;
+    }
+
+    public void setSmallNotificationIcon (String icon) {
+        this.notificationIconSmall = icon;
+    }
+
     public Boolean getStopOnTerminate() {
         return stopOnTerminate;
     }
@@ -176,15 +191,23 @@ public class Config implements Parcelable
         this.stopOnTerminate = stopOnTerminate;
     }
 
-    public ServiceProvider getServiceProvider() {
+    public Boolean getStartOnBoot() {
+        return startOnBoot;
+    }
+
+    public void setStartOnBoot(Boolean startOnBoot) {
+        this.startOnBoot = startOnBoot;
+    }
+
+    public ServiceProviderEnum getServiceProvider() {
         return this.serviceProvider;
     }
 
     public void setServiceProvider(Integer providerId) {
-        this.serviceProvider = ServiceProvider.forInt(providerId);
+        this.serviceProvider = ServiceProviderEnum.forInt(providerId);
     }
 
-    public void setServiceProvider(ServiceProvider provider) {
+    public void setServiceProvider(ServiceProviderEnum provider) {
         this.serviceProvider = provider;
     }
 
@@ -212,22 +235,6 @@ public class Config implements Parcelable
         this.activitiesInterval = activitiesInterval;
     }
 
-    public String getLargeNotificationIcon () {
-        String iconName = getNotificationIcon();
-        if (iconName != null) {
-            iconName = iconName + "_large";
-        }
-        return iconName;
-    }
-
-    public String getSmallNotificationIcon () {
-        String iconName = getNotificationIcon();
-        if (iconName != null) {
-            iconName = iconName + "_small";
-        }
-        return iconName;
-    }
-
     private void setActivityType(String activityType) {
         this.activityType = activityType;
     }
@@ -244,10 +251,12 @@ public class Config implements Parcelable
                 .append(" distanceFilter: "        + getDistanceFilter())
                 .append(" locationTimeout: "       + getLocationTimeout())
                 .append(" debugging: "             + isDebugging())
-                .append(" notificationIcon: "      + getNotificationIcon())
-                .append(" notificationIconColor: " + getNotificationIconColor())
                 .append(" notificationTitle: "     + getNotificationTitle())
                 .append(" notificationText: "      + getNotificationText())
+                .append(" notificationIconLarge: " + getLargeNotificationIcon())
+                .append(" notificationIconSmall: " + getSmallNotificationIcon())
+                .append(" notificationIconColor: " + getNotificationIconColor())
+                .append(" startOnBoot: "           + getStartOnBoot())
                 .append(" stopOnTerminate: "       + getStopOnTerminate())
                 .append(" serviceProvider: "       + getServiceProvider())
                 .append(" interval: "              + getInterval())
@@ -281,13 +290,38 @@ public class Config implements Parcelable
         config.setNotificationText(data.getString(6));
         config.setActivityType(data.getString(7));
         config.setStopOnTerminate(data.getBoolean(8));
-        config.setNotificationIcon(data.getString(9));
-        config.setNotificationIconColor(data.getString(10));
-        config.setServiceProvider(data.getInt(11));
-        config.setInterval(data.getInt(12));
-        config.setFastestInterval(data.getInt(13));
-        config.setActivitiesInterval(data.getInt(14));
+        config.setStartOnBoot(data.getBoolean(9));
+        config.setServiceProvider(data.getInt(10));
+        config.setInterval(data.getInt(11));
+        config.setFastestInterval(data.getInt(12));
+        config.setActivitiesInterval(data.getInt(13));
+        config.setNotificationIconColor(data.getString(14));
+        config.setLargeNotificationIcon(data.getString(15));
+        config.setSmallNotificationIcon(data.getString(16));
 
         return config;
     }
+
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("stationaryRadius", getStationaryRadius());
+        json.put("distanceFilter", getDistanceFilter());
+        json.put("locationTimeout", getLocationTimeout());
+        json.put("desiredAccuracy", getDesiredAccuracy());
+        json.put("debugging", isDebugging());
+        json.put("notificationTitle", getNotificationTitle());
+        json.put("notificationText", getNotificationText());
+        json.put("notificationIconLarge", getLargeNotificationIcon());
+        json.put("notificationIconSmall", getSmallNotificationIcon());
+        json.put("notificationIconColor", getNotificationIconColor());
+        json.put("activityType", getActivityType());
+        json.put("stopOnTerminate", getStopOnTerminate());
+        json.put("startOnBoot", getStartOnBoot());
+        json.put("serviceProvider", getServiceProvider());
+        json.put("interval", getInterval());
+        json.put("fastestInterval", getFastestInterval());
+        json.put("activitiesInterval", getActivitiesInterval());
+
+        return json;
+  	}
 }

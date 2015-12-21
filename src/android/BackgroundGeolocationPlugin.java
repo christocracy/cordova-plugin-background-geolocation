@@ -32,8 +32,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
-import com.marianhello.cordova.bgloc.ServiceProvider;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.tenforwardconsulting.cordova.bgloc.data.ConfigurationDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
 
@@ -45,7 +45,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public static final String ACTION_START = "start";
     public static final String ACTION_STOP = "stop";
     public static final String ACTION_CONFIGURE = "configure";
-    public static final String ACTION_SET_CONFIG = "setConfig";
     public static final String ACTION_LOCATION_ENABLED_CHECK = "isLocationEnabled";
     public static final String ACTION_SHOW_LOCATION_SETTINGS = "showLocationSettings";
     public static final String REGISTER_MODE_CHANGED_RECEIVER = "watchLocationMode";
@@ -53,8 +52,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public static final String ACTION_GET_ALL_LOCATIONS = "getLocations";
     public static final String ACTION_DELETE_LOCATION = "deleteLocation";
     public static final String ACTION_DELETE_ALL_LOCATIONS = "deleteAllLocations";
+    public static final String ACTION_GET_CONFIG = "getConfig";
 
-    private Config config = new Config();
+    private LocationDAO dao;
+    private Config config;
     private Boolean isEnabled = false;
     private Boolean isActionReceiverRegistered = false;
     private Boolean isLocationModeChangeReceiverRegistered = false;
@@ -114,22 +115,19 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Activity activity = this.cordova.getActivity();
         Context context = activity.getApplicationContext();
 
-        if (ACTION_START.equals(action) && !isEnabled) {
-            Class serviceProviderClass = null;
-
-            try {
-                serviceProviderClass = ServiceProvider.getClass(config.getServiceProvider());
-            } catch (ClassNotFoundException e) {
-                callbackContext.error("Configuration error: provider not found");
-                return true;
+        if (ACTION_START.equals(action)) {
+            if (config == null) {
+                callbackContext.error("Plugin not configured. Please call configure method first.");
+            } else {
+                registerActionReceiver();
+                startBackgroundService();
+                // startRecording();
+                callbackContext.success();
             }
-
-            registerActionReceiver();
-            startBackgroundService(serviceProviderClass);
-            // TODO: call success/fail callback
 
             return true;
         } else if (ACTION_STOP.equals(action)) {
+            // stopRecording();
             unregisterActionReceiver();
             stopBackgroundService();
             callbackContext.success();
@@ -138,18 +136,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         } else if (ACTION_CONFIGURE.equals(action)) {
             try {
                 this.callbackContext = callbackContext;
-                this.config = Config.fromJSONArray(data);
+                config = Config.fromJSONArray(data);
+                persistConfiguration(config);
                 Log.d(TAG, "bg service configured");
                 // callbackContext.success(); //we cannot do this
             } catch (JSONException e) {
                 callbackContext.error("Configuration error: " + e.getMessage());
             }
-
-            return true;
-        } else if (ACTION_SET_CONFIG.equals(action)) {
-            // TODO reconfigure Service
-            callbackContext.success();
-            Log.d(TAG, "bg service reconfigured");
 
             return true;
         } else if (ACTION_LOCATION_ENABLED_CHECK.equals(action)) {
@@ -181,7 +174,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             return true;
         } else if (ACTION_GET_ALL_LOCATIONS.equals(action)) {
             try {
-                callbackContext.success(this.getAllLocations());
+                callbackContext.success(getAllLocations());
             } catch (JSONException e) {
                 callbackContext.error("Converting locations to JSON failed.");
             }
@@ -189,7 +182,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             return true;
         } else if (ACTION_DELETE_LOCATION.equals(action)) {
             try {
-                this.deleteLocation(data.getInt(0));
+                deleteLocation(data.getInt(0));
                 callbackContext.success();
             } catch (JSONException e) {
                 callbackContext.error("Configuration error: " + e.getMessage());
@@ -197,13 +190,30 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
 
             return true;
         } else if (ACTION_DELETE_ALL_LOCATIONS.equals(action)) {
-            this.deleteAllLocations();
+            deleteAllLocations();
             callbackContext.success();
 
+            return true;
+        } else if (ACTION_GET_CONFIG.equals(action)) {
+            try {
+                callbackContext.success(retrieveConfiguration());
+            } catch (JSONException e) {
+                callbackContext.error("Configuration error: " + e.getMessage());
+            }
             return true;
         }
 
         return false;
+    }
+
+
+    @Override
+    protected void pluginInitialize() {
+        Log.d(TAG, "initializing plugin");
+        super.pluginInitialize();
+
+        Context context = this.cordova.getActivity().getApplicationContext();
+        dao = DAOFactory.createLocationDAO(context);
     }
 
     /**
@@ -212,9 +222,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
      */
      @Override
     public void onDestroy() {
-        Log.d(TAG, "Main Activity destroyed!!!");
-        Activity activity = this.cordova.getActivity();
-
+        Log.d(TAG, "destroying plugin");
         cleanUp();
 
         if (config.getStopOnTerminate()) {
@@ -224,13 +232,17 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         super.onDestroy();
     }
 
-    public ComponentName startBackgroundService (Class serviceProviderClass) {
+    public Context getContext() {
+        return this.cordova.getActivity().getApplicationContext();
+    }
+
+    public ComponentName startBackgroundService () {
         if (isEnabled) { return null; }
 
         Activity activity = this.cordova.getActivity();
         Log.d(TAG, "Starting bg service");
 
-        locationServiceIntent = new Intent(activity, serviceProviderClass);
+        locationServiceIntent = new Intent(activity, LocationService.class);
         locationServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
         // locationServiceIntent.putExtra("config", config.toParcel().marshall());
         locationServiceIntent.putExtra("config", config);
@@ -248,40 +260,47 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return activity.stopService(locationServiceIntent);
     }
 
+    public void startRecording () {
+        Intent intent = new Intent(Constant.ACTION_FILTER);
+        intent.putExtra(Constant.ACTION, Constant.ACTION_START_RECORDING);
+        getContext().sendBroadcast(intent);
+    }
+
+    public void stopRecording () {
+        Intent intent = new Intent(Constant.ACTION_FILTER);
+        intent.putExtra(Constant.ACTION, Constant.ACTION_STOP_RECORDING);
+        getContext().sendBroadcast(intent);
+    }
+
     public Intent registerActionReceiver () {
         if (isActionReceiverRegistered) { return null; }
 
-        Context context = this.cordova.getActivity().getApplicationContext();
         isActionReceiverRegistered = true;
-        return context.registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
+        return getContext().registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
     }
 
     public Intent registerLocationModeChangeReceiver () {
         if (isLocationModeChangeReceiverRegistered) { return null; }
 
-        Context context = this.cordova.getActivity().getApplicationContext();
         isLocationModeChangeReceiverRegistered = true;
-        return context.registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
+        return getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
     }
 
     public void unregisterActionReceiver () {
         if (!isActionReceiverRegistered) { return; }
 
-        Context context = this.cordova.getActivity().getApplicationContext();
-        context.unregisterReceiver(actionReceiver);
+        getContext().unregisterReceiver(actionReceiver);
         isActionReceiverRegistered = false;
     }
 
     public void unregisterLocationModeChangeReceiver () {
         if (!isLocationModeChangeReceiverRegistered) { return; }
 
-        Context context = this.cordova.getActivity().getApplicationContext();
-        context.unregisterReceiver(locationModeChangeReceiver);
+        getContext().unregisterReceiver(locationModeChangeReceiver);
         isLocationModeChangeReceiverRegistered = false;
     }
 
     public void cleanUp() {
-        Context context = this.cordova.getActivity().getApplicationContext();
         unregisterActionReceiver();
         unregisterLocationModeChangeReceiver();
     }
@@ -307,8 +326,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
 
     public JSONArray getAllLocations() throws JSONException {
         JSONArray jsonLocationsArray = new JSONArray();
-        Context context = this.cordova.getActivity().getApplicationContext();
-        LocationDAO dao = DAOFactory.createLocationDAO(context);
         Collection<LocationProxy> locations = dao.getAllLocations();
         for (LocationProxy location : locations) {
             jsonLocationsArray.put(location.toJSONObject());
@@ -317,14 +334,28 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     }
 
     public void deleteLocation(Integer locationId) {
-        Context context = this.cordova.getActivity().getApplicationContext();
-        LocationDAO dao = DAOFactory.createLocationDAO(context);
         dao.deleteLocation(locationId);
     }
 
     public void deleteAllLocations() {
-        Context context = this.cordova.getActivity().getApplicationContext();
-        LocationDAO dao = DAOFactory.createLocationDAO(context);
         dao.deleteAllLocations();
     }
+
+    public void persistConfiguration(Config config) {
+        Context context = this.cordova.getActivity().getApplicationContext();
+        ConfigurationDAO dao = DAOFactory.createConfigurationDAO(context);
+
+        dao.persistConfiguration(config);
+    }
+
+    public JSONObject retrieveConfiguration() throws JSONException {
+        Context context = this.cordova.getActivity().getApplicationContext();
+        ConfigurationDAO dao = DAOFactory.createConfigurationDAO(context);
+        Config config = dao.retrieveConfiguration();
+        if (config != null) {
+            return config.toJSONObject();
+        }
+        return null;
+    }
+
 }

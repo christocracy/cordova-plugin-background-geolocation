@@ -45,8 +45,8 @@ public class SQLiteLocationDAO implements LocationDAO {
       LocationEntry.COLUMN_NAME_DEBUG
     };
 
-    String selection = null;
-    String[] selectionArgs = null;
+    String whereClause = null;
+    String[] whereArgs = null;
     String groupBy = null;
     String having = null;
 
@@ -55,17 +55,16 @@ public class SQLiteLocationDAO implements LocationDAO {
 
     Collection<LocationProxy> all = new ArrayList<LocationProxy>();
     try {
-      db = new LocationOpenHelper(context).getReadableDatabase();
+      db = new SQLiteOpenHelper(context).getReadableDatabase();
       cursor = db.query(
           LocationEntry.TABLE_NAME,  // The table to query
           columns,                   // The columns to return
-          selection,                 // The columns for the WHERE clause
-          selectionArgs,             // The values for the WHERE clause
+          whereClause,               // The columns for the WHERE clause
+          whereArgs,                 // The values for the WHERE clause
           groupBy,                   // don't group the rows
           having,                    // don't filter by row groups
           orderBy                    // The sort order
       );
-      cursor.moveToFirst();
       while (cursor.moveToNext()) {
         all.add(hydrate(cursor));
       }
@@ -81,7 +80,7 @@ public class SQLiteLocationDAO implements LocationDAO {
   }
 
   public boolean persistLocation(LocationProxy location) {
-    SQLiteDatabase db = new LocationOpenHelper(context).getWritableDatabase();
+    SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
     db.beginTransaction();
     ContentValues values = getContentValues(location);
     long rowId = db.insert(LocationEntry.TABLE_NAME, LocationEntry.COLUMN_NAME_NULLABLE, values);
@@ -98,20 +97,20 @@ public class SQLiteLocationDAO implements LocationDAO {
   }
 
   public void deleteLocation(Integer locationId) {
-    String selection = LocationEntry._ID + " = ?";
-    String[] selectionArgs = { String.valueOf(locationId) };
-    SQLiteDatabase db = new LocationOpenHelper(context).getWritableDatabase();
+    String whereClause = LocationEntry._ID + " = ?";
+    String[] whereArgs = { String.valueOf(locationId) };
+    SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
     db.beginTransaction();
-    db.delete(LocationEntry.TABLE_NAME, selection, selectionArgs);
+    db.delete(LocationEntry.TABLE_NAME, whereClause, whereArgs);
     db.setTransactionSuccessful();
     db.endTransaction();
     db.close();
   }
 
   public void deleteAllLocations() {
-    SQLiteDatabase db = new LocationOpenHelper(context).getWritableDatabase();
+    SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
     db.beginTransaction();
-    db.execSQL("DELETE FROM " + LocationEntry.TABLE_NAME);
+    db.delete(LocationEntry.TABLE_NAME, null, null);
     db.setTransactionSuccessful();
     db.endTransaction();
     db.close();

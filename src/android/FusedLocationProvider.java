@@ -25,13 +25,14 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.ActivityRecognitionResult;
-import static android.telephony.PhoneStateListener.*;
 
+import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
+import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
-public class FusedLocationService extends AbstractLocationService implements GoogleApiClient.ConnectionCallbacks,
+public class FusedLocationProvider extends AbstractLocationProvider implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private static final String TAG = "FusedLocationService";
+    private static final String TAG = "FusedLocationProvider";
 
     private PowerManager.WakeLock wakeLock;
     private GoogleApiClient googleApiClient;
@@ -39,34 +40,36 @@ public class FusedLocationService extends AbstractLocationService implements Goo
 
     private Boolean startRecordingOnConnect = true;
     private Boolean isTracking = false;
+    private Boolean isWatchingActivity = false;
     private DetectedActivity lastActivity;
 
-    @Override
+    public FusedLocationProvider(LocationDAO dao, Config config, Context context) {
+        super(dao, config, context);
+    }
+
     public void onCreate() {
         super.onCreate();
-        Log.i(TAG, "OnCreate");
+        Log.i(TAG, "onCreate");
 
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         wakeLock.acquire();
 
         Intent detectedActivitiesIntent = new Intent(Constant.DETECTED_ACTIVITY_UPDATE);
-        detectedActivitiesPI = PendingIntent.getBroadcast(this, 9002, detectedActivitiesIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        detectedActivitiesPI = PendingIntent.getBroadcast(context, 9002, detectedActivitiesIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         registerReceiver(detectedActivitiesReceiver, new IntentFilter(Constant.DETECTED_ACTIVITY_UPDATE));
-
-        startRecording();
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(TAG, "- onLocationChanged" + location.toString());
+        Log.d(TAG, "onLocationChanged: " + location.toString());
 
         if (lastActivity.getType() == DetectedActivity.STILL) {
             stopTracking();
         }
 
         if (config.isDebugging()) {
-            Toast.makeText(FusedLocationService.this, "acy:" + location.getAccuracy() + ",v:" + location.getSpeed() + ",df:" + config.getDistanceFilter(), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "acy:" + location.getAccuracy() + ",v:" + location.getSpeed() + ",df:" + config.getDistanceFilter(), Toast.LENGTH_LONG).show();
         }
 
         // if (lastLocation != null && location.distanceTo(lastLocation) < config.getDistanceFilter()) {
@@ -78,17 +81,17 @@ public class FusedLocationService extends AbstractLocationService implements Goo
         }
 
         lastLocation = location;
-        handleLocation(location);
+        broadcastLocation(location);
     }
 
     public void startRecording() {
-        Log.d(TAG, "- locationUpdateReceiver STARTING RECORDING!!!!!!!!!!");
+        Log.i(TAG, "startRecording");
         this.startRecordingOnConnect = true;
         attachRecorder();
     }
 
     public void stopRecording() {
-        Log.d(TAG, "- locationUpdateReceiver STOPPING RECORDING!!!!!!!!!!");
+        Log.i(TAG, "stopRecording");
         this.startRecordingOnConnect = false;
         detachRecorder();
     }
@@ -104,7 +107,7 @@ public class FusedLocationService extends AbstractLocationService implements Goo
                 // .setSmallestDisplacement(config.getStationaryRadius());
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
         isTracking = true;
-        Log.d(TAG, "- locationUpdateReceiver NOW RECORDING!!!!!!!!!! with priority: "
+        Log.d(TAG, "startTracking with priority: "
             + priority + ", fastestInterval: " + config.getFastestInterval() + ", interval: " + config.getInterval() + ", smallestDisplacement: " + config.getStationaryRadius());
     }
 
@@ -116,8 +119,8 @@ public class FusedLocationService extends AbstractLocationService implements Goo
     }
 
     private void connectToPlayAPI() {
-        Log.d(TAG, "- CONNECTING TO GOOGLE PLAY SERVICES API!!!!!!!!!!");
-        googleApiClient =  new GoogleApiClient.Builder(this)
+        Log.d(TAG, "connecting to Google Play Services");
+        googleApiClient =  new GoogleApiClient.Builder(context)
                 .addApi(LocationServices.API)
                 .addApi(ActivityRecognition.API)
                 .addConnectionCallbacks(this)
@@ -126,39 +129,42 @@ public class FusedLocationService extends AbstractLocationService implements Goo
         googleApiClient.connect();
     }
 
+    private void disconnectFromPlayAPI() {
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            googleApiClient.disconnect();
+        }
+    }
+
     private void attachRecorder() {
         if (googleApiClient == null) {
             connectToPlayAPI();
         } else if (googleApiClient.isConnected()) {
+            if (isWatchingActivity == true) { return; }
+
             ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 googleApiClient,
                 config.getActivitiesInterval(),
                 detectedActivitiesPI
             );
+            isWatchingActivity = true;
         } else {
             googleApiClient.connect();
         }
     }
 
     private void detachRecorder() {
-        if (googleApiClient == null) {
-            connectToPlayAPI();
-        } else if (googleApiClient.isConnected()) {
+        if (isWatchingActivity == true) {
+            Log.d(TAG, "detachRecorder");
             ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(googleApiClient, detectedActivitiesPI);
-            stopTracking();
-            Log.d(TAG, "- locationUpdateReceiver NO LONGER RECORDING!!!!!!!!!!");
-        } else {
-            googleApiClient.connect();
+            isWatchingActivity = false;
         }
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.d(TAG, "- CONNECTED TO GOOGLE PLAY SERVICES API!!!!!!!!!!");
+        Log.d(TAG, "connected to Google Play Services");
         if (this.startRecordingOnConnect) {
             attachRecorder();
-        } else {
-            detachRecorder();
         }
     }
 
@@ -268,9 +274,13 @@ public class FusedLocationService extends AbstractLocationService implements Goo
         }
     };
 
-    protected void cleanUp() {
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
+        unregisterReceiver(detectedActivitiesReceiver);
+        stopTracking();
         stopRecording();
-        googleApiClient.disconnect();
+        disconnectFromPlayAPI();
         wakeLock.release();
     }
 }

@@ -46,10 +46,12 @@ var backgroundGeoLocation = {
             debug                 = config.debug || false,
             notificationTitle     = config.notificationTitle || 'Background tracking',
             notificationText      = config.notificationText || 'ENABLED',
-            notificationIcon      = config.notificationIcon,
+            notificationIconLarge = config.notificationIconLarge,
+            notificationIconSmall = config.notificationIconSmall,
             notificationIconColor = config.notificationIconColor,
             activityType          = config.activityType || 'OTHER',
             stopOnTerminate       = config.stopOnTerminate || false,
+            startOnBoot           = config.startOnBoot || false,
             locationService       = config.locationService || this.service.ANDROID_DISTANCE_FILTER,
             //Android FusedLocation config
             interval              = (config.interval >= 0) ? config.interval : locationTimeout * 1000, // milliseconds
@@ -69,18 +71,20 @@ var backgroundGeoLocation = {
                 notificationText,
                 activityType,
                 stopOnTerminate,
-                notificationIcon,
-                notificationIconColor,
+                startOnBoot,
                 locationService,
                 interval,
                 fastestInterval,
-                activitiesInterval
+                activitiesInterval,
+                notificationIconColor,
+                notificationIconLarge,
+                notificationIconSmall
             ]
         );
     },
     start: function(success, failure) {
         exec(success || function() {},
-            failure || function() {},
+            failure || function(err) { console.log(err); },
             'BackgroundGeoLocation',
             'start', []);
     },
@@ -114,6 +118,15 @@ var backgroundGeoLocation = {
             failure || function() {},
             'BackgroundGeoLocation',
             'setConfig', [config]);
+    },
+    getConfig: function(success, failure) {
+      if (typeof(success) !== 'function') {
+           throw 'BackgroundGeolocation#getConfig requires a success callback';
+      }
+      exec(success,
+          failure || function() {},
+          'BackgroundGeoLocation',
+          'getConfig', []);
     },
     /**
      * Returns current stationaryLocation if available.  null if not

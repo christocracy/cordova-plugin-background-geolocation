@@ -4,13 +4,13 @@ import android.location.Location;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import com.marianhello.cordova.bgloc.ServiceProvider;
+import com.marianhello.cordova.bgloc.ServiceProviderEnum;
 
 public class LocationProxy {
     private Location location;
     private Long locationId;
     private Boolean debug = false;
-    private ServiceProvider serviceProvider;
+    private ServiceProviderEnum serviceProvider;
 
     public LocationProxy (String provider) {
         location = new Location(provider);
@@ -100,15 +100,15 @@ public class LocationProxy {
         location.setProvider(provider);
     }
 
-    public void setServiceProvider(ServiceProvider serviceProvider) {
+    public void setServiceProvider(ServiceProviderEnum serviceProvider) {
         this.serviceProvider = serviceProvider;
     }
 
     public void setServiceProvider(Integer providerId) {
-        this.serviceProvider = ServiceProvider.forInt(providerId);
+        this.serviceProvider = ServiceProviderEnum.forInt(providerId);
     }
 
-    public ServiceProvider getServiceProvider() {
+    public ServiceProviderEnum getServiceProvider() {
         return serviceProvider;
     }
 

@@ -35,9 +35,12 @@ import static java.lang.Math.pow;
 import static java.lang.Math.round;
 import static java.lang.Math.abs;
 
+import com.marianhello.cordova.bgloc.Config;
+import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 
-public class DistanceFilterLocationService extends com.tenforwardconsulting.cordova.bgloc.AbstractLocationService implements LocationListener {
-    private static final String TAG = "DistanceFilterLocationService";
+
+public class DistanceFilterLocationProvider extends AbstractLocationProvider implements LocationListener {
+    private static final String TAG = "DistanceFilterLocationProvider";
     private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
     private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
     private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
@@ -70,31 +73,35 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
     private AlarmManager alarmManager;
     private NotificationManager notificationManager;
 
+    public DistanceFilterLocationProvider(LocationDAO dao, Config config, Context context) {
+        super(dao, config, context);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "OnCreate");
 
-        locationManager  = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-        alarmManager     = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         // Stop-detection PI
-        stationaryAlarmPI   = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
+        stationaryAlarmPI = PendingIntent.getBroadcast(context, 0, new Intent(STATIONARY_ALARM_ACTION), 0);
         registerReceiver(stationaryAlarmReceiver, new IntentFilter(STATIONARY_ALARM_ACTION));
 
         // Stationary region PI
-        stationaryRegionPI  = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_REGION_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
+        stationaryRegionPI = PendingIntent.getBroadcast(context, 0, new Intent(STATIONARY_REGION_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
         registerReceiver(stationaryRegionReceiver, new IntentFilter(STATIONARY_REGION_ACTION));
 
         // Stationary location monitor PI
-        stationaryLocationPollingPI = PendingIntent.getBroadcast(this, 0, new Intent(STATIONARY_LOCATION_MONITOR_ACTION), 0);
+        stationaryLocationPollingPI = PendingIntent.getBroadcast(context, 0, new Intent(STATIONARY_LOCATION_MONITOR_ACTION), 0);
         registerReceiver(stationaryLocationMonitorReceiver, new IntentFilter(STATIONARY_LOCATION_MONITOR_ACTION));
 
         // One-shot PI (TODO currently unused)
-        singleUpdatePI = PendingIntent.getBroadcast(this, 0, new Intent(SINGLE_LOCATION_UPDATE_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
+        singleUpdatePI = PendingIntent.getBroadcast(context, 0, new Intent(SINGLE_LOCATION_UPDATE_ACTION), PendingIntent.FLAG_CANCEL_CURRENT);
         registerReceiver(singleUpdateReceiver, new IntentFilter(SINGLE_LOCATION_UPDATE_ACTION));
 
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         wakeLock.acquire();
 
@@ -106,22 +113,14 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         criteria.setCostAllowed(true);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        super.onStartCommand(intent, flags, startId);
-        this.scaledDistanceFilter = config.getDistanceFilter();
-        this.setPace(false);
-
-        //We want this service to continue running until it is explicitly stopped
-        return START_REDELIVER_INTENT;
-    }
-
     public void startRecording() {
-        Log.d(TAG, "- startRecording not implemented yet");
+        Log.i(TAG, "startRecording");
+        scaledDistanceFilter = config.getDistanceFilter();
+        setPace(false);
     }
 
     public void stopRecording() {
-        Log.d(TAG, "- stopRecording not implemented yet");
+        Log.d(TAG, "stopRecording not implemented yet");
     }
 
     /**
@@ -203,7 +202,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
      */
     public Location getLastBestLocation() {
         double minDistance = config.getStationaryRadius();
-        long minTime    = System.currentTimeMillis() - (config.getLocationTimeout() * 1000);
+        long minTime = System.currentTimeMillis() - (config.getLocationTimeout() * 1000);
 
         Log.i(TAG, "- fetching last best location " + minDistance + "," + minTime);
         Location bestResult = null;
@@ -241,7 +240,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         }
 
         if (config.isDebugging()) {
-            Toast.makeText(this, "mv:" + isMoving + ",acy:" + location.getAccuracy() + ",v:" + location.getSpeed() + ",df:" + scaledDistanceFilter, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "mv:" + isMoving + ",acy:" + location.getAccuracy() + ",v:" + location.getSpeed() + ",df:" + scaledDistanceFilter, Toast.LENGTH_LONG).show();
         }
         if (isAcquiringStationaryLocation) {
             if (stationaryLocation == null || stationaryLocation.getAccuracy() > location.getAccuracy()) {
@@ -298,7 +297,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         }
         // Go ahead and cache, push to server
         lastLocation = location;
-        handleLocation(location);
+        broadcastLocation(location);
     }
 
     public void resetStationaryAlarm() {
@@ -354,7 +353,7 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
         float distance = abs(location.distanceTo(stationaryLocation) - stationaryLocation.getAccuracy() - location.getAccuracy());
 
         if (config.isDebugging()) {
-            Toast.makeText(this, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Stationary exit in " + (stationaryRadius-distance) + "m", Toast.LENGTH_LONG).show();
         }
 
         // TODO http://www.cse.buffalo.edu/~demirbas/publications/proximity.pdf
@@ -462,21 +461,23 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
 
     public void onProviderDisabled(String provider) {
         // TODO Auto-generated method stub
-        Log.d(TAG, "- onProviderDisabled: " + provider);
+        Log.d(TAG, "onProviderDisabled: " + provider);
     }
 
     public void onProviderEnabled(String provider) {
         // TODO Auto-generated method stub
-        Log.d(TAG, "- onProviderEnabled: " + provider);
+        Log.d(TAG, "onProviderEnabled: " + provider);
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // TODO Auto-generated method stub
-        Log.d(TAG, "- onStatusChanged: " + provider + ", status: " + status);
+        Log.d(TAG, "onStatusChanged: " + provider + ", status: " + status);
     }
 
-    protected void cleanUp() {
-        Log.d(TAG, "cleanUp");
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy");
 
         locationManager.removeUpdates(this);
         alarmManager.cancel(stationaryAlarmPI);
@@ -491,18 +492,9 @@ public class DistanceFilterLocationService extends com.tenforwardconsulting.cord
             try {
                 locationManager.removeProximityAlert(stationaryRegionPI);
             } catch (Throwable e) {
-                Log.w(TAG, "- Something bad happened while removing proximity-alert");
+                Log.w(TAG, "Something bad happened while removing proximity-alert");
             }
         }
         wakeLock.release();
     }
-
-    // @Override
-    // public void onTaskRemoved(Intent rootIntent) {
-    //     super.onTaskRemoved(rootIntent);
-    //     if (config.getStopOnTerminate() == false) {
-    //         stopSelf();
-    //         startDelayed();
-    //     }
-    // }
 }
