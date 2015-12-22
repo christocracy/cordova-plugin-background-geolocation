@@ -162,7 +162,7 @@ public class DistanceFilterLocationProvider extends AbstractLocationProvider imp
                 }
             }
         } else {
-            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), config.getLocationTimeout()*1000, scaledDistanceFilter, this);
+            locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true), config.getInterval(), scaledDistanceFilter, this);
         }
     }
 
@@ -202,7 +202,7 @@ public class DistanceFilterLocationProvider extends AbstractLocationProvider imp
      */
     public Location getLastBestLocation() {
         double minDistance = config.getStationaryRadius();
-        long minTime = System.currentTimeMillis() - (config.getLocationTimeout() * 1000);
+        long minTime = System.currentTimeMillis() - config.getInterval();
 
         Log.i(TAG, "- fetching last best location " + minDistance + "," + minTime);
         Location bestResult = null;

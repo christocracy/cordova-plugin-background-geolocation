@@ -25,7 +25,6 @@ public class Config implements Parcelable
 {
     private float stationaryRadius = 50;
     private Integer distanceFilter = 500;
-    private Integer locationTimeout = 60;
     private Integer desiredAccuracy = 100;
     private Boolean debugging = false;
     private String notificationTitle = "Background tracking";
@@ -49,7 +48,6 @@ public class Config implements Parcelable
     public void writeToParcel(Parcel out, int flags) {
         out.writeFloat(getStationaryRadius());
         out.writeInt(getDistanceFilter());
-        out.writeInt(getLocationTimeout());
         out.writeInt(getDesiredAccuracy());
         out.writeValue(isDebugging());
         out.writeString(getNotificationTitle());
@@ -84,7 +82,6 @@ public class Config implements Parcelable
     private Config(Parcel in) {
         setStationaryRadius(in.readFloat());
         setDistanceFilter(in.readInt());
-        setLocationTimeout(in.readInt());
         setDesiredAccuracy(in.readInt());
         setDebugging((Boolean) in.readValue(null));
         setNotificationTitle(in.readString());
@@ -123,14 +120,6 @@ public class Config implements Parcelable
 
     public void setDistanceFilter(Integer distanceFilter) {
         this.distanceFilter = distanceFilter;
-    }
-
-    public Integer getLocationTimeout() {
-        return locationTimeout;
-    }
-
-    public void setLocationTimeout(Integer locationTimeout) {
-        this.locationTimeout = locationTimeout;
     }
 
     public Boolean isDebugging() {
@@ -249,7 +238,6 @@ public class Config implements Parcelable
                 .append("stationaryRadius: "       + getStationaryRadius())
                 .append(" desiredAccuracy: "       + getDesiredAccuracy())
                 .append(" distanceFilter: "        + getDistanceFilter())
-                .append(" locationTimeout: "       + getLocationTimeout())
                 .append(" debugging: "             + isDebugging())
                 .append(" notificationTitle: "     + getNotificationTitle())
                 .append(" notificationText: "      + getNotificationText())
@@ -285,7 +273,6 @@ public class Config implements Parcelable
         Config config = new Config();
         config.setStationaryRadius((float) jObject.optDouble("stationaryRadius", config.getStationaryRadius()));
         config.setDistanceFilter(jObject.optInt("distanceFilter", config.getDistanceFilter()));
-        config.setLocationTimeout(jObject.optInt("locationTimeout", config.getLocationTimeout()));
         config.setDesiredAccuracy(jObject.optInt("desiredAccuracy", config.getDesiredAccuracy()));
         config.setDebugging(jObject.optBoolean("debug", config.isDebugging()));
         config.setNotificationTitle(jObject.optString("notificationTitle", config.getNotificationTitle()));
@@ -308,7 +295,6 @@ public class Config implements Parcelable
         JSONObject json = new JSONObject();
         json.put("stationaryRadius", getStationaryRadius());
         json.put("distanceFilter", getDistanceFilter());
-        json.put("locationTimeout", getLocationTimeout());
         json.put("desiredAccuracy", getDesiredAccuracy());
         json.put("debugging", isDebugging());
         json.put("notificationTitle", getNotificationTitle());

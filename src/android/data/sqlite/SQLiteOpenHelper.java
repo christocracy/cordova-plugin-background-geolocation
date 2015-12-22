@@ -10,7 +10,7 @@ import com.tenforwardconsulting.cordova.bgloc.data.sqlite.ConfigurationContract.
 
 public class SQLiteOpenHelper extends android.database.sqlite.SQLiteOpenHelper {
     private static final String SQLITE_DATABASE_NAME = "cordova_bg_geolocation.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String REAL_TYPE = " REAL";
@@ -36,7 +36,6 @@ public class SQLiteOpenHelper extends android.database.sqlite.SQLiteOpenHelper {
         ConfigurationEntry._ID + " INTEGER PRIMARY KEY," +
         ConfigurationEntry.COLUMN_NAME_RADIUS + REAL_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_DISTANCE_FILTER + INTEGER_TYPE + COMMA_SEP +
-        ConfigurationEntry.COLUMN_NAME_LOCATION_TIMEOUT + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_DESIRED_ACCURACY + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_DEBUGGING + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_NOTIF_TITLE + TEXT_TYPE + COMMA_SEP +

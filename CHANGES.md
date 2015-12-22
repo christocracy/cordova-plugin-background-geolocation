@@ -12,6 +12,7 @@
 
 #### Removed
 - Android deprecated window.plugins.backgroundGeoLocation
+- Android locationTimeout option (use interval instead)
 
 ### [0.9.1] - 2015-12-18
 #### Fixed
