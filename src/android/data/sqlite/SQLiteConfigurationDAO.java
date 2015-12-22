@@ -45,6 +45,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
       ConfigurationEntry.COLUMN_NAME_NOTIF_COLOR,
       ConfigurationEntry.COLUMN_NAME_STOP_TERMINATE,
       ConfigurationEntry.COLUMN_NAME_START_BOOT,
+      ConfigurationEntry.COLUMN_NAME_START_FOREGROUND,
       ConfigurationEntry.COLUMN_NAME_SERVICE_PROVIDER,
       ConfigurationEntry.COLUMN_NAME_INTERVAL,
       ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL,
@@ -113,6 +114,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     config.setNotificationIconColor(c.getString(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_NOTIF_COLOR)));
     config.setStopOnTerminate( (c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_STOP_TERMINATE)) == 1) ? true : false );
     config.setStartOnBoot( (c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_START_BOOT)) == 1) ? true : false );
+    config.setStartForeground( (c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_START_FOREGROUND)) == 1) ? true : false );
     config.setServiceProvider(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_SERVICE_PROVIDER)));
     config.setInterval(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_INTERVAL)));
     config.setFastestInterval(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL)));
@@ -135,6 +137,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     values.put(ConfigurationEntry.COLUMN_NAME_NOTIF_COLOR, config.getNotificationIconColor());
     values.put(ConfigurationEntry.COLUMN_NAME_STOP_TERMINATE, (config.getStopOnTerminate() == true) ? 1 : 0);
     values.put(ConfigurationEntry.COLUMN_NAME_START_BOOT, (config.getStartOnBoot() == true) ? 1 : 0);
+    values.put(ConfigurationEntry.COLUMN_NAME_START_FOREGROUND, (config.getStartForeground() == true) ? 1 : 0);
     values.put(ConfigurationEntry.COLUMN_NAME_SERVICE_PROVIDER, config.getServiceProvider().asInt());
     values.put(ConfigurationEntry.COLUMN_NAME_INTERVAL, config.getInterval());
     values.put(ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL, config.getFastestInterval());

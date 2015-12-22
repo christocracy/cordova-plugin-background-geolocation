@@ -297,7 +297,7 @@ public class DistanceFilterLocationProvider extends AbstractLocationProvider imp
         }
         // Go ahead and cache, push to server
         lastLocation = location;
-        broadcastLocation(location);
+        handleLocation(location);
     }
 
     public void resetStationaryAlarm() {

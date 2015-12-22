@@ -90,33 +90,33 @@ public class LocationService extends Service {
             config = new Config();
         }
 
-        Log.i(TAG, "Config: " + config.toString());
-
         ServiceProviderFactory spf = new ServiceProviderFactory(this, config);
         provider = spf.getInstance(config.getServiceProvider());
         provider.onCreate();
 
-        // Build a Notification required for running service in foreground.
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setContentTitle(config.getNotificationTitle());
-        builder.setContentText(config.getNotificationText());
-        if (config.getSmallNotificationIcon() != null) {
-            builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
-        } else {
-            builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);          
-        }
-        if (config.getLargeNotificationIcon() != null) {
-            builder.setLargeIcon(BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon())));
-        }
-        if (config.getNotificationIconColor() != null) {
-            builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
-        }
+        if (config.getStartForeground()) {
+            // Build a Notification required for running service in foreground.
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+            builder.setContentTitle(config.getNotificationTitle());
+            builder.setContentText(config.getNotificationText());
+            if (config.getSmallNotificationIcon() != null) {
+                builder.setSmallIcon(getPluginResource(config.getSmallNotificationIcon()));
+            } else {
+                builder.setSmallIcon(android.R.drawable.ic_menu_mylocation);
+            }
+            if (config.getLargeNotificationIcon() != null) {
+                builder.setLargeIcon(BitmapFactory.decodeResource(getApplication().getResources(), getPluginResource(config.getLargeNotificationIcon())));
+            }
+            if (config.getNotificationIconColor() != null) {
+                builder.setColor(this.parseNotificationIconColor(config.getNotificationIconColor()));
+            }
 
-        setClickEvent(builder);
+            setClickEvent(builder);
 
-        Notification notification = builder.build();
-        notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
-        startForeground(startId, notification);
+            Notification notification = builder.build();
+            notification.flags |= Notification.FLAG_ONGOING_EVENT | Notification.FLAG_FOREGROUND_SERVICE | Notification.FLAG_NO_CLEAR;
+            startForeground(startId, notification);
+        }
 
         provider.startRecording();
 

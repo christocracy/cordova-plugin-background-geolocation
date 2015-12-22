@@ -2,11 +2,16 @@
 
 ### [1.0.0] - unreleased
 #### Changed
-- Android notificationIcon option split into small and large
+- Android notificationIcon option split into small and large!!!
+- Android stopOnTerminate defaults to true
 - Android bugfixing
 
 #### Added
-- Android startOnBoot
+- Android startOnBoot option
+- Android startForeground option
+
+#### Removed
+- Android deprecated window.plugins.backgroundGeoLocation
 
 ### [0.9.1] - 2015-12-18
 #### Fixed

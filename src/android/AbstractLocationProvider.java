@@ -44,7 +44,6 @@ public abstract class AbstractLocationProvider implements ServiceProvider {
     protected HandlerThread handlerThread;
 
     protected AbstractLocationProvider(LocationDAO dao, Config config, Context context) {
-        Log.d(TAG, "Config: " + config.toString());
         this.dao = dao;
         this.config = config;
         this.context = context.getApplicationContext();
@@ -74,6 +73,10 @@ public abstract class AbstractLocationProvider implements ServiceProvider {
 
     public void persistLocation (Location location) {
         persistLocation(LocationProxy.fromAndroidLocation(location));
+    }
+
+    public void handleLocation (Location location) {
+        broadcastLocation(location);
     }
 
     public void persistLocation (LocationProxy location) {

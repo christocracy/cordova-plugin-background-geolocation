@@ -81,7 +81,7 @@ public class FusedLocationProvider extends AbstractLocationProvider implements G
         }
 
         lastLocation = location;
-        broadcastLocation(location);
+        handleLocation(location);
     }
 
     public void startRecording() {

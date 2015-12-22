@@ -23,6 +23,7 @@ public final class ConfigurationContract {
         public static final String COLUMN_NAME_NOTIF_COLOR = "notification_icon_color";
         public static final String COLUMN_NAME_STOP_TERMINATE = "stop_terminate";
         public static final String COLUMN_NAME_START_BOOT = "start_boot";
+        public static final String COLUMN_NAME_START_FOREGROUND = "start_foreground";
         public static final String COLUMN_NAME_SERVICE_PROVIDER = "service_provider";
         public static final String COLUMN_NAME_INTERVAL = "interval";
         public static final String COLUMN_NAME_FASTEST_INTERVAL = "fastest_interval";

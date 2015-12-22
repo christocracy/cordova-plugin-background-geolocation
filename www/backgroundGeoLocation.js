@@ -39,73 +39,42 @@ var backgroundGeoLocation = {
 
     configure: function(success, failure, config) {
         this.config = config || {};
-        var stationaryRadius      = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50, // meters
-            distanceFilter        = (config.distanceFilter >= 0) ? config.distanceFilter   : 500, // meters
-            locationTimeout       = (config.locationTimeout >= 0) ? config.locationTimeout  : 60, // seconds
-            desiredAccuracy       = (config.desiredAccuracy >= 0) ? config.desiredAccuracy  : this.accuracy.MEDIUM,
-            debug                 = config.debug || false,
-            notificationTitle     = config.notificationTitle || 'Background tracking',
-            notificationText      = config.notificationText || 'ENABLED',
-            notificationIconLarge = config.notificationIconLarge,
-            notificationIconSmall = config.notificationIconSmall,
-            notificationIconColor = config.notificationIconColor,
-            activityType          = config.activityType || 'OTHER',
-            stopOnTerminate       = config.stopOnTerminate || false,
-            startOnBoot           = config.startOnBoot || false,
-            locationService       = config.locationService || this.service.ANDROID_DISTANCE_FILTER,
-            //Android FusedLocation config
-            interval              = (config.interval >= 0) ? config.interval : locationTimeout * 1000, // milliseconds
-            fastestInterval       = (config.fastestInterval >= 0) ? config.fastestInterval : 120000, // milliseconds
-            activitiesInterval    = config.activitiesInterval || 1000;
-
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
-            'configure', [
-                stationaryRadius,
-                distanceFilter,
-                locationTimeout,
-                desiredAccuracy,
-                debug,
-                notificationTitle,
-                notificationText,
-                activityType,
-                stopOnTerminate,
-                startOnBoot,
-                locationService,
-                interval,
-                fastestInterval,
-                activitiesInterval,
-                notificationIconColor,
-                notificationIconLarge,
-                notificationIconSmall
-            ]
+            'configure',
+            [config]
         );
     },
+
     start: function(success, failure) {
         exec(success || function() {},
             failure || function(err) { console.log(err); },
             'BackgroundGeoLocation',
             'start', []);
     },
+
     stop: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'stop', []);
     },
+
     finish: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'finish', []);
     },
+
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'onPaceChange', [isMoving]);
     },
+
     /**
      * @param {Integer} stationaryRadius
      * @param {Integer} desiredAccuracy
@@ -119,6 +88,7 @@ var backgroundGeoLocation = {
             'BackgroundGeoLocation',
             'setConfig', [config]);
     },
+
     getConfig: function(success, failure) {
       if (typeof(success) !== 'function') {
            throw 'BackgroundGeolocation#getConfig requires a success callback';
@@ -128,6 +98,7 @@ var backgroundGeoLocation = {
           'BackgroundGeoLocation',
           'getConfig', []);
     },
+
     /**
      * Returns current stationaryLocation if available.  null if not
      */
@@ -137,6 +108,7 @@ var backgroundGeoLocation = {
             'BackgroundGeoLocation',
             'getStationaryLocation', []);
     },
+
     /**
      * Add a stationary-region listener.  Whenever the devices enters "stationary-mode", your #success callback will be executed with #location param containing #radius of region
      * @param {Function} success
@@ -220,9 +192,5 @@ var backgroundGeoLocation = {
         return destination;
     }
 };
-
-/* @Deprecated */
-window.plugins = window.plugins || {};
-window.plugins.backgroundGeoLocation = backgroundGeoLocation;
 
 module.exports = backgroundGeoLocation;

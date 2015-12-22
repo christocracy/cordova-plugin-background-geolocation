@@ -138,7 +138,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                 this.callbackContext = callbackContext;
                 config = Config.fromJSONArray(data);
                 persistConfiguration(config);
-                Log.d(TAG, "bg service configured");
+                Log.d(TAG, "bg service configured: " + config.toString());
                 // callbackContext.success(); //we cannot do this
             } catch (JSONException e) {
                 callbackContext.error("Configuration error: " + e.getMessage());
