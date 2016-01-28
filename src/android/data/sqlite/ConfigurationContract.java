@@ -14,7 +14,7 @@ public final class ConfigurationContract {
         public static final String COLUMN_NAME_RADIUS = "stationary_radius";
         public static final String COLUMN_NAME_DISTANCE_FILTER = "distance_filter";
         public static final String COLUMN_NAME_DESIRED_ACCURACY = "desired_accuracy";
-        public static final String COLUMN_NAME_DEBUGGING = "debugging";
+        public static final String COLUMN_NAME_DEBUG = "debugging";
         public static final String COLUMN_NAME_NOTIF_TITLE = "notification_title";
         public static final String COLUMN_NAME_NOTIF_TEXT = "notification_text";
         public static final String COLUMN_NAME_NOTIF_ICON_LARGE = "notification_icon_large";

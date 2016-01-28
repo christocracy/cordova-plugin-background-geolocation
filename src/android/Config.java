@@ -26,7 +26,7 @@ public class Config implements Parcelable
     private float stationaryRadius = 50;
     private Integer distanceFilter = 500;
     private Integer desiredAccuracy = 100;
-    private Boolean debugging = false;
+    private Boolean debug = false;
     private String notificationTitle = "Background tracking";
     private String notificationText = "ENABLED";
     private String notificationIconLarge;
@@ -36,9 +36,9 @@ public class Config implements Parcelable
     private Integer interval = 600000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
     private Integer activitiesInterval = 1000; //milliseconds
-    private Boolean stopOnTerminate = false;
+    private Boolean stopOnTerminate = true;
     private Boolean startOnBoot = false;
-    private Boolean startForeground = true;
+    private Boolean startForeground = false;
 
     public int describeContents() {
         return 0;
@@ -123,11 +123,11 @@ public class Config implements Parcelable
     }
 
     public Boolean isDebugging() {
-        return debugging;
+        return debug;
     }
 
-    public void setDebugging(Boolean debugging) {
-        this.debugging = debugging;
+    public void setDebugging(Boolean debug) {
+        this.debug = debug;
     }
 
     public String getNotificationIconColor() {
@@ -238,7 +238,7 @@ public class Config implements Parcelable
                 .append("stationaryRadius: "       + getStationaryRadius())
                 .append(" desiredAccuracy: "       + getDesiredAccuracy())
                 .append(" distanceFilter: "        + getDistanceFilter())
-                .append(" debugging: "             + isDebugging())
+                .append(" debug: "                 + isDebugging())
                 .append(" notificationTitle: "     + getNotificationTitle())
                 .append(" notificationText: "      + getNotificationText())
                 .append(" notificationIconLarge: " + getLargeNotificationIcon())
@@ -247,7 +247,7 @@ public class Config implements Parcelable
                 .append(" stopOnTerminate: "       + getStopOnTerminate())
                 .append(" startOnBoot: "           + getStartOnBoot())
                 .append(" startForeground: "       + getStartForeground())
-                .append(" locationProvider: "       + getLocationProvider())
+                .append(" locationProvider: "      + getLocationProvider())
                 .append(" interval: "              + getInterval())
                 .append(" fastestInterval: "       + getFastestInterval())
                 .append(" activitiesInterval: "    + getActivitiesInterval())
@@ -296,7 +296,7 @@ public class Config implements Parcelable
         json.put("stationaryRadius", getStationaryRadius());
         json.put("distanceFilter", getDistanceFilter());
         json.put("desiredAccuracy", getDesiredAccuracy());
-        json.put("debugging", isDebugging());
+        json.put("debug", isDebugging());
         json.put("notificationTitle", getNotificationTitle());
         json.put("notificationText", getNotificationText());
         json.put("notificationIconLarge", getLargeNotificationIcon());

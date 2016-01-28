@@ -162,9 +162,9 @@ Parameter | Type | Platform     | Description
 `option.stationaryRadius` | `Number` | all | Stationary radius in meters. When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.
 `option.debug` | `Boolean` | all | When enabled, the plugin will emit sounds for life-cycle events of background-geolocation! See debugging sounds table.
 `option.distanceFilter` | `Number` | all | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).
-`option.stopOnTerminate` | `Boolean` | iOS, Android | Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).
-`option.startOnBoot` | `Boolean` | Android | Start background service on device boot.
-`option.startForeground` | `Boolean` | Android | If false location service will not be started in foreground and no notification will be shown.
+`option.stopOnTerminate` | `Boolean` | iOS, Android | Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app). (default true)
+`option.startOnBoot` | `Boolean` | Android | Start background service on device boot. (default false)
+`option.startForeground` | `Boolean` | Android | If false location service will not be started in foreground and no notification will be shown. (default false)
 `option.interval` | `Number` | Android | The minimum time interval between location updates in seconds. **@see** [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent) for more information.
 `option.notificationTitle` | `String` optional | Android | Custom notification title in the drawer.
 `option.notificationText` | `String` optional | Android | Custom notification text in the drawer.

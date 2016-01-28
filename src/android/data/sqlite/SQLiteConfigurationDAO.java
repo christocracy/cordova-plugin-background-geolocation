@@ -36,7 +36,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
       ConfigurationEntry.COLUMN_NAME_RADIUS,
       ConfigurationEntry.COLUMN_NAME_DISTANCE_FILTER,
       ConfigurationEntry.COLUMN_NAME_DESIRED_ACCURACY,
-      ConfigurationEntry.COLUMN_NAME_DEBUGGING,
+      ConfigurationEntry.COLUMN_NAME_DEBUG,
       ConfigurationEntry.COLUMN_NAME_NOTIF_TITLE,
       ConfigurationEntry.COLUMN_NAME_NOTIF_TEXT,
       ConfigurationEntry.COLUMN_NAME_NOTIF_ICON_LARGE,
@@ -104,7 +104,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     config.setStationaryRadius(c.getFloat(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_RADIUS)));
     config.setDistanceFilter(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_DISTANCE_FILTER)));
     config.setDesiredAccuracy(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_DESIRED_ACCURACY)));
-    config.setDebugging( (c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_DEBUGGING)) == 1) ? true : false );
+    config.setDebugging( (c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_DEBUG)) == 1) ? true : false );
     config.setNotificationTitle(c.getString(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_NOTIF_TITLE)));
     config.setNotificationText(c.getString(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_NOTIF_TEXT)));
     config.setSmallNotificationIcon(c.getString(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_NOTIF_ICON_SMALL)));
@@ -126,7 +126,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     values.put(ConfigurationEntry.COLUMN_NAME_RADIUS, config.getStationaryRadius());
     values.put(ConfigurationEntry.COLUMN_NAME_DISTANCE_FILTER, config.getDistanceFilter());
     values.put(ConfigurationEntry.COLUMN_NAME_DESIRED_ACCURACY, config.getDesiredAccuracy());
-    values.put(ConfigurationEntry.COLUMN_NAME_DEBUGGING, (config.isDebugging() == true) ? 1 : 0);
+    values.put(ConfigurationEntry.COLUMN_NAME_DEBUG, (config.isDebugging() == true) ? 1 : 0);
     values.put(ConfigurationEntry.COLUMN_NAME_NOTIF_TITLE, config.getNotificationTitle());
     values.put(ConfigurationEntry.COLUMN_NAME_NOTIF_TEXT, config.getNotificationText());
     values.put(ConfigurationEntry.COLUMN_NAME_NOTIF_ICON_SMALL, config.getSmallNotificationIcon());
