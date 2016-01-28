@@ -1,6 +1,6 @@
 ## Changelog
 
-### [1.0.0] - unreleased
+### [2.0.0] - unreleased
 #### Changed
 - Android notificationIcon option split into small and large!!!
 - Android stopOnTerminate defaults to true
@@ -11,6 +11,7 @@
 - Android startForeground option
 
 #### Removed
+- WP8 platform
 - Android deprecated window.plugins.backgroundGeoLocation
 - Android locationTimeout option (use interval instead)
 

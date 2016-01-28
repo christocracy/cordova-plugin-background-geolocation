@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
-        version="1.0.0">
+        version="2.0.0">
     <name>CDVBackgroundGeoLocation</name>
     <description>Cordova Background GeoLocation Plugin</description>
     <license>Apache-2.0</license>
@@ -77,8 +77,6 @@
 
     <platform name="ios">
         <!-- required background modes:  App registers for location updates -->
-        <dependency id="cordova-plugin-geolocation" />
-
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
             <string>This app requires background location tracking</string>
         </config-file>
@@ -99,37 +97,5 @@
         <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
         <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
      </platform>
-
-	<!-- wp8 -->
-	<platform name="wp8">
-		<config-file target="config.xml" parent="/*">
-			<feature name="BackgroundGeoLocation">
-				<param name="wp-package" value="BackgroundGeoLocation" onload="true" />
-				<param name="onload" value="true" />
-			</feature>
-		</config-file>
-
-		<config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Tasks/DefaultTask">
-			<BackgroundExecution>
-				<ExecutionType Name="LocationTracking" />
-			</BackgroundExecution>
-		</config-file>
-
-		<config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-			<Capability Name="ID_CAP_LOCATION" />
-		</config-file>
-		<source-file src="src/wp8/BackgroundGeoLocation.cs" />
-		<source-file src="src/wp8/BackgroundGeoLocationOptions.cs" />
-		<source-file src="src/wp8/DebugNotifier.cs" />
-		<source-file src="src/wp8/ExtensionMethods.cs" />
-        <source-file src="src/wp8/GeolocatorWrapper.cs" />
-        <source-file src="src/wp8/GeolocatorWrapperPositionChangedEventArgs.cs" />
-        <source-file src="src/wp8/IBackgroundGeoLocation.cs" />
-        <source-file src="src/wp8/UpdateScaledDistanceFilterResult.cs" />
-        <source-file src="src/wp8/Position.cs" />
-        <source-file src="src/wp8/PositionPath.cs" />
-        <source-file src="src/wp8/PostionUpdateDebugData.cs" />
-        <source-file src="src/wp8/StationaryManager.cs" />
-	</platform>
 
 </plugin>
