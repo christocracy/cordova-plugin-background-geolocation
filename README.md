@@ -25,6 +25,19 @@ As Cordova is [shifting towards npm](http://cordova.apache.org/announcements/201
 ```
 cordova plugin add cordova-plugin-mauron85-background-geolocation
 ```
+### Android SDK dependencies
+Plugin requires following android SDK dependencies to work properly.
+
+Name                       | Version
+-------------------------- | -------
+Android SDK Tools          | 24.4.1
+Android SDK Platform-tools | 23.1
+Android SDK Build-tools    | 23.0.1
+Android Support Repository | 25
+Android Support Library    | 23.1.1
+Google Play Services       | 29
+Google Repository          | 24
+
 
 ## Registering plugin for Adobe® PhoneGap™ Build
 
