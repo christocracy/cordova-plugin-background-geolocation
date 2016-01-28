@@ -1,5 +1,10 @@
 ## Changelog
 
+### [0.9.2] - 2016-01-29
+#### Fixed
+- iOS temporarily using cordova-plugin-geolocation-ios9-fix to fix issues with iOS9
+- iOS fixing SampleApp indexedDB issues
+
 ### [0.9.1] - 2015-12-18
 #### Fixed
 - Android ANDROID_FUSED_LOCATION fix config setActivitiesInterval

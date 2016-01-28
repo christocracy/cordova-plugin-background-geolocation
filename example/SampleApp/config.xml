@@ -16,14 +16,15 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <hook type="after_platform_add" src="scripts/install_plugins.js"/>
     <platform name="android">
         <allow-intent href="market:*" />
+        <hook type="after_prepare" src="scripts/res_android.js"/>
     </platform>
     <platform name="ios">
-        <dependency id="cordova-plugin-indexeddb" />
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
+        <hook type="after_prepare" src="scripts/res_ios.js"/>
+        <hook type="after_platform_add" src="scripts/install_ios.js"/>
     </platform>
-    <hook type="after_platform_add" src="scripts/install_plugins.js"/>
-    <hook type="after_prepare" src="scripts/resource_files.js"/>
 </widget>

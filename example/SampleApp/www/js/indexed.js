@@ -15,10 +15,11 @@
   }
 }(this, function () {
 
-  // Hackery
-  window.indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
-
   function indexed(dbstore) {
+
+    // Hackery
+    // cannot monkey patch window.indexedDB in Safari (dammn you!)
+    var _indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB;
 
     return {
 
@@ -69,7 +70,7 @@
       // Create indexedDB store
       create: function (cb) {
         var self = this;
-        var request = window.indexedDB.open(dbstore);
+        var request = _indexedDB.open(dbstore);
 
         // Handle onupgradeneeded
         request.onupgradeneeded = function (e) {
@@ -95,7 +96,7 @@
       // Add item to the store
       insert: function (data, cb) {
         var self = this;
-        var request = window.indexedDB.open(dbstore);
+        var request = _indexedDB.open(dbstore);
         request.onsuccess = function (e) {
           // Setup trans and store
           var db = e.target.result;
@@ -155,7 +156,7 @@
       // Traverse data
       traverse: function (query, data, cb) {
         var self = this;
-        var request = window.indexedDB.open(dbstore);
+        var request = _indexedDB.open(dbstore);
 
         request.onsuccess = function (e) {
 
@@ -312,7 +313,7 @@
       // Drop data store
       drop: function (cb) {
         var self = this;
-        var deleteRequest = window.indexedDB.deleteDatabase(dbstore);
+        var deleteRequest = _indexedDB.deleteDatabase(dbstore);
         // Golden
         deleteRequest.onsuccess = function (e) {
           self.processCB(cb, true);
