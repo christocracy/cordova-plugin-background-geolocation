@@ -41,7 +41,7 @@ public class SQLiteLocationDAO implements LocationDAO {
       LocationEntry.COLUMN_NAME_LATITUDE,
       LocationEntry.COLUMN_NAME_LONGITUDE,
       LocationEntry.COLUMN_NAME_PROVIDER,
-      LocationEntry.COLUMN_NAME_SERVICE_PROVIDER,
+      LocationEntry.COLUMN_NAME_LOCATION_PROVIDER,
       LocationEntry.COLUMN_NAME_DEBUG
     };
 
@@ -126,7 +126,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     l.setAltitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_ALTITUDE)));
     l.setLatitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_LATITUDE)));
     l.setLongitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_LONGITUDE)));
-    l.setServiceProvider(c.getInt(c.getColumnIndex(LocationEntry.COLUMN_NAME_SERVICE_PROVIDER)));
+    l.setLocationProvider(c.getInt(c.getColumnIndex(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER)));
     l.setDebug( (c.getInt(c.getColumnIndex(LocationEntry.COLUMN_NAME_DEBUG)) == 1) ? true : false);
 
     return l;
@@ -142,7 +142,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     values.put(LocationEntry.COLUMN_NAME_LATITUDE, location.getLatitude());
     values.put(LocationEntry.COLUMN_NAME_LONGITUDE, location.getLongitude());
     values.put(LocationEntry.COLUMN_NAME_PROVIDER, location.getProvider());
-    values.put(LocationEntry.COLUMN_NAME_SERVICE_PROVIDER, location.getServiceProvider().asInt());
+    values.put(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER, location.getLocationProvider().asInt());
     values.put(LocationEntry.COLUMN_NAME_DEBUG, (location.getDebug() == true) ? 1 : 0);
 
     return values;

@@ -27,7 +27,7 @@ public class SQLiteOpenHelper extends android.database.sqlite.SQLiteOpenHelper {
         LocationEntry.COLUMN_NAME_LATITUDE + REAL_TYPE + COMMA_SEP +
         LocationEntry.COLUMN_NAME_LONGITUDE + REAL_TYPE + COMMA_SEP +
         LocationEntry.COLUMN_NAME_PROVIDER + TEXT_TYPE + COMMA_SEP +
-        LocationEntry.COLUMN_NAME_SERVICE_PROVIDER + INTEGER_TYPE + COMMA_SEP +
+        LocationEntry.COLUMN_NAME_LOCATION_PROVIDER + INTEGER_TYPE + COMMA_SEP +
         LocationEntry.COLUMN_NAME_DEBUG + INTEGER_TYPE +
         " )";
 
@@ -46,7 +46,7 @@ public class SQLiteOpenHelper extends android.database.sqlite.SQLiteOpenHelper {
         ConfigurationEntry.COLUMN_NAME_STOP_TERMINATE + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_START_BOOT + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_START_FOREGROUND + INTEGER_TYPE + COMMA_SEP +
-        ConfigurationEntry.COLUMN_NAME_SERVICE_PROVIDER + INTEGER_TYPE + COMMA_SEP +
+        ConfigurationEntry.COLUMN_NAME_LOCATION_PROVIDER + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_INTERVAL + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_ACTIVITIES_INTERVAL + INTEGER_TYPE +

@@ -32,7 +32,7 @@ public class Config implements Parcelable
     private String notificationIconLarge;
     private String notificationIconSmall;
     private String notificationIconColor;
-    private ServiceProviderEnum serviceProvider = ServiceProviderEnum.ANDROID_DISTANCE_FILTER;
+    private LocationProviderEnum locationProvider = LocationProviderEnum.ANDROID_DISTANCE_FILTER;
     private Integer interval = 600000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
     private Integer activitiesInterval = 1000; //milliseconds
@@ -58,7 +58,7 @@ public class Config implements Parcelable
         out.writeValue(getStopOnTerminate());
         out.writeValue(getStartOnBoot());
         out.writeValue(getStartForeground());
-        out.writeInt(getServiceProvider().asInt());
+        out.writeInt(getLocationProvider().asInt());
         out.writeInt(getInterval());
         out.writeInt(getFastestInterval());
         out.writeInt(getActivitiesInterval());
@@ -92,7 +92,7 @@ public class Config implements Parcelable
         setStopOnTerminate((Boolean) in.readValue(null));
         setStartOnBoot((Boolean) in.readValue(null));
         setStartForeground((Boolean) in.readValue(null));
-        setServiceProvider(in.readInt());
+        setLocationProvider(in.readInt());
         setInterval(in.readInt());
         setFastestInterval(in.readInt());
         setActivitiesInterval(in.readInt());
@@ -196,16 +196,16 @@ public class Config implements Parcelable
         this.startForeground = startForeground;
     }
 
-    public ServiceProviderEnum getServiceProvider() {
-        return this.serviceProvider;
+    public LocationProviderEnum getLocationProvider() {
+        return this.locationProvider;
     }
 
-    public void setServiceProvider(Integer providerId) {
-        this.serviceProvider = ServiceProviderEnum.forInt(providerId);
+    public void setLocationProvider(Integer providerId) {
+        this.locationProvider = LocationProviderEnum.forInt(providerId);
     }
 
-    public void setServiceProvider(ServiceProviderEnum provider) {
-        this.serviceProvider = provider;
+    public void setLocationProvider(LocationProviderEnum provider) {
+        this.locationProvider = provider;
     }
 
     public Integer getInterval() {
@@ -247,7 +247,7 @@ public class Config implements Parcelable
                 .append(" stopOnTerminate: "       + getStopOnTerminate())
                 .append(" startOnBoot: "           + getStartOnBoot())
                 .append(" startForeground: "       + getStartForeground())
-                .append(" serviceProvider: "       + getServiceProvider())
+                .append(" locationProvider: "       + getLocationProvider())
                 .append(" interval: "              + getInterval())
                 .append(" fastestInterval: "       + getFastestInterval())
                 .append(" activitiesInterval: "    + getActivitiesInterval())
@@ -279,7 +279,7 @@ public class Config implements Parcelable
         config.setNotificationText(jObject.optString("notificationText", config.getNotificationText()));
         config.setStopOnTerminate(jObject.optBoolean("stopOnTerminate", config.getStopOnTerminate()));
         config.setStartOnBoot(jObject.optBoolean("startOnBoot", config.getStartOnBoot()));
-        config.setServiceProvider(jObject.optInt("locationService", config.getServiceProvider().asInt()));
+        config.setLocationProvider(jObject.optInt("locationProvider", config.getLocationProvider().asInt()));
         config.setInterval(jObject.optInt("interval", config.getInterval()));
         config.setFastestInterval(jObject.optInt("fastestInterval", config.getFastestInterval()));
         config.setActivitiesInterval(jObject.optInt("activitiesInterval", config.getActivitiesInterval()));
@@ -305,7 +305,7 @@ public class Config implements Parcelable
         json.put("stopOnTerminate", getStopOnTerminate());
         json.put("startOnBoot", getStartOnBoot());
         json.put("startForeground", getStartForeground());
-        json.put("serviceProvider", getServiceProvider());
+        json.put("locationProvider", getLocationProvider());
         json.put("interval", getInterval());
         json.put("fastestInterval", getFastestInterval());
         json.put("activitiesInterval", getActivitiesInterval());

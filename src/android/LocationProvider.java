@@ -10,9 +10,9 @@ This is a new class
 package com.tenforwardconsulting.cordova.bgloc;
 
 /**
- * ServiceProvider
+ * LocationProvider
  */
-public interface ServiceProvider {
+public interface LocationProvider {
 
     public void onCreate();
     public void onDestroy();

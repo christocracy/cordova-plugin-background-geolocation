@@ -19,7 +19,7 @@ public final class LocationContract {
         public static final String COLUMN_NAME_LATITUDE = "latitude";
         public static final String COLUMN_NAME_LONGITUDE = "longitude";
         public static final String COLUMN_NAME_PROVIDER = "provider";
-        public static final String COLUMN_NAME_SERVICE_PROVIDER = "service_provider";
+        public static final String COLUMN_NAME_LOCATION_PROVIDER = "service_provider";
         public static final String COLUMN_NAME_DEBUG = "debug";
     }
 }

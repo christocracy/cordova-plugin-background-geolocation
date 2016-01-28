@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
-import com.marianhello.cordova.bgloc.ServiceProviderFactory;
+import com.marianhello.cordova.bgloc.LocationProviderFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
@@ -46,7 +46,7 @@ public class LocationService extends Service {
 
     private Config config;
     private Boolean isActionReceiverRegistered = false;
-    private ServiceProvider provider;
+    private LocationProvider provider;
 
     private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
         @Override
@@ -90,8 +90,8 @@ public class LocationService extends Service {
             config = new Config();
         }
 
-        ServiceProviderFactory spf = new ServiceProviderFactory(this, config);
-        provider = spf.getInstance(config.getServiceProvider());
+        LocationProviderFactory spf = new LocationProviderFactory(this, config);
+        provider = spf.getInstance(config.getLocationProvider());
         provider.onCreate();
 
         if (config.getStartForeground()) {

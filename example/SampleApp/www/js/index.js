@@ -28,7 +28,7 @@ var ENV = (function() {
             */
             enabled:         localStorage.getItem('enabled')     || 'true',
             aggressive:      localStorage.getItem('aggressive')  || 'false',
-            locationService: localStorage.getItem('locationService')  || 'ANDROID_DISTANCE_FILTER'
+            locationProvider: localStorage.getItem('locationProvider')  || 'ANDROID_DISTANCE_FILTER'
         },
         toggle: function(key) {
             var value    = localStorage.getItem(key),
@@ -135,7 +135,7 @@ var app = {
             this.btnEnabled[0].innerHTML = 'Start';
         }
 
-        this.ddService.val(ENV.settings.locationService);
+        this.ddService.val(ENV.settings.locationProvider);
 
         this.btnHome.on('click', this.onClickHome);
         this.btnReset.on('click', this.onClickReset);
@@ -219,7 +219,7 @@ var app = {
                     timestamp: location.time,
                     battery: app.battery,
                     coords: location,
-                    service_provider: ENV.settings.locationService
+                    service_provider: ENV.settings.locationProvider
                 },
                 device: anonDevice
             };
@@ -277,12 +277,12 @@ var app = {
             notificationIconSmall: 'mappointer_small',
             notificationIconColor: '#FEDD1E',
             notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
-            notificationText: ENV.settings.locationService, // <-- android only, customize the text of the notification
+            notificationText: ENV.settings.locationProvider, // <-- android only, customize the text of the notification
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             startOnBoot: true,
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-            locationService: backgroundGeoLocation.service[ENV.settings.locationService],
+            locationProvider: backgroundGeoLocation.service[ENV.settings.locationProvider],
             fastestInterval: 5000,
             activitiesInterval: 10000
         });
@@ -326,10 +326,10 @@ var app = {
         }
     },
     onServiceChange: function(ev) {
-        var locationService = $(ev.target).text();
+        var locationProvider = $(ev.target).text();
 
-        ENV.settings.locationService = locationService;
-        localStorage.setItem('locationService', locationService);
+        ENV.settings.locationProvider = locationProvider;
+        localStorage.setItem('locationProvider', locationProvider);
         if (app.isTracking) {
             app.stopTracking();
             app.configureBackgroundGeoLocation();

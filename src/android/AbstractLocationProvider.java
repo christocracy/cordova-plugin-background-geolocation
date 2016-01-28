@@ -32,7 +32,7 @@ import org.json.JSONException;
 /**
  * AbstractLocationProvider
  */
-public abstract class AbstractLocationProvider implements ServiceProvider {
+public abstract class AbstractLocationProvider implements LocationProvider {
     private static final String TAG = "AbstractLocationProvider";
 
     protected LocationDAO dao;
@@ -89,7 +89,7 @@ public abstract class AbstractLocationProvider implements ServiceProvider {
 
     public void broadcastLocation (Location location) {
         final LocationProxy bgLocation = LocationProxy.fromAndroidLocation(location);
-        bgLocation.setServiceProvider(config.getServiceProvider());
+        bgLocation.setLocationProvider(config.getLocationProvider());
 
         if (config.isDebugging()) {
             bgLocation.setDebug(true);

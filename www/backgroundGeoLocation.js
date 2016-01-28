@@ -18,9 +18,9 @@ var backgroundGeoLocation = {
     stationaryRegion: null,
 
     /**
-     * @property {Object} service
+     * @property {Object} provider
      */
-    service: {
+    provider: {
         ANDROID_DISTANCE_FILTER: 0,
         ANDROID_FUSED_LOCATION: 1
     },

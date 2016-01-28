@@ -11,25 +11,25 @@ package com.marianhello.cordova.bgloc;
 
 import android.content.Context;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
-import com.tenforwardconsulting.cordova.bgloc.ServiceProvider;
+import com.tenforwardconsulting.cordova.bgloc.LocationProvider;
 import com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationProvider;
 import com.tenforwardconsulting.cordova.bgloc.FusedLocationProvider;
 import java.lang.IllegalArgumentException;
 
 /**
- * ServiceProviderFactory
+ * LocationProviderFactory
  */
-public class ServiceProviderFactory {
+public class LocationProviderFactory {
 
     private Context context;
     private Config config;
 
-    public ServiceProviderFactory(Context context, Config config) {
+    public LocationProviderFactory(Context context, Config config) {
         this.context = context;
         this.config = config;
     };
 
-    public ServiceProvider getInstance (ServiceProviderEnum provider) {
+    public LocationProvider getInstance (LocationProviderEnum provider) {
         switch (provider) {
             case ANDROID_DISTANCE_FILTER:
                 return new DistanceFilterLocationProvider(DAOFactory.createLocationDAO(context), config, context);

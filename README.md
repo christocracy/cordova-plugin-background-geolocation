@@ -4,9 +4,9 @@
 
 Cross-platform geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
-Plugin is both foreground and background geolocation provider. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But it can be used together with other geolocation providers (eg. html5 navigator.geolocation).
+Plugin is both foreground and background geolocation service. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But it can be used together with other geolocation providers (eg. html5 navigator.geolocation).
 
-On Android you can choose from two location service providers:
+On Android you can choose from two location location providers:
 * ANDROID_DISTANCE_FILTER (forked from [cordova-plugin-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation))
 * ANDROID_FUSED_LOCATION
 
@@ -18,6 +18,7 @@ As version 2.0 platform support for Windows Phone 8 was removed.
 Some incompatible changes were introduced:
 
 * option stopOnTerminate defaults to true
+* option locationService renamed to locationProvider
 * removed locationTimeout option (use interval instead)
 * notificationIcon was replaced with two separate options (notificationIconSmall and notificationIconLarge)
 
@@ -170,10 +171,10 @@ Parameter | Type | Platform     | Description
 `option.notificationIconColor` | `String` optional| Android | The accent color to use for notification. Eg. **#4CAF50**.
 `option.notificationIconLarge` | `String` optional | Android | The filename of a custom notification icon. See android quirks.
 `option.notificationIconSmall` | `String` optional | Android | The filename of a custom notification icon. See android quirks.
-`option.locationService` | `Number` | Android | Set location service provider **@see** [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers)
+`option.locationProvider` | `Number` | Android | Set location provider **@see** [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers)
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
-Following options are specific to provider as defined by locationService option
+Following options are specific to provider as defined by locationProvider option
 ### ANDROID_FUSED_LOCATION provider options
 
 Parameter | Type | Platform     | Description
@@ -283,7 +284,7 @@ backgroundGeoLocation.configure(callbackFn, failureFn, {
     notificationIconSmall: 'icon_small', //filename without extension
     debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
     stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-    locationService: backgroundGeoLocation.service.ANDROID_FUSED_LOCATION,
+    locationProvider: backgroundGeoLocation.provider.ANDROID_FUSED_LOCATION,
     interval: 60000, // <!-- poll for position every minute
     fastestInterval: 120000
 });
