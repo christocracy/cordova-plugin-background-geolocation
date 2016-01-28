@@ -25,20 +25,6 @@ As Cordova is [shifting towards npm](http://cordova.apache.org/announcements/201
 ```
 cordova plugin add cordova-plugin-mauron85-background-geolocation
 ```
-### Android SDK dependencies
-Plugin requires following android SDK dependencies to work properly.
-
-Name                       | Version
--------------------------- | -------
-Android SDK Tools          | 24.4.1
-Android SDK Platform-tools | 23.1
-Android SDK Build-tools    | 23.0.1
-Android Support Repository | 25
-Android Support Library    | 23.1.1
-Google Play Services       | 29
-Google Repository          | 24
-
-
 ## Registering plugin for Adobe® PhoneGap™ Build
 
 There is separate project [cordova-plugin-mauron85-background-geolocation-phonegapbuild](https://github.com/mauron85/cordova-plugin-mauron85-background-geolocation-phonegapbuild) to support [Adobe® PhoneGap™ Build](http://build.phonegap.com).
@@ -52,6 +38,21 @@ To register plugin add following line into your config.xml:
 ```
 
 NOTE: If you're using *hydration*, you have to download and reinstall your app with every new version of the plugin, as plugins are not updated.
+
+## Compilation
+
+### Android
+You will need to ensure that you have installed the following items through the Android SDK Manager:
+
+Name                       | Version
+-------------------------- | -------
+Android SDK Tools          | 24.4.1
+Android SDK Platform-tools | 23.1
+Android SDK Build-tools    | 23.0.1
+Android Support Repository | 25
+Android Support Library    | 23.1.1
+Google Play Services       | 29
+Google Repository          | 24
 
 ## Quick Example
 
@@ -328,6 +329,33 @@ If main activity is killed by the system and ```stopOnTerminate``` option is fal
 
 Plugin should work with custom ROMS at least ANDROID_DISTANCE_FILTER. But ANDROID_FUSED_LOCATION provider depends on Google Play Services.
 Usually ROMs don't include Google Play Services libraries. Strange bugs may occur, like no GPS locations (only from network and passive) and other. When posting issue report, please mention that you're using custom ROM.
+
+
+#### Multidex
+Note: Following section was kindly copied from [phonegap-plugin-push](https://github.com/phonegap/phonegap-plugin-push/blob/master/docs/INSTALLATION.md#multidex). Visit link for resolving issue with facebook plugin.
+
+If you have an issue compiling the app and you're getting an error similar to this (`com.android.dex.DexException: Multiple dex files define`):
+
+```
+UNEXPECTED TOP-LEVEL EXCEPTION:
+com.android.dex.DexException: Multiple dex files define Landroid/support/annotation/AnimRes;
+	at com.android.dx.merge.DexMerger.readSortableTypes(DexMerger.java:596)
+	at com.android.dx.merge.DexMerger.getSortedTypes(DexMerger.java:554)
+	at com.android.dx.merge.DexMerger.mergeClassDefs(DexMerger.java:535)
+	at com.android.dx.merge.DexMerger.mergeDexes(DexMerger.java:171)
+	at com.android.dx.merge.DexMerger.merge(DexMerger.java:189)
+	at com.android.dx.command.dexer.Main.mergeLibraryDexBuffers(Main.java:502)
+	at com.android.dx.command.dexer.Main.runMonoDex(Main.java:334)
+	at com.android.dx.command.dexer.Main.run(Main.java:277)
+	at com.android.dx.command.dexer.Main.main(Main.java:245)
+	at com.android.dx.command.Main.main(Main.java:106)
+```
+
+Then at least one other plugin you have installed is using an outdated way to declare dependencies such as `android-support` or `play-services-gcm`.
+This causes gradle to fail, and you'll need to identify which plugin is causing it and request an update to the plugin author, so that it uses the proper way to declare dependencies for cordova.
+See [this for the reference on the cordova plugin specification](https://cordova.apache.org/docs/en/5.4.0/plugin_ref/spec.html#link-18), it'll be usefull to mention it when creating an issue or requesting that plugin to be updated.
+
+Common plugins to suffer from this outdated dependency management are plugins related to *facebook*, *google+*, *notifications*, *crosswalk* and *google maps*.
 
 #### `notificationIcon`
 **NOTE:** Only available for API Level >=21.
