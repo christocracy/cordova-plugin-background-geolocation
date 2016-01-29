@@ -88,8 +88,8 @@ var app = {
     initializeMap: function() {
 
         var mapOptions = {
-          center: { lat: -34.397, lng: 150.644},
-          zoom: 8,
+          center: { lat: 37.3318907, lng: -122.0318303 },
+          zoom: 12,
           zoomControl: false
         };
 
@@ -247,8 +247,9 @@ var app = {
             }
         };
 
-        var failureFn = function() {
-            window.alert('BackgroundGeoLocation err');
+        var failureFn = function(err) {
+            console.log('BackgroundGeoLocation err', err);
+            window.alert('BackgroundGeoLocation err: ' + err.message);
         };
 
         // Only ios emits this stationary event
@@ -301,7 +302,8 @@ var app = {
 
         // Your app must execute AT LEAST ONE call for the current position via standard Cordova geolocation,
         //  in order to prompt the user for Location permission.
-        fgGeo.getCurrentPosition(function(location) {
+        fgGeo.getCurrentPosition(
+          function(location) {
             var map     = app.map,
                 coords  = location.coords,
                 ll      = new google.maps.LatLng(coords.latitude, coords.longitude),
@@ -312,6 +314,9 @@ var app = {
                 map.setZoom(15);
             }
             app.setCurrentLocation(coords);
+        },function(err) {
+            console.log('Error occured. Maybe check permissions', err);
+            window.alert('Error occured. Maybe check permissions');
         });
     },
     onCollectToggle: function(ev) {

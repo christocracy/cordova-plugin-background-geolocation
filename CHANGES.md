@@ -1,5 +1,17 @@
 ## Changelog
 
+### [0.9.3] - 2016-01-29
+#### Fixed
+- iOS cordova 6 compilation error
+- iOS fix for iOS 9
+
+#### Changes
+- iOS removing cordova-plugin-geolocation dependency
+- iOS user prompt for using location services
+- iOS error callback when location services are disabled
+- iOS error callback when user denied location tracking
+- iOS adding error callbacks to SampleApp
+
 ### [0.9.2] - 2016-01-29
 #### Fixed
 - iOS temporarily using cordova-plugin-geolocation-ios9-fix to fix issues with iOS9
