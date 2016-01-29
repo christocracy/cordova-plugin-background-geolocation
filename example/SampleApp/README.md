@@ -83,12 +83,6 @@ $ cordova build
 
 * [transistorsoft](https://github.com/transistorsoft) for background-geolocation-console, cordova-background-geolocation and SampleApp.
 
-Run on device
-
-```
-$ cordova run --device
-```
-
 ### iOS quirks
 
 If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.

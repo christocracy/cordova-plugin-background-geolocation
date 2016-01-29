@@ -27,7 +27,6 @@ Some incompatible changes were introduced:
 ```
 cordova plugin add cordova-plugin-mauron85-background-geolocation
 ```
-
 ## Registering plugin for Adobe® PhoneGap™ Build
 
 There is separate project [cordova-plugin-mauron85-background-geolocation-phonegapbuild](https://github.com/mauron85/cordova-plugin-mauron85-background-geolocation-phonegapbuild) to support [Adobe® PhoneGap™ Build](http://build.phonegap.com).
@@ -41,7 +40,6 @@ To register plugin add following line into your config.xml:
 ```
 
 NOTE: If you're using *hydration*, you have to download and reinstall your app with every new version of the plugin, as plugins are not updated.
-
 
 ## Compilation
 
@@ -57,7 +55,6 @@ Android Support Repository | 25
 Android Support Library    | 23.1.1
 Google Play Services       | 29
 Google Repository          | 24
-
 
 ## Quick Example
 

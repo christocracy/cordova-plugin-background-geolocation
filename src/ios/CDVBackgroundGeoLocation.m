@@ -3,9 +3,7 @@
 //
 //  Created by Chris Scott <chris@transistorsoft.com> on 2013-06-15
 //
-#import "CDVLocation.h"
 #import "CDVBackgroundGeoLocation.h"
-#import <Cordova/CDVJSON.h>
 
 // Debug sounds for bg-geolocation life-cycle events.
 // http://iphonedevwiki.net/index.php/AudioServices
@@ -16,6 +14,14 @@
 #define acquiringLocationSound  1103
 #define acquiredLocationSound   1052
 #define locationErrorSound      1073
+
+//Edited by kingalione: START
+#define SYSTEM_VERSION_EQUAL_TO(v)                  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedSame)
+#define SYSTEM_VERSION_GREATER_THAN(v)              ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedDescending)
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
+#define SYSTEM_VERSION_LESS_THAN(v)                 ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] == NSOrderedAscending)
+#define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
+//Edited by kingalione: END
 
 @implementation CDVBackgroundGeoLocation {
     BOOL isDebugging;
@@ -34,7 +40,6 @@
     CLLocationManager *locationManager;
     UILocalNotification *localNotification;
 
-    CDVLocationData *locationData;
     CLLocation *lastLocation;
     NSMutableArray *locationQueue;
 
@@ -64,6 +69,14 @@
 {
     // background location cache, for when no network is detected.
     locationManager = [[CLLocationManager alloc] init];
+
+    //Edited by kingalione: START
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
+        NSLog(@"CDVBackgroundGeoLocation iOS9 detected");
+        locationManager.allowsBackgroundLocationUpdates = YES;
+    }
+    //Edited by kingalione: END
+
     locationManager.delegate = self;
 
     localNotification = [[UILocalNotification alloc] init];
@@ -88,6 +101,41 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onResume:) name:UIApplicationWillEnterForegroundNotification object:nil];
 
 }
+
+- (BOOL)isAuthorized
+{
+    BOOL authorizationStatusClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
+    
+    if (authorizationStatusClassPropertyAvailable) {
+        NSUInteger authStatus = [CLLocationManager authorizationStatus];
+#ifdef __IPHONE_8_0
+        NSLog(@"CDVBackgroundGeoLocation requestAlwaysAuthorization");
+        if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {  //iOS 8.0+
+            return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
+        }
+#endif
+        return (authStatus == kCLAuthorizationStatusAuthorized) || (authStatus == kCLAuthorizationStatusNotDetermined);
+    }
+    
+    // by default, assume YES (for iOS < 4.2)
+    return YES;
+}
+
+
+- (BOOL)isLocationServicesEnabled
+{
+    BOOL locationServicesEnabledInstancePropertyAvailable = [locationManager respondsToSelector:@selector(locationServicesEnabled)]; // iOS 3.x
+    BOOL locationServicesEnabledClassPropertyAvailable = [CLLocationManager respondsToSelector:@selector(locationServicesEnabled)]; // iOS 4.x
+    
+    if (locationServicesEnabledClassPropertyAvailable) { // iOS 4.x
+        return [CLLocationManager locationServicesEnabled];
+    } else if (locationServicesEnabledInstancePropertyAvailable) { // iOS 2.x, iOS 3.x
+        return [(id)locationManager locationServicesEnabled];
+    } else {
+        return NO;
+    }
+}
+
 /**
  * configure plugin
  * @param {Number} stationaryRadius
@@ -232,14 +280,76 @@
 
 /**
  * Turn on background geolocation
+ * in case of failure it calls error callback from configure method
+ * may fire two callback when location services are disabled and when authorization failed
  */
 - (void) start:(CDVInvokedUrlCommand*)command
 {
+    NSString* message = nil;
+    NSLog(@"- CDVBackgroundGeoLocation starting attempt");
+
+    [locationManager requestAlwaysAuthorization];
+    
+    if ([self isLocationServicesEnabled] == NO) {
+        message = @"Location services are disabled.";
+        NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
+        [posError setObject:[NSNumber numberWithInt:PERMISSIONDENIED] forKey:@"code"];
+        [posError setObject:message forKey:@"message"];
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:posError];
+        [result setKeepCallbackAsBool:YES];
+        // for compatibility reasons with call configure error callback instead of start callback
+        [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+    }
+
+    if (![self isAuthorized]) {
+        BOOL authStatusAvailable = [CLLocationManager respondsToSelector:@selector(authorizationStatus)]; // iOS 4.2+
+        if (authStatusAvailable) {
+            NSUInteger code = [CLLocationManager authorizationStatus];
+            if (code == kCLAuthorizationStatusNotDetermined) {
+                // could return POSITION_UNAVAILABLE but need to coordinate with other platforms
+                message = @"User undecided on application's use of location services.";
+                NSLog(@"- CDVBackgroundGeoLocation start failed: %@)", message);
+                NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
+                [posError setObject:[NSNumber numberWithInt:PERMISSIONDENIED] forKey:@"code"];
+                [posError setObject:message forKey:@"message"];
+                CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:posError];
+                [result setKeepCallbackAsBool:YES];
+                // for compatibility reasons with call configure error callback instead of start callback
+                [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+                // go ahead start service
+            } else if (code == kCLAuthorizationStatusRestricted) {
+                message = @"Application's use of location services is restricted.";
+                NSLog(@"- CDVBackgroundGeoLocation start failed: %@)", message);
+                NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
+                [posError setObject:[NSNumber numberWithInt:PERMISSIONDENIED] forKey:@"code"];
+                [posError setObject:message forKey:@"message"];
+                CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:posError];
+                [result setKeepCallbackAsBool:YES];
+                // for compatibility reasons with call configure error callback instead of start callback
+                [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+                return;
+            } else if (code == kCLAuthorizationStatusDenied) {
+                message = @"User denied use of location services.";
+                NSLog(@"- CDVBackgroundGeoLocation start failed: %@)", message);
+                NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
+                [posError setObject:[NSNumber numberWithInt:PERMISSIONDENIED] forKey:@"code"];
+                [posError setObject:message forKey:@"message"];
+                CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:posError];
+                [result setKeepCallbackAsBool:YES];
+                // for compatibility reasons with call configure error callback instead of start callback
+                [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+                return;
+            } else {
+                NSLog(@"- CDVBackgroundGeoLocation start code %lu", (unsigned long)code);                
+            }
+        }
+    }
+
     enabled = YES;
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
-
-    NSLog(@"- CDVBackgroundGeoLocation start (background? %d)", state);
-
+    
+    NSLog(@"- CDVBackgroundGeoLocation start (background? %ld)", (long)state);
+    
     [locationManager startMonitoringSignificantLocationChanges];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
@@ -335,6 +445,42 @@
     }
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
+
+- (void) isLocationEnabled:(CDVInvokedUrlCommand*)command
+{
+    // TODO: yet to be implemented
+}
+
+- (void) showLocationSettings:(CDVInvokedUrlCommand*)command
+{
+    // TODO: yet to be implemented
+}
+
+- (void) watchLocationMode:(CDVInvokedUrlCommand*)command
+{
+    // TODO: yet to be implemented
+}
+
+- (void) stopWatchingLocationMode:(CDVInvokedUrlCommand*)command
+{
+     // TODO: yet to be implemented
+}
+
+- (void) getLocations:(CDVInvokedUrlCommand*)command
+{
+    // TODO: yet to be implemented
+}
+
+- (void) deleteLocation:(CDVInvokedUrlCommand*)command
+{
+    // TODO: yet to be implemented
+}
+
+- (void) deleteAllLocations:(CDVInvokedUrlCommand*)command
+{
+    // TODO: yet to be implemented    
+}
+
 
 -(NSMutableDictionary*) locationToHash:(CLLocation*)location
 {
@@ -717,16 +863,10 @@
 
 - (void) startUpdatingLocation
 {
-    SEL requestSelector = NSSelectorFromString(@"requestAlwaysAuthorization");
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined && [locationManager respondsToSelector:requestSelector]) {
-        ((void (*)(id, SEL))[locationManager methodForSelector:requestSelector])(locationManager, requestSelector);
-        [locationManager startUpdatingLocation];
-        isUpdatingLocation = YES;
-    } else {
-        [locationManager startUpdatingLocation];
-        isUpdatingLocation = YES;
-    }
+    [locationManager startUpdatingLocation];
+    isUpdatingLocation = YES;
 }
+
 - (void) locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
     NSLog(@"- CDVBackgroundGeoLocation didChangeAuthorizationStatus %u", status);

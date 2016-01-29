@@ -7,14 +7,6 @@
 
 // configure all the files to copy.  Key of object is the source file, value is the destination location.  It's fine to put all platforms' icons and splash screen files here, even if we don't build for all platforms on each developer's box.
 var filestocopy = [
-// android
-{ "res/icon/android/drawable-xhdpi/ic_launcher.png": "platforms/android/res/drawable/icon.png" },
-{ "res/icon/android/drawable-hdpi/ic_launcher.png": "platforms/android/res/drawable-hdpi/icon.png" },
-{ "res/icon/android/drawable-ldpi/ic_launcher.png": "platforms/android/res/drawable-ldpi/icon.png" },
-{ "res/icon/android/drawable-mdpi/ic_launcher.png": "platforms/android/res/drawable-mdpi/icon.png" },
-{ "res/icon/android/drawable-xhdpi/ic_launcher.png": "platforms/android/res/drawable-xhdpi/icon.png" },
-{ "res/icon/android/drawable-ldpi/ic_launcher.png": "platforms/android/res/drawable-hdpi/mappointer_small.png" },
-{ "res/drawable/android/mappointer_large.png": "platforms/android/res/drawable-hdpi/mappointer_large.png" },
 // ios
 { "res/icon/ios/Icon-40.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-40.png" },
 { "res/icon/ios/Icon-40@2x.png": "platforms/ios/Cordova Background GeoLocation/Resources/icons/icon-40@2x.png" },
