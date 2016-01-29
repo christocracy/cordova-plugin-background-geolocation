@@ -14,9 +14,9 @@ Warning: You probably have to set your cordova app to keep running by **keepRunn
 
 ## Description
 
-Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
+Cross-platform foreground and background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
-Plugin is both foreground and background geolocation provider. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But you can still use it together with other geolocation providers (eg. html5 navigator.geolocation).
+It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But you can still use it together with other geolocation providers (eg. html5 navigator.geolocation).
 
 ## Installing the plugin
 
@@ -98,8 +98,6 @@ function onDeviceReady () {
     // backgroundGeoLocation.stop();
 }
 ```
-
-NOTE: On some platforms is required to enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `watchPosition` or `getCurrentPosition`. Not needed on Android.
 
 ## Example Application
 
