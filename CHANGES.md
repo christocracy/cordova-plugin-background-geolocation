@@ -1,5 +1,9 @@
 ## Changelog
 
+### [0.9.4] -
+#### Fixed
+- Android 6.0 permissions issue #21
+
 ### [0.9.3] - 2016-01-29
 #### Fixed
 - iOS cordova 6 compilation error

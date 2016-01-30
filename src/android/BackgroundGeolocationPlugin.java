@@ -24,9 +24,12 @@ import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.location.LocationManager;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
+import com.marianhello.cordova.bgloc.PermissionHelper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +39,7 @@ import com.marianhello.cordova.bgloc.ServiceProvider;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
+
 
 import java.util.Collection;
 
@@ -61,6 +65,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     private Intent locationServiceIntent;
     private CallbackContext callbackContext;
     private CallbackContext locationModeChangeCallbackContext;
+    public static final int START_REQ_CODE = 0;
+    public static final int PERMISSION_DENIED_ERROR = 20;
+    protected final static String[] permissions = { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION };
 
     private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
         @Override
@@ -114,23 +121,18 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Activity activity = this.cordova.getActivity();
         Context context = activity.getApplicationContext();
 
-        if (ACTION_START.equals(action) && !isEnabled) {
-            Class serviceProviderClass = null;
+        if (ACTION_START.equals(action)) {
+            if (isEnabled) { return true; }
 
-            try {
-                serviceProviderClass = ServiceProvider.getClass(config.getServiceProvider());
-            } catch (ClassNotFoundException e) {
-                callbackContext.error("Configuration error: provider not found");
-                return true;
+            if (hasPermisssion()) {
+                startBackgroundService();
+                // TODO: call success/fail callback
+            } else {
+                PermissionHelper.requestPermissions(this, START_REQ_CODE, permissions);
             }
-
-            registerActionReceiver();
-            startBackgroundService(serviceProviderClass);
-            // TODO: call success/fail callback
 
             return true;
         } else if (ACTION_STOP.equals(action)) {
-            unregisterActionReceiver();
             stopBackgroundService();
             callbackContext.success();
 
@@ -224,12 +226,21 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         super.onDestroy();
     }
 
-    public ComponentName startBackgroundService (Class serviceProviderClass) {
+    public ComponentName startBackgroundService () {
         if (isEnabled) { return null; }
+        Class serviceProviderClass = null;
+
+        try {
+            serviceProviderClass = ServiceProvider.getClass(config.getServiceProvider());
+        } catch (ClassNotFoundException e) {
+            callbackContext.error("Configuration error: provider not found");
+            return null;
+        }
 
         Activity activity = this.cordova.getActivity();
         Log.d(TAG, "Starting bg service");
 
+        registerActionReceiver();
         locationServiceIntent = new Intent(activity, serviceProviderClass);
         locationServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
         // locationServiceIntent.putExtra("config", config.toParcel().marshall());
@@ -326,5 +337,34 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Context context = this.cordova.getActivity().getApplicationContext();
         LocationDAO dao = DAOFactory.createLocationDAO(context);
         dao.deleteAllLocations();
+    }
+
+    public boolean hasPermisssion() {
+        for(String p : permissions)
+        {
+            if(!PermissionHelper.hasPermission(this, p))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void onRequestPermissionResult(int requestCode, String[] permissions,
+                                          int[] grantResults) throws JSONException {
+        for (int r : grantResults) {
+            if (r == PackageManager.PERMISSION_DENIED) {
+                Log.d(TAG, "Permission Denied!");
+                PluginResult result = new PluginResult(PluginResult.Status.ERROR, PERMISSION_DENIED_ERROR);
+                result.setKeepCallback(true);
+                this.callbackContext.sendPluginResult(result);
+                return;
+            }
+        }
+        switch (requestCode) {
+            case START_REQ_CODE:
+                startBackgroundService();
+                break;
+        }
     }
 }

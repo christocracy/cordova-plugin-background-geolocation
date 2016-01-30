@@ -355,6 +355,11 @@ See [this for the reference on the cordova plugin specification](https://cordova
 
 Common plugins to suffer from this outdated dependency management are plugins related to *facebook*, *google+*, *notifications*, *crosswalk* and *google maps*.
 
+#### Android Permissions
+
+Android 6.0 "Marshmallow" introduced a new permissions model where the user can turn on and off permissions as necessary. When user disallow location access permissions, error configure callback will be called with error code: 20.
+
+
 #### `notificationIcon`
 **NOTE:** Only available for API Level >=21.
 
