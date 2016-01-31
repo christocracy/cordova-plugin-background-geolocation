@@ -7,7 +7,7 @@ https://github.com/christocracy/cordova-plugin-background-geolocation
 This is a new class
 */
 
-package com.tenforwardconsulting.cordova.bgloc;
+package com.marianhello.cordova.bgloc;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -34,9 +34,9 @@ import android.widget.Toast;
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
 import com.marianhello.cordova.bgloc.LocationProviderFactory;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
-import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
+import com.marianhello.cordova.bgloc.data.LocationProxy;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.DAOFactory;
 
 import java.util.Random;
 

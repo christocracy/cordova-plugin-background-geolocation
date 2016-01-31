@@ -10,10 +10,10 @@ This is a new class
 package com.marianhello.cordova.bgloc;
 
 import android.content.Context;
-import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
-import com.tenforwardconsulting.cordova.bgloc.LocationProvider;
+import com.marianhello.cordova.bgloc.data.DAOFactory;
+import com.marianhello.cordova.bgloc.LocationProvider;
 import com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationProvider;
-import com.tenforwardconsulting.cordova.bgloc.FusedLocationProvider;
+import com.marianhello.cordova.bgloc.ActivityRecognitionLocationProvider;
 import java.lang.IllegalArgumentException;
 
 /**
@@ -31,10 +31,10 @@ public class LocationProviderFactory {
 
     public LocationProvider getInstance (LocationProviderEnum provider) {
         switch (provider) {
-            case ANDROID_DISTANCE_FILTER:
+            case ANDROID_DISTANCE_FILTER_PROVIDER:
                 return new DistanceFilterLocationProvider(DAOFactory.createLocationDAO(context), config, context);
-            case ANDROID_FUSED_LOCATION:
-                return new FusedLocationProvider(DAOFactory.createLocationDAO(context), config, context);
+            case ANDROID_ACTIVITY_PROVIDER:
+                return new ActivityRecognitionLocationProvider(DAOFactory.createLocationDAO(context), config, context);
             default:
                 throw new IllegalArgumentException("Provider not found");
         }

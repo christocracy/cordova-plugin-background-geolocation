@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
+package com.marianhello.cordova.bgloc.data.sqlite;
 
 import android.provider.BaseColumns;
 

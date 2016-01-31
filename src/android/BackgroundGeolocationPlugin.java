@@ -11,6 +11,7 @@ Differences to original version:
 
 package com.tenforwardconsulting.cordova.bgloc;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,15 +35,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
+import com.marianhello.cordova.bgloc.LocationService;
 import com.marianhello.cordova.bgloc.PermissionHelper;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
-import com.tenforwardconsulting.cordova.bgloc.data.ConfigurationDAO;
-import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.ConfigurationDAO;
+import com.marianhello.cordova.bgloc.data.DAOFactory;
+import com.marianhello.cordova.bgloc.data.LocationProxy;
 import java.util.Collection;
 
 public class BackgroundGeolocationPlugin extends CordovaPlugin {
-    private static final String TAG = "BackgroundGeolocationPlugin";
+    private static final String TAG = "BGPlugin";
 
     public static final String ACTION_START = "start";
     public static final String ACTION_STOP = "stop";
@@ -289,6 +291,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return getContext().registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     public Intent registerLocationModeChangeReceiver () {
         if (isLocationModeChangeReceiverRegistered) { return null; }
 

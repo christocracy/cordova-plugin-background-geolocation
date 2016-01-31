@@ -5,6 +5,7 @@
 - Android notificationIcon option split into small and large!!!
 - Android stopOnTerminate defaults to true
 - Android option locationService renamed to locationProvider
+- Android providers renamed (see README.md)
 - Android bugfixing
 
 #### Added

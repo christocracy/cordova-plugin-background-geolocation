@@ -15,9 +15,9 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.marianhello.cordova.bgloc.Config;
-import com.tenforwardconsulting.cordova.bgloc.LocationService;
-import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
-import com.tenforwardconsulting.cordova.bgloc.data.ConfigurationDAO;
+import com.marianhello.cordova.bgloc.LocationService;
+import com.marianhello.cordova.bgloc.data.DAOFactory;
+import com.marianhello.cordova.bgloc.data.ConfigurationDAO;
 /**
  * BootCompletedReceiver class
  */

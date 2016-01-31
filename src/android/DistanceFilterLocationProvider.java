@@ -35,8 +35,9 @@ import static java.lang.Math.pow;
 import static java.lang.Math.round;
 import static java.lang.Math.abs;
 
+import com.marianhello.cordova.bgloc.AbstractLocationProvider;
 import com.marianhello.cordova.bgloc.Config;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
 
 
 public class DistanceFilterLocationProvider extends AbstractLocationProvider implements LocationListener {

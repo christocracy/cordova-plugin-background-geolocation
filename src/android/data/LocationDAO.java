@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc.data;
+package com.marianhello.cordova.bgloc.data;
 
 import java.util.Date;
 import java.util.Collection;

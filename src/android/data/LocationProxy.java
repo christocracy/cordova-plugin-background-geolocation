@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc.data;
+package com.marianhello.cordova.bgloc.data;
 
 import android.location.Location;
 import org.json.JSONObject;

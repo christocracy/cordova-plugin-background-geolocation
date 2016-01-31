@@ -32,13 +32,13 @@ public class Config implements Parcelable
     private String notificationIconLarge;
     private String notificationIconSmall;
     private String notificationIconColor;
-    private LocationProviderEnum locationProvider = LocationProviderEnum.ANDROID_DISTANCE_FILTER;
+    private LocationProviderEnum locationProvider = LocationProviderEnum.ANDROID_DISTANCE_FILTER_PROVIDER;
     private Integer interval = 600000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
     private Integer activitiesInterval = 1000; //milliseconds
     private Boolean stopOnTerminate = true;
     private Boolean startOnBoot = false;
-    private Boolean startForeground = false;
+    private Boolean startForeground = true;
 
     public int describeContents() {
         return 0;

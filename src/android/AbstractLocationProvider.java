@@ -7,7 +7,7 @@ https://github.com/christocracy/cordova-plugin-background-geolocation
 This is a new class
 */
 
-package com.tenforwardconsulting.cordova.bgloc;
+package com.marianhello.cordova.bgloc;
 
 import android.os.HandlerThread;
 import android.os.Handler;
@@ -24,8 +24,8 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.LocationProxy;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
 
 import org.json.JSONException;
 
@@ -41,19 +41,15 @@ public abstract class AbstractLocationProvider implements LocationProvider {
     protected Location lastLocation;
 
     protected ToneGenerator toneGenerator;
-    protected HandlerThread handlerThread;
 
     protected AbstractLocationProvider(LocationDAO dao, Config config, Context context) {
         this.dao = dao;
         this.config = config;
-        this.context = context.getApplicationContext();
+        this.context = context;
     }
 
     public void onCreate() {
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-
-        handlerThread = new HandlerThread("LocationProviderThread");
-        handlerThread.start();
     }
 
     public void onDestroy() {
@@ -61,10 +57,7 @@ public abstract class AbstractLocationProvider implements LocationProvider {
     }
 
     public Intent registerReceiver (BroadcastReceiver receiver, IntentFilter filter) {
-        Looper looper = handlerThread.getLooper();
-        Handler handler = new Handler(looper);
-
-        return context.registerReceiver(receiver, filter, null, handler);
+        return context.registerReceiver(receiver, filter);
     }
 
     public void unregisterReceiver (BroadcastReceiver receiver) {

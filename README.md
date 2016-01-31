@@ -7,8 +7,8 @@ Cross-platform geolocation for Cordova / PhoneGap with battery-saving "circular 
 Plugin is both foreground and background geolocation service. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But it can be used together with other geolocation providers (eg. html5 navigator.geolocation).
 
 On Android you can choose from two location location providers:
-* ANDROID_DISTANCE_FILTER (forked from [cordova-plugin-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation))
-* ANDROID_FUSED_LOCATION
+* ANDROID_DISTANCE_FILTER_PROVIDER (forked from [cordova-plugin-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation))
+* ANDROID_ACTIVITY_PROVIDER
 
 See wiki [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers) for more information about providers.
 
@@ -19,6 +19,7 @@ Some incompatible changes were introduced:
 
 * option stopOnTerminate defaults to true
 * option locationService renamed to locationProvider
+* android providers are now ANDROID_DISTANCE_FILTER_PROVIDER and ANDROID_ACTIVITY_PROVIDER
 * removed locationTimeout option (use interval instead)
 * notificationIcon was replaced with two separate options (notificationIconSmall and notificationIconLarge)
 
@@ -161,7 +162,7 @@ Parameter | Type | Platform     | Description
 `option.distanceFilter` | `Number` | all | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).
 `option.stopOnTerminate` | `Boolean` | iOS, Android | Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app). (default true)
 `option.startOnBoot` | `Boolean` | Android | Start background service on device boot. (default false)
-`option.startForeground` | `Boolean` | Android | If false location service will not be started in foreground and no notification will be shown. (default false)
+`option.startForeground` | `Boolean` | Android | If false location service will not be started in foreground and no notification will be shown. (default true)
 `option.interval` | `Number` | Android | The minimum time interval between location updates in seconds. **@see** [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent) for more information.
 `option.notificationTitle` | `String` optional | Android | Custom notification title in the drawer.
 `option.notificationText` | `String` optional | Android | Custom notification text in the drawer.
@@ -172,7 +173,7 @@ Parameter | Type | Platform     | Description
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
 Following options are specific to provider as defined by locationProvider option
-### ANDROID_FUSED_LOCATION provider options
+### ANDROID_ACTIVITY_PROVIDER provider options
 
 Parameter | Type | Platform     | Description
 --------- | ---- | ------------ | -----------
@@ -281,7 +282,7 @@ backgroundGeoLocation.configure(callbackFn, failureFn, {
     notificationIconSmall: 'icon_small', //filename without extension
     debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
     stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-    locationProvider: backgroundGeoLocation.provider.ANDROID_FUSED_LOCATION,
+    locationProvider: backgroundGeoLocation.provider.ANDROID_ACTIVITY_PROVIDER,
     interval: 60000, // <!-- poll for position every minute
     fastestInterval: 120000
 });
@@ -320,7 +321,7 @@ If main activity is killed by the system and ```stopOnTerminate``` option is fal
 
 #### Custom ROMs
 
-Plugin should work with custom ROMS at least ANDROID_DISTANCE_FILTER. But ANDROID_FUSED_LOCATION provider depends on Google Play Services.
+Plugin should work with custom ROMS at least ANDROID_DISTANCE_FILTER_PROVIDER. But ANDROID_ACTIVITY_PROVIDER provider depends on Google Play Services.
 Usually ROMs don't include Google Play Services libraries. Strange bugs may occur, like no GPS locations (only from network and passive) and other. When posting issue report, please mention that you're using custom ROM.
 
 #### Multidex

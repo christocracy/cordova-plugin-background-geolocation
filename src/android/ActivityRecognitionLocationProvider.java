@@ -1,24 +1,19 @@
-package com.tenforwardconsulting.cordova.bgloc;
+package com.marianhello.cordova.bgloc;
 
 import java.util.ArrayList;
-import android.annotation.TargetApi;
-import android.app.Notification;
+
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Criteria;
 import android.location.Location;
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationListener;
@@ -28,9 +23,9 @@ import com.google.android.gms.location.ActivityRecognitionResult;
 
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
-import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
 
-public class FusedLocationProvider extends AbstractLocationProvider implements GoogleApiClient.ConnectionCallbacks,
+public class ActivityRecognitionLocationProvider extends AbstractLocationProvider implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private static final String TAG = "FusedLocationProvider";
 
@@ -43,7 +38,7 @@ public class FusedLocationProvider extends AbstractLocationProvider implements G
     private Boolean isWatchingActivity = false;
     private DetectedActivity lastActivity;
 
-    public FusedLocationProvider(LocationDAO dao, Config config, Context context) {
+    public ActivityRecognitionLocationProvider(LocationDAO dao, Config config, Context context) {
         super(dao, config, context);
     }
 
@@ -139,7 +134,7 @@ public class FusedLocationProvider extends AbstractLocationProvider implements G
         if (googleApiClient == null) {
             connectToPlayAPI();
         } else if (googleApiClient.isConnected()) {
-            if (isWatchingActivity == true) { return; }
+            if (isWatchingActivity) { return; }
 
             ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 googleApiClient,
@@ -153,7 +148,7 @@ public class FusedLocationProvider extends AbstractLocationProvider implements G
     }
 
     private void detachRecorder() {
-        if (isWatchingActivity == true) {
+        if (isWatchingActivity) {
             Log.d(TAG, "detachRecorder");
             ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(googleApiClient, detectedActivitiesPI);
             isWatchingActivity = false;

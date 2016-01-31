@@ -14,7 +14,7 @@ package com.marianhello.cordova.bgloc;
  */
 public abstract class Constant
 {
-    private static final String P_NAME = "com.tenforwardconsulting.cordova.bgloc";
+    private static final String P_NAME = "com.marianhello.cordova.bgloc";
 
     public static final String DATA = "DATA";
     public static final String ACTION = "ACTION";

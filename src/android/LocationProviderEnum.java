@@ -14,8 +14,8 @@ package com.marianhello.cordova.bgloc;
  */
 public enum LocationProviderEnum
 {
-    ANDROID_DISTANCE_FILTER(0),
-    ANDROID_FUSED_LOCATION(1);
+    ANDROID_DISTANCE_FILTER_PROVIDER(0),
+    ANDROID_ACTIVITY_PROVIDER(1);
 
     public final int id;
 

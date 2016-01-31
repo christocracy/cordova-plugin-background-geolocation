@@ -1,12 +1,12 @@
-package com.tenforwardconsulting.cordova.bgloc.data.sqlite;
+package com.marianhello.cordova.bgloc.data.sqlite;
 
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.tenforwardconsulting.cordova.bgloc.data.sqlite.LocationContract.LocationEntry;
-import com.tenforwardconsulting.cordova.bgloc.data.sqlite.ConfigurationContract.ConfigurationEntry;
+import com.marianhello.cordova.bgloc.data.sqlite.LocationContract.LocationEntry;
+import com.marianhello.cordova.bgloc.data.sqlite.ConfigurationContract.ConfigurationEntry;
 
 public class SQLiteOpenHelper extends android.database.sqlite.SQLiteOpenHelper {
     private static final String SQLITE_DATABASE_NAME = "cordova_bg_geolocation.db";

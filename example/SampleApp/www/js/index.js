@@ -28,7 +28,7 @@ var ENV = (function() {
             */
             enabled:         localStorage.getItem('enabled')     || 'true',
             aggressive:      localStorage.getItem('aggressive')  || 'false',
-            locationProvider: localStorage.getItem('locationProvider')  || 'ANDROID_DISTANCE_FILTER'
+            locationProvider: localStorage.getItem('locationProvider')  || 'ANDROID_DISTANCE_FILTER_PROVIDER'
         },
         toggle: function(key) {
             var value    = localStorage.getItem(key),
@@ -281,9 +281,9 @@ var app = {
             notificationText: ENV.settings.locationProvider, // <-- android only, customize the text of the notification
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-            startOnBoot: true,
+            startOnBoot: false,
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-            locationProvider: backgroundGeoLocation.service[ENV.settings.locationProvider],
+            locationProvider: backgroundGeoLocation.provider[ENV.settings.locationProvider],
             fastestInterval: 5000,
             activitiesInterval: 10000
         });
