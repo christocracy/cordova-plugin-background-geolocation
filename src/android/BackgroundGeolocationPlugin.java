@@ -24,6 +24,8 @@ import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.location.LocationManager;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -32,11 +34,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.marianhello.cordova.bgloc.Config;
 import com.marianhello.cordova.bgloc.Constant;
+import com.marianhello.cordova.bgloc.PermissionHelper;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.ConfigurationDAO;
 import com.tenforwardconsulting.cordova.bgloc.data.DAOFactory;
 import com.tenforwardconsulting.cordova.bgloc.data.LocationProxy;
-
 import java.util.Collection;
 
 public class BackgroundGeolocationPlugin extends CordovaPlugin {
@@ -62,6 +64,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     private Intent locationServiceIntent;
     private CallbackContext callbackContext;
     private CallbackContext locationModeChangeCallbackContext;
+
+    public static final int START_REQ_CODE = 0;
+    public static final int PERMISSION_DENIED_ERROR = 20;
+    protected final static String[] permissions = { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION };
 
     private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
         @Override
@@ -118,11 +124,15 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         if (ACTION_START.equals(action)) {
             if (config == null) {
                 callbackContext.error("Plugin not configured. Please call configure method first.");
-            } else {
-                registerActionReceiver();
+                return true;
+            }
+
+            if (hasPermissions()) {
                 startBackgroundService();
                 // startRecording();
                 callbackContext.success();
+            } else {
+                PermissionHelper.requestPermissions(this, START_REQ_CODE, permissions);
             }
 
             return true;
@@ -239,9 +249,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public ComponentName startBackgroundService () {
         if (isEnabled) { return null; }
 
+        registerActionReceiver();
         Activity activity = this.cordova.getActivity();
         Log.d(TAG, "Starting bg service");
-
         locationServiceIntent = new Intent(activity, LocationService.class);
         locationServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
         // locationServiceIntent.putExtra("config", config.toParcel().marshall());
@@ -358,4 +368,30 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return null;
     }
 
+    public boolean hasPermissions() {
+        for(String p : permissions) {
+            if(!PermissionHelper.hasPermission(this, p)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void onRequestPermissionResult(int requestCode, String[] permissions,
+        int[] grantResults) throws JSONException {
+        for (int r : grantResults) {
+            if (r == PackageManager.PERMISSION_DENIED) {
+                Log.d(TAG, "Permission Denied!");
+                PluginResult result = new PluginResult(PluginResult.Status.ERROR, PERMISSION_DENIED_ERROR);
+                result.setKeepCallback(true);
+                this.callbackContext.sendPluginResult(result);
+                return;
+            }
+        }
+        switch (requestCode) {
+            case START_REQ_CODE:
+                startBackgroundService();
+                break;
+        }
+    }
 }

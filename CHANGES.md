@@ -16,6 +16,10 @@
 - Android deprecated window.plugins.backgroundGeoLocation
 - Android locationTimeout option (use interval instead)
 
+### [0.9.4] - 2016-01-31
+#### Fixed
+- Android 6.0 permissions issue #21
+
 ### [0.9.3] - 2016-01-29
 #### Fixed
 - iOS cordova 6 compilation error

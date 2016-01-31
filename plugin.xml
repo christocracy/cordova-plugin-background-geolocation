@@ -26,6 +26,7 @@
         <source-file src="src/android/LocationProviderFactory.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/LocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/LocationProvider.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
+        <source-file src="src/android/PermissionHelper.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/AbstractLocationProvider.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
         <source-file src="src/android/DistanceFilterLocationProvider.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>

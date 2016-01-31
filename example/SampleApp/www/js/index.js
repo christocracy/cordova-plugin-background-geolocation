@@ -249,7 +249,7 @@ var app = {
 
         var failureFn = function(err) {
             console.log('BackgroundGeoLocation err', err);
-            window.alert('BackgroundGeoLocation err: ' + err.message);
+            window.alert('BackgroundGeoLocation err: ' + JSON.stringify(err));
         };
 
         // Only ios emits this stationary event
