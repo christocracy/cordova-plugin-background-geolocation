@@ -1,6 +1,6 @@
 ## Changelog
 
-### [0.9.4] -
+### [0.9.4] - 2016-01-31
 #### Fixed
 - Android 6.0 permissions issue #21
 
