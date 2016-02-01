@@ -21,22 +21,26 @@ import java.lang.IllegalArgumentException;
  */
 public class LocationProviderFactory {
 
-    private Context context;
-    private Config config;
+    private LocationService context;
 
-    public LocationProviderFactory(Context context, Config config) {
+    public LocationProviderFactory(LocationService context) {
         this.context = context;
-        this.config = config;
     };
 
-    public LocationProvider getInstance (LocationProviderEnum provider) {
-        switch (provider) {
-            case ANDROID_DISTANCE_FILTER_PROVIDER:
-                return new DistanceFilterLocationProvider(DAOFactory.createLocationDAO(context), config, context);
-            case ANDROID_ACTIVITY_PROVIDER:
-                return new ActivityRecognitionLocationProvider(DAOFactory.createLocationDAO(context), config, context);
+    public LocationProvider getInstance (Integer locationProvider) {
+        LocationProvider provider;
+        switch (locationProvider) {
+            case Config.ANDROID_DISTANCE_FILTER_PROVIDER:
+                provider = new DistanceFilterLocationProvider(context);
+                break;
+            case Config.ANDROID_ACTIVITY_PROVIDER:
+                provider = new ActivityRecognitionLocationProvider(context);
+                break;
             default:
                 throw new IllegalArgumentException("Provider not found");
         }
+
+        provider.onCreate();
+        return provider;
     }
 }

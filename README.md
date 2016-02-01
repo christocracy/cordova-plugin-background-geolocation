@@ -392,6 +392,8 @@ There are many works of original christocracy's plugin. The most interesting rep
 Lot of work has been done, but scattered all over the github. My intention is to maintain
 this version and adopt all those cool changes. You're more then welcome to pull your request here.
 
+To learn more about services and related android bugs, I recommend reading question [foreground-service-being-killed-by-android](http://stackoverflow.com/questions/6645193/foreground-service-being-killed-by-android) on stackoverflow.
+
 ## Changelog
 
 See [CHANGES.md](/CHANGES.md)

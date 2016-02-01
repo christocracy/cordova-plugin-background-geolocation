@@ -18,8 +18,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
@@ -27,6 +33,7 @@ import android.util.Log;
 import android.location.LocationManager;
 import android.Manifest;
 import android.content.pm.PackageManager;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -34,13 +41,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.marianhello.cordova.bgloc.Config;
-import com.marianhello.cordova.bgloc.Constant;
 import com.marianhello.cordova.bgloc.LocationService;
 import com.marianhello.cordova.bgloc.PermissionHelper;
 import com.marianhello.cordova.bgloc.data.LocationDAO;
 import com.marianhello.cordova.bgloc.data.ConfigurationDAO;
 import com.marianhello.cordova.bgloc.data.DAOFactory;
-import com.marianhello.cordova.bgloc.data.LocationProxy;
+import com.marianhello.cordova.bgloc.data.BackgroundLocation;
 import java.util.Collection;
 
 public class BackgroundGeolocationPlugin extends CordovaPlugin {
@@ -58,64 +64,106 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public static final String ACTION_DELETE_ALL_LOCATIONS = "deleteAllLocations";
     public static final String ACTION_GET_CONFIG = "getConfig";
 
-    private LocationDAO dao;
-    private Config config;
-    private Boolean isEnabled = false;
-    private Boolean isActionReceiverRegistered = false;
-    private Boolean isLocationModeChangeReceiverRegistered = false;
-    private Intent locationServiceIntent;
-    private CallbackContext callbackContext;
-    private CallbackContext locationModeChangeCallbackContext;
-
     public static final int START_REQ_CODE = 0;
     public static final int PERMISSION_DENIED_ERROR = 20;
-    protected final static String[] permissions = { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION };
+    public static final String[] permissions = { Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION };
 
-    private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
+    /** Messenger for communicating with the service. */
+    private Messenger mService = null;
+    /** Flag indicating whether we have called bind on the service. */
+    private Boolean mIsBound = false;
+
+    private Boolean isServiceRunning = false;
+    private Boolean isLocationModeChangeReceiverRegistered = false;
+
+    private LocationDAO dao;
+    private Config config;
+    private CallbackContext callbackContext;
+    private CallbackContext actionStartCallbackContext;
+    private CallbackContext locationModeChangeCallbackContext;
+
+    /**
+     * Handler of incoming messages from service.
+     */
+    class IncomingHandler extends Handler {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Received location from bg service");
-            Bundle results = getResultExtras(true);
-            Bundle data = intent.getExtras();
-            switch (data.getInt(Constant.ACTION)) {
-                case Constant.ACTION_LOCATION_UPDATE:
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case LocationService.MSG_LOCATION_UPDATE:
                     try {
                         Log.d(TAG, "Sending location update");
-                        JSONObject location = new JSONObject(data.getString(Constant.DATA));
+                        Bundle bundle = msg.getData();
+                        bundle.setClassLoader(LocationService.class.getClassLoader());
+                        JSONObject location = ((BackgroundLocation) bundle.getParcelable("location")).toJSONObject();
                         PluginResult result = new PluginResult(PluginResult.Status.OK, location);
                         result.setKeepCallback(true);
                         callbackContext.sendPluginResult(result);
-                        results.putString(Constant.LOCATION_SENT_INDICATOR, "OK");
                     } catch (JSONException e) {
                         Log.w(TAG, "Error converting message to json");
                         PluginResult result = new PluginResult(PluginResult.Status.JSON_EXCEPTION);
                         result.setKeepCallback(true);
                         callbackContext.sendPluginResult(result);
-                        results.putString(Constant.LOCATION_SENT_INDICATOR, "ERROR");
                     }
-
                     break;
                 default:
-                    break;
+                    super.handleMessage(msg);
             }
+        }
+    }
+
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+    /**
+     * Class for interacting with the main interface of the service.
+     */
+    private ServiceConnection mConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // This is called when the connection with the service has been
+            // established, giving us the object we can use to
+            // interact with the service.  We are communicating with the
+            // service using a Messenger, so here we get a client-side
+            // representation of that from the raw IBinder object.
+            mService = new Messenger(service);
+            mIsBound = true;
+
+            // We want to monitor the service for as long as we are
+            // connected to it.
+            try {
+                Message msg = Message.obtain(null,
+                        LocationService.MSG_REGISTER_CLIENT);
+                msg.replyTo = mMessenger;
+                mService.send(msg);
+            } catch (RemoteException e) {
+                // In this case the service has crashed before we could even
+                // do anything with it; we can count on soon being
+                // disconnected (and then reconnected if it can be restarted)
+                // so there is no need to do anything here.
+            }
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            // This is called when the connection with the service has been
+            // unexpectedly disconnected -- that is, its process crashed.
+            mService = null;
+            mIsBound = false;
         }
     };
 
     private BroadcastReceiver locationModeChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Received MODE_CHANGED_ACTION action");
-            if (locationModeChangeCallbackContext != null) {
-                PluginResult result;
-                try {
-                    int isLocationEnabled = BackgroundGeolocationPlugin.isLocationEnabled(context) ? 1 : 0;
-                    result = new PluginResult(PluginResult.Status.OK, isLocationEnabled);
-                    result.setKeepCallback(true);
-                } catch (SettingNotFoundException e) {
-                    result = new PluginResult(PluginResult.Status.ERROR, "Location setting error occured");
-                }
-                locationModeChangeCallbackContext.sendPluginResult(result);
+        Log.d(TAG, "Received MODE_CHANGED_ACTION action");
+        if (locationModeChangeCallbackContext != null) {
+            PluginResult result;
+            try {
+                int isLocationEnabled = BackgroundGeolocationPlugin.isLocationEnabled(context) ? 1 : 0;
+                result = new PluginResult(PluginResult.Status.OK, isLocationEnabled);
+                result.setKeepCallback(true);
+            } catch (SettingNotFoundException e) {
+                result = new PluginResult(PluginResult.Status.ERROR, "Location setting error occured");
             }
+            locationModeChangeCallbackContext.sendPluginResult(result);
+        }
         }
     };
 
@@ -130,17 +178,16 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             }
 
             if (hasPermissions()) {
-                startBackgroundService();
-                // startRecording();
+                startAndBindBackgroundService();
                 callbackContext.success();
             } else {
+                actionStartCallbackContext = callbackContext;
                 PermissionHelper.requestPermissions(this, START_REQ_CODE, permissions);
             }
 
             return true;
         } else if (ACTION_STOP.equals(action)) {
-            // stopRecording();
-            unregisterActionReceiver();
+            doUnbindService();
             stopBackgroundService();
             callbackContext.success();
 
@@ -224,8 +271,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Log.d(TAG, "initializing plugin");
         super.pluginInitialize();
 
-        Context context = this.cordova.getActivity().getApplicationContext();
-        dao = DAOFactory.createLocationDAO(context);
+        dao = DAOFactory.createLocationDAO(getContext());
     }
 
     /**
@@ -235,12 +281,12 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
      @Override
     public void onDestroy() {
         Log.d(TAG, "destroying plugin");
-        cleanUp();
-
+        unregisterLocationModeChangeReceiver();
+        // Unbind from the service
+        doUnbindService();
         if (config.getStopOnTerminate()) {
             stopBackgroundService();
         }
-
         super.onDestroy();
     }
 
@@ -248,47 +294,65 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return this.cordova.getActivity().getApplicationContext();
     }
 
-    public ComponentName startBackgroundService () {
-        if (isEnabled) { return null; }
-
-        registerActionReceiver();
-        Activity activity = this.cordova.getActivity();
-        Log.d(TAG, "Starting bg service");
-        locationServiceIntent = new Intent(activity, LocationService.class);
-        locationServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
-        // locationServiceIntent.putExtra("config", config.toParcel().marshall());
-        locationServiceIntent.putExtra("config", config);
-        isEnabled = true;
-
-        return activity.startService(locationServiceIntent);
+    protected void startAndBindBackgroundService () {
+        startBackgroundService();
+        doBindService();
     }
 
-    public boolean stopBackgroundService () {
-        if (!isEnabled) { return false; }
-
-        Log.d(TAG, "Stopping bg service");
-        Activity activity = this.cordova.getActivity();
-        isEnabled = false;
-        return activity.stopService(locationServiceIntent);
+    protected void startBackgroundService () {
+        if (!isServiceRunning) {
+            Activity activity = this.cordova.getActivity();
+            Intent locationServiceIntent = new Intent(activity, LocationService.class);
+            locationServiceIntent.putExtra("config", config);
+            locationServiceIntent.addFlags(Intent.FLAG_FROM_BACKGROUND);
+            // start service to keep service running even if no clients are bound to it
+            activity.startService(locationServiceIntent);
+            isServiceRunning = true;
+        }
     }
 
-    public void startRecording () {
-        Intent intent = new Intent(Constant.ACTION_FILTER);
-        intent.putExtra(Constant.ACTION, Constant.ACTION_START_RECORDING);
-        getContext().sendBroadcast(intent);
+    protected void stopBackgroundService() {
+        if (isServiceRunning) {
+            Log.d(TAG, "Stopping bg service");
+            Activity activity = this.cordova.getActivity();
+            activity.stopService(new Intent(activity, LocationService.class));
+            isServiceRunning = false;
+        }
     }
 
-    public void stopRecording () {
-        Intent intent = new Intent(Constant.ACTION_FILTER);
-        intent.putExtra(Constant.ACTION, Constant.ACTION_STOP_RECORDING);
-        getContext().sendBroadcast(intent);
+    void doBindService () {
+        // Establish a connection with the service.  We use an explicit
+        // class name because there is no reason to be able to let other
+        // applications replace our component.
+        if (!mIsBound) {
+            Activity activity = this.cordova.getActivity();
+            Intent locationServiceIntent = new Intent(activity, LocationService.class);
+            locationServiceIntent.putExtra("config", config);
+            activity.bindService(locationServiceIntent, mConnection, Context.BIND_IMPORTANT);
+        }
     }
 
-    public Intent registerActionReceiver () {
-        if (isActionReceiverRegistered) { return null; }
+    void doUnbindService () {
+        if (mIsBound) {
+            // If we have received the service, and hence registered with
+            // it, then now is the time to unregister.
+            if (mService != null) {
+                try {
+                    Message msg = Message.obtain(null,
+                            LocationService.MSG_UNREGISTER_CLIENT);
+                    msg.replyTo = mMessenger;
+                    mService.send(msg);
+                } catch (RemoteException e) {
+                    // There is nothing special we need to do if the service
+                    // has crashed.
+                }
 
-        isActionReceiverRegistered = true;
-        return getContext().registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
+                // Detach our existing connection.
+                Activity activity = this.cordova.getActivity();
+                activity.unbindService(mConnection);
+                mIsBound = false;
+            }
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -299,23 +363,11 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return getContext().registerReceiver(locationModeChangeReceiver, new IntentFilter(LocationManager.MODE_CHANGED_ACTION));
     }
 
-    public void unregisterActionReceiver () {
-        if (!isActionReceiverRegistered) { return; }
-
-        getContext().unregisterReceiver(actionReceiver);
-        isActionReceiverRegistered = false;
-    }
-
     public void unregisterLocationModeChangeReceiver () {
         if (!isLocationModeChangeReceiverRegistered) { return; }
 
         getContext().unregisterReceiver(locationModeChangeReceiver);
         isLocationModeChangeReceiverRegistered = false;
-    }
-
-    public void cleanUp() {
-        unregisterActionReceiver();
-        unregisterLocationModeChangeReceiver();
     }
 
     public void showLocationSettings() {
@@ -339,8 +391,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
 
     public JSONArray getAllLocations() throws JSONException {
         JSONArray jsonLocationsArray = new JSONArray();
-        Collection<LocationProxy> locations = dao.getAllLocations();
-        for (LocationProxy location : locations) {
+        Collection<BackgroundLocation> locations = dao.getAllLocations();
+        for (BackgroundLocation location : locations) {
             jsonLocationsArray.put(location.toJSONObject());
         }
         return jsonLocationsArray;
@@ -385,15 +437,14 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         for (int r : grantResults) {
             if (r == PackageManager.PERMISSION_DENIED) {
                 Log.d(TAG, "Permission Denied!");
-                PluginResult result = new PluginResult(PluginResult.Status.ERROR, PERMISSION_DENIED_ERROR);
-                result.setKeepCallback(true);
-                this.callbackContext.sendPluginResult(result);
+                actionStartCallbackContext.error(PERMISSION_DENIED_ERROR);
+                actionStartCallbackContext = null;
                 return;
             }
         }
         switch (requestCode) {
             case START_REQ_CODE:
-                startBackgroundService();
+                startAndBindBackgroundService();
                 break;
         }
     }

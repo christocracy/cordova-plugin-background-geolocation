@@ -1,24 +1,61 @@
 package com.marianhello.cordova.bgloc.data;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import com.marianhello.cordova.bgloc.LocationProviderEnum;
-
-public class LocationProxy {
+public class BackgroundLocation implements Parcelable {
+    private Long locationId = Long.valueOf(-1);
+    private String locationProvider;
     private Location location;
-    private Long locationId;
     private Boolean debug = false;
-    private LocationProviderEnum locationProvider;
 
-    public LocationProxy (String provider) {
+    public BackgroundLocation(String locationProvider, Location location) {
+        this.location = location;
+        this.locationProvider = locationProvider;
+    }
+
+    public BackgroundLocation(String provider) {
         location = new Location(provider);
     }
 
-    public LocationProxy (Location location) {
+    public BackgroundLocation(Location location) {
         this.location = location;
     }
+
+    private BackgroundLocation(Parcel in) {
+        setLocationId(in.readLong());
+        setLocationProvider(in.readString());
+        setLocation(Location.CREATOR.createFromParcel(in));
+//        setLocation((Location) in.readParcelable(Location.class.getClassLoader()));
+        setDebug((Boolean) in.readValue(null));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(getLocationId());
+        dest.writeString(getLocationProvider());
+        location.writeToParcel(dest, flags);
+        dest.writeValue(getDebug());
+    }
+
+    public static final Parcelable.Creator<BackgroundLocation> CREATOR
+            = new Parcelable.Creator<BackgroundLocation>() {
+        public BackgroundLocation createFromParcel(Parcel in) {
+            return new BackgroundLocation(in);
+        }
+        public BackgroundLocation[] newArray(int size) {
+            return new BackgroundLocation[size];
+        }
+    };
 
     public Long getLocationId() {
         return locationId;
@@ -100,20 +137,20 @@ public class LocationProxy {
         location.setProvider(provider);
     }
 
-    public void setLocationProvider(LocationProviderEnum locationProvider) {
+    public void setLocationProvider(String locationProvider) {
         this.locationProvider = locationProvider;
     }
 
-    public void setLocationProvider(Integer providerId) {
-        this.locationProvider = LocationProviderEnum.forInt(providerId);
-    }
-
-    public LocationProviderEnum getLocationProvider() {
+    public String getLocationProvider() {
         return locationProvider;
     }
 
-    public static LocationProxy fromAndroidLocation(Location location) {
-        return new LocationProxy(location);
+    public Location getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public JSONObject toJSONObject() throws JSONException {
@@ -132,3 +169,5 @@ public class LocationProxy {
         return json;
   	}
 }
+
+

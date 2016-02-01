@@ -24,15 +24,15 @@
         <source-file src="src/android/BootCompletedReceiver.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/Config.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/Constant.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/LocationProviderEnum.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/LocationProviderFactory.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/LocationService.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/LocationProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/PermissionHelper.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/AbstractLocationProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
         <source-file src="src/android/ActivityRecognitionLocationProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
+        <source-file src="src/android/DummyActivity.java" target-dir="src/com/marianhello/cordova/bgloc"/>
 
-        <source-file src="src/android/data/LocationProxy.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
+        <source-file src="src/android/data/BackgroundLocation.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
         <source-file src="src/android/data/DAOFactory.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
         <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
         <source-file src="src/android/data/ConfigurationDAO.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
@@ -44,6 +44,18 @@
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
+            <activity
+                android:name="com.marianhello.cordova.bgloc.DummyActivity"
+                android:theme="@android:style/Theme.NoDisplay"
+                android:enabled="true"
+                android:allowTaskReparenting="true"
+                android:noHistory="true"
+                android:excludeFromRecents="true"
+                android:alwaysRetainTaskState="false"
+                android:stateNotNeeded="true"
+                android:clearTaskOnLaunch="true"
+                android:finishOnTaskLaunch="true"
+                />
             <service android:enabled="true" android:exported="false" android:name="com.marianhello.cordova.bgloc.LocationService"
                      android:process=":remote" android:stopWithTask="false">
             </service>

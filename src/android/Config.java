@@ -23,6 +23,9 @@ import org.json.JSONException;
  */
 public class Config implements Parcelable
 {
+    public static final int ANDROID_DISTANCE_FILTER_PROVIDER = 0;
+    public static final int ANDROID_ACTIVITY_PROVIDER = 1;
+
     private float stationaryRadius = 50;
     private Integer distanceFilter = 500;
     private Integer desiredAccuracy = 100;
@@ -32,13 +35,16 @@ public class Config implements Parcelable
     private String notificationIconLarge;
     private String notificationIconSmall;
     private String notificationIconColor;
-    private LocationProviderEnum locationProvider = LocationProviderEnum.ANDROID_DISTANCE_FILTER_PROVIDER;
+    private Integer locationProvider = ANDROID_DISTANCE_FILTER_PROVIDER;
     private Integer interval = 600000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
     private Integer activitiesInterval = 1000; //milliseconds
     private Boolean stopOnTerminate = true;
     private Boolean startOnBoot = false;
     private Boolean startForeground = true;
+
+    public Config () {
+    }
 
     public int describeContents() {
         return 0;
@@ -58,7 +64,7 @@ public class Config implements Parcelable
         out.writeValue(getStopOnTerminate());
         out.writeValue(getStartOnBoot());
         out.writeValue(getStartForeground());
-        out.writeInt(getLocationProvider().asInt());
+        out.writeInt(getLocationProvider());
         out.writeInt(getInterval());
         out.writeInt(getFastestInterval());
         out.writeInt(getActivitiesInterval());
@@ -74,10 +80,6 @@ public class Config implements Parcelable
             return new Config[size];
         }
     };
-
-    public Config () {
-
-    }
 
     private Config(Parcel in) {
         setStationaryRadius(in.readFloat());
@@ -196,16 +198,12 @@ public class Config implements Parcelable
         this.startForeground = startForeground;
     }
 
-    public LocationProviderEnum getLocationProvider() {
+    public Integer getLocationProvider() {
         return this.locationProvider;
     }
 
-    public void setLocationProvider(Integer providerId) {
-        this.locationProvider = LocationProviderEnum.forInt(providerId);
-    }
-
-    public void setLocationProvider(LocationProviderEnum provider) {
-        this.locationProvider = provider;
+    public void setLocationProvider(Integer locationProvider) {
+        this.locationProvider = locationProvider;
     }
 
     public Integer getInterval() {
@@ -235,22 +233,22 @@ public class Config implements Parcelable
     @Override
     public String toString () {
         return new StringBuffer()
-                .append("stationaryRadius: "       + getStationaryRadius())
-                .append(" desiredAccuracy: "       + getDesiredAccuracy())
-                .append(" distanceFilter: "        + getDistanceFilter())
-                .append(" debug: "                 + isDebugging())
-                .append(" notificationTitle: "     + getNotificationTitle())
-                .append(" notificationText: "      + getNotificationText())
-                .append(" notificationIconLarge: " + getLargeNotificationIcon())
-                .append(" notificationIconSmall: " + getSmallNotificationIcon())
-                .append(" notificationIconColor: " + getNotificationIconColor())
-                .append(" stopOnTerminate: "       + getStopOnTerminate())
-                .append(" startOnBoot: "           + getStartOnBoot())
-                .append(" startForeground: "       + getStartForeground())
-                .append(" locationProvider: "      + getLocationProvider())
-                .append(" interval: "              + getInterval())
-                .append(" fastestInterval: "       + getFastestInterval())
-                .append(" activitiesInterval: "    + getActivitiesInterval())
+                .append("stationaryRadius: ").append(getStationaryRadius())
+                .append(" desiredAccuracy: ").append(getDesiredAccuracy())
+                .append(" distanceFilter: ").append(getDistanceFilter())
+                .append(" debug: ").append(isDebugging())
+                .append(" notificationTitle: ").append(getNotificationTitle())
+                .append(" notificationText: ").append(getNotificationText())
+                .append(" notificationIconLarge: ").append(getLargeNotificationIcon())
+                .append(" notificationIconSmall: ").append(getSmallNotificationIcon())
+                .append(" notificationIconColor: ").append(getNotificationIconColor())
+                .append(" stopOnTerminate: " ).append(getStopOnTerminate())
+                .append(" startOnBoot: ").append(getStartOnBoot())
+                .append(" startForeground: ").append(getStartForeground())
+                .append(" locationProvider: ").append(getLocationProvider())
+                .append(" interval: ").append(getInterval())
+                .append(" fastestInterval: ").append(getFastestInterval())
+                .append(" activitiesInterval: ").append(getActivitiesInterval())
                 .toString();
     }
 
@@ -279,7 +277,7 @@ public class Config implements Parcelable
         config.setNotificationText(jObject.optString("notificationText", config.getNotificationText()));
         config.setStopOnTerminate(jObject.optBoolean("stopOnTerminate", config.getStopOnTerminate()));
         config.setStartOnBoot(jObject.optBoolean("startOnBoot", config.getStartOnBoot()));
-        config.setLocationProvider(jObject.optInt("locationProvider", config.getLocationProvider().asInt()));
+        config.setLocationProvider(jObject.optInt("locationProvider", config.getLocationProvider()));
         config.setInterval(jObject.optInt("interval", config.getInterval()));
         config.setFastestInterval(jObject.optInt("fastestInterval", config.getFastestInterval()));
         config.setActivitiesInterval(jObject.optInt("activitiesInterval", config.getActivitiesInterval()));

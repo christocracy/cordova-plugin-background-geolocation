@@ -9,13 +9,15 @@ This is a new class
 
 package com.marianhello.cordova.bgloc;
 
+import android.location.Location;
+
 /**
  * LocationProvider
  */
 public interface LocationProvider {
 
-    public void onCreate();
-    public void onDestroy();
-    public void startRecording();
-    public void stopRecording();
+    void onCreate();
+    void onDestroy();
+    void startRecording();
+    void stopRecording();
 }

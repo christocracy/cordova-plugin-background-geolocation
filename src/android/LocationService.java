@@ -9,90 +9,135 @@ This is a new class
 
 package com.marianhello.cordova.bgloc;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
-import android.app.AlarmManager;
-import android.support.v4.app.NotificationCompat;
-import android.app.Service;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.BroadcastReceiver;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
-import android.os.SystemClock;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.marianhello.cordova.bgloc.Config;
-import com.marianhello.cordova.bgloc.Constant;
-import com.marianhello.cordova.bgloc.LocationProviderFactory;
-import com.marianhello.cordova.bgloc.data.LocationProxy;
-import com.marianhello.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.data.BackgroundLocation;
 import com.marianhello.cordova.bgloc.data.DAOFactory;
+import com.marianhello.cordova.bgloc.data.LocationDAO;
 
+import java.util.ArrayList;
 import java.util.Random;
-
 
 public class LocationService extends Service {
     private static final String TAG = "LocationService";
 
+    private LocationDAO dao;
     private Config config;
-    private Boolean isActionReceiverRegistered = false;
     private LocationProvider provider;
 
-    private BroadcastReceiver actionReceiver = new BroadcastReceiver() {
+    /** Keeps track of all current registered clients. */
+    ArrayList<Messenger> mClients = new ArrayList<Messenger>();
+
+    /**
+     * Command to the service to register a client, receiving callbacks
+     * from the service.  The Message's replyTo field must be a Messenger of
+     * the client where callbacks should be sent.
+     */
+    public static final int MSG_REGISTER_CLIENT = 1;
+
+    /**
+     * Command to the service to unregister a client, ot stop receiving callbacks
+     * from the service.  The Message's replyTo field must be a Messenger of
+     * the client as previously given with MSG_REGISTER_CLIENT.
+     */
+    public static final int MSG_UNREGISTER_CLIENT = 2;
+
+    /**
+     * Command ent by the service to
+     * any registered clients with the new position.
+     */
+    public static final int MSG_LOCATION_UPDATE = 3;
+
+    /**
+     * Handler of incoming messages from clients.
+     */
+    class IncomingHandler extends Handler {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            Bundle data = intent.getExtras();
-            switch (data.getInt(Constant.ACTION)) {
-                case Constant.ACTION_START_RECORDING:
-                    startRecording();
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_REGISTER_CLIENT:
+                    mClients.add(msg.replyTo);
                     break;
-                case Constant.ACTION_STOP_RECORDING:
-                    stopRecording();
+                case MSG_UNREGISTER_CLIENT:
+                    mClients.remove(msg.replyTo);
                     break;
                 default:
-                    break;
+                    super.handleMessage(msg);
             }
         }
-    };
+    }
 
+    /**
+     * Target we publish for clients to send messages to IncomingHandler.
+     */
+    final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+    /**
+     * When binding to the service, we return an interface to our messenger
+     * for sending messages to the service.
+     */
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO Auto-generated method stub
-        Log.i(TAG, "OnBind" + intent);
-        return null;
+        return mMessenger.getBinder();
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        // Receiver for actions
-        registerActionReceiver();
+        dao = (DAOFactory.createLocationDAO(this));
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.w(TAG, "Destroying Location Service");
+        provider.onDestroy();
+//        stopForeground(true);
+        super.onDestroy();
+    }
+
+    // @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.d(TAG, "Task has been removed");
+        if (config.getStopOnTerminate()) {
+            Log.d(TAG, "Stopping self");
+            stopSelf();
+        } else {
+            Log.d(TAG, "Continue running in background");
+//            Intent intent = new Intent( this, DummyActivity.class );
+//            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+//            startActivity(intent);
+        }
+        super.onTaskRemoved(rootIntent);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "Received start id " + startId + ": " + intent);
 
-        // config = Config.fromByteArray(intent.getByteArrayExtra("config"));
         if (intent.hasExtra("config")) {
             config = (Config) intent.getParcelableExtra("config");
         } else {
             config = new Config();
         }
 
-        LocationProviderFactory spf = new LocationProviderFactory(this, config);
+        LocationProviderFactory spf = new LocationProviderFactory(this);
         provider = spf.getInstance(config.getLocationProvider());
-        provider.onCreate();
 
         if (config.getStartForeground()) {
             // Build a Notification required for running service in foreground.
@@ -154,20 +199,6 @@ public class LocationService extends Service {
         return iconColor;
     }
 
-    public Intent registerActionReceiver () {
-        if (isActionReceiverRegistered) { return null; }
-
-        isActionReceiverRegistered = true;
-        return registerReceiver(actionReceiver, new IntentFilter(Constant.ACTION_FILTER));
-    }
-
-    public void unregisterActionReceiver () {
-        if (!isActionReceiverRegistered) { return; }
-
-        unregisterReceiver(actionReceiver);
-        isActionReceiverRegistered = false;
-    }
-
     public void startRecording() {
         provider.startRecording();
     }
@@ -176,14 +207,42 @@ public class LocationService extends Service {
         provider.stopRecording();
     }
 
-    @Override
-    public boolean stopService(Intent intent) {
-        Log.i(TAG, "Stopping service: " + intent);
-        provider.stopRecording();
+    public void handleLocation (BackgroundLocation location) {
+        Boolean shouldPersists = mClients.size() == 0;
+
         if (config.isDebugging()) {
-            Toast.makeText(this, "Stopping Location service", Toast.LENGTH_SHORT).show();
+            location.setDebug(true);
+            persistLocation(location);
         }
-        return super.stopService(intent); // not needed???
+
+        for (int i=mClients.size()-1; i>=0; i--) {
+            try {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("location", location);
+                Message msg = Message.obtain(null, MSG_LOCATION_UPDATE);
+                msg.setData(bundle);
+                mClients.get(i).send(msg);
+            } catch (RemoteException e) {
+                // The client is dead.  Remove it from the list;
+                // we are going through the list from back to front
+                // so this is safe to do inside the loop.
+                mClients.remove(i);
+                shouldPersists = true;
+            }
+        }
+
+        if (shouldPersists) {
+            Log.d(TAG, "Persisting location. Reason: Main activity was probably killed.");
+            persistLocation(location);
+        }
+    }
+
+    public void persistLocation (BackgroundLocation location) {
+        if (dao.persistLocation(location)) {
+            Log.d(TAG, "Persisted Location: " + location.toString());
+        } else {
+            Log.w(TAG, "Failed to persist location");
+        }
     }
 
     /**
@@ -195,23 +254,12 @@ public class LocationService extends Service {
         startActivity(launchIntent);
     }
 
-    @Override
-    public void onDestroy() {
-        Log.w(TAG, "Destroying Location Service");
-        unregisterActionReceiver();
-        provider.onDestroy();
-        stopForeground(true);
-        super.onDestroy();
+    public Config getConfig() {
+        return this.config;
     }
 
-    // @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        Log.d(TAG, "Task has been removed");
-        unregisterActionReceiver();
-        if (config.getStopOnTerminate()) {
-            stopSelf();
-        }
-        super.onTaskRemoved(rootIntent);
+    public void setConfig(Config config) {
+        this.config = config;
     }
+
 }

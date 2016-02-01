@@ -22,12 +22,15 @@ import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.ActivityRecognitionResult;
 
 import com.marianhello.cordova.bgloc.Config;
-import com.marianhello.cordova.bgloc.Constant;
 import com.marianhello.cordova.bgloc.data.LocationDAO;
 
 public class ActivityRecognitionLocationProvider extends AbstractLocationProvider implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, LocationListener {
+    private final String PROVIDER_ID = "ANDROID_ACTIVITY_PROVIDER";
+
     private static final String TAG = "FusedLocationProvider";
+    private static final String P_NAME = " com.marianhello.cordova.bgloc";
+    private static final String DETECTED_ACTIVITY_UPDATE = P_NAME + ".DETECTED_ACTIVITY_UPDATE";
 
     private PowerManager.WakeLock wakeLock;
     private GoogleApiClient googleApiClient;
@@ -38,8 +41,8 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
     private Boolean isWatchingActivity = false;
     private DetectedActivity lastActivity;
 
-    public ActivityRecognitionLocationProvider(LocationDAO dao, Config config, Context context) {
-        super(dao, config, context);
+    public ActivityRecognitionLocationProvider(LocationService context) {
+        super(context);
     }
 
     public void onCreate() {
@@ -50,9 +53,9 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
         wakeLock.acquire();
 
-        Intent detectedActivitiesIntent = new Intent(Constant.DETECTED_ACTIVITY_UPDATE);
+        Intent detectedActivitiesIntent = new Intent(DETECTED_ACTIVITY_UPDATE);
         detectedActivitiesPI = PendingIntent.getBroadcast(context, 9002, detectedActivitiesIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        registerReceiver(detectedActivitiesReceiver, new IntentFilter(Constant.DETECTED_ACTIVITY_UPDATE));
+        registerReceiver(detectedActivitiesReceiver, new IntentFilter(DETECTED_ACTIVITY_UPDATE));
     }
 
     @Override

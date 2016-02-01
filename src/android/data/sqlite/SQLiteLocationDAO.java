@@ -1,11 +1,6 @@
 package com.marianhello.cordova.bgloc.data.sqlite;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimeZone;
-import java.util.List;
 import java.util.Collection;
 
 import android.content.ContentValues;
@@ -15,7 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.marianhello.cordova.bgloc.data.LocationDAO;
-import com.marianhello.cordova.bgloc.data.LocationProxy;
+import com.marianhello.cordova.bgloc.data.BackgroundLocation;
 import com.marianhello.cordova.bgloc.data.sqlite.LocationContract.LocationEntry;
 
 public class SQLiteLocationDAO implements LocationDAO {
@@ -27,7 +22,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     this.context = context;
   }
 
-  public Collection<LocationProxy> getAllLocations() {
+  public Collection<BackgroundLocation> getAllLocations() {
     SQLiteDatabase db = null;
     Cursor cursor = null;
 
@@ -53,7 +48,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     String orderBy =
         LocationEntry.COLUMN_NAME_TIME + " ASC";
 
-    Collection<LocationProxy> all = new ArrayList<LocationProxy>();
+    Collection<BackgroundLocation> all = new ArrayList<BackgroundLocation>();
     try {
       db = new SQLiteOpenHelper(context).getReadableDatabase();
       cursor = db.query(
@@ -79,7 +74,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     return all;
   }
 
-  public boolean persistLocation(LocationProxy location) {
+  public boolean persistLocation(BackgroundLocation location) {
     SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
     db.beginTransaction();
     ContentValues values = getContentValues(location);
@@ -116,8 +111,8 @@ public class SQLiteLocationDAO implements LocationDAO {
     db.close();
   }
 
-  private LocationProxy hydrate(Cursor c) {
-    LocationProxy l = new LocationProxy(c.getString(c.getColumnIndex(LocationEntry.COLUMN_NAME_PROVIDER)));
+  private BackgroundLocation hydrate(Cursor c) {
+    BackgroundLocation l = new BackgroundLocation(c.getString(c.getColumnIndex(LocationEntry.COLUMN_NAME_PROVIDER)));
     l.setLocationId(c.getLong(c.getColumnIndex(LocationEntry._ID)));
     l.setTime(c.getLong(c.getColumnIndex(LocationEntry.COLUMN_NAME_TIME)));
     l.setAccuracy(c.getFloat(c.getColumnIndex(LocationEntry.COLUMN_NAME_ACCURACY)));
@@ -126,13 +121,13 @@ public class SQLiteLocationDAO implements LocationDAO {
     l.setAltitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_ALTITUDE)));
     l.setLatitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_LATITUDE)));
     l.setLongitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_LONGITUDE)));
-    l.setLocationProvider(c.getInt(c.getColumnIndex(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER)));
+    l.setLocationProvider(c.getString(c.getColumnIndex(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER)));
     l.setDebug( (c.getInt(c.getColumnIndex(LocationEntry.COLUMN_NAME_DEBUG)) == 1) ? true : false);
 
     return l;
   }
 
-  private ContentValues getContentValues(LocationProxy location) {
+  private ContentValues getContentValues(BackgroundLocation location) {
     ContentValues values = new ContentValues();
     values.put(LocationEntry.COLUMN_NAME_TIME, location.getTime());
     values.put(LocationEntry.COLUMN_NAME_ACCURACY, location.getAccuracy());
@@ -142,7 +137,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     values.put(LocationEntry.COLUMN_NAME_LATITUDE, location.getLatitude());
     values.put(LocationEntry.COLUMN_NAME_LONGITUDE, location.getLongitude());
     values.put(LocationEntry.COLUMN_NAME_PROVIDER, location.getProvider());
-    values.put(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER, location.getLocationProvider().asInt());
+    values.put(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER, location.getLocationProvider());
     values.put(LocationEntry.COLUMN_NAME_DEBUG, (location.getDebug() == true) ? 1 : 0);
 
     return values;

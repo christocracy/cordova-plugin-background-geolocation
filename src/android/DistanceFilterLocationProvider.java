@@ -11,21 +11,17 @@ Differences to original version:
 
 package com.tenforwardconsulting.cordova.bgloc;
 
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
@@ -36,16 +32,19 @@ import static java.lang.Math.round;
 import static java.lang.Math.abs;
 
 import com.marianhello.cordova.bgloc.AbstractLocationProvider;
-import com.marianhello.cordova.bgloc.Config;
-import com.marianhello.cordova.bgloc.data.LocationDAO;
+import com.marianhello.cordova.bgloc.LocationService;
 
 
 public class DistanceFilterLocationProvider extends AbstractLocationProvider implements LocationListener {
     private static final String TAG = "DistanceFilterLocationProvider";
-    private static final String STATIONARY_REGION_ACTION        = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_REGION_ACTION";
-    private static final String STATIONARY_ALARM_ACTION         = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_ALARM_ACTION";
-    private static final String SINGLE_LOCATION_UPDATE_ACTION   = "com.tenforwardconsulting.cordova.bgloc.SINGLE_LOCATION_UPDATE_ACTION";
-    private static final String STATIONARY_LOCATION_MONITOR_ACTION = "com.tenforwardconsulting.cordova.bgloc.STATIONARY_LOCATION_MONITOR_ACTION";
+    private static final String P_NAME = "com.tenforwardconsulting.cordova.bgloc";
+    private final String PROVIDER_ID = "ANDROID_DISTANCE_FILTER_PROVIDER";
+
+    private static final String STATIONARY_REGION_ACTION        = P_NAME + ".STATIONARY_REGION_ACTION";
+    private static final String STATIONARY_ALARM_ACTION         = P_NAME + ".STATIONARY_ALARM_ACTION";
+    private static final String SINGLE_LOCATION_UPDATE_ACTION   = P_NAME + ".SINGLE_LOCATION_UPDATE_ACTION";
+    private static final String STATIONARY_LOCATION_MONITOR_ACTION = P_NAME + ".STATIONARY_LOCATION_MONITOR_ACTION";
+
     private static final long STATIONARY_TIMEOUT                                = 5 * 1000 * 60;    // 5 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_LAZY         = 3 * 1000 * 60;    // 3 minutes.
     private static final long STATIONARY_LOCATION_POLLING_INTERVAL_AGGRESSIVE   = 1 * 1000 * 60;    // 1 minute.
@@ -74,8 +73,8 @@ public class DistanceFilterLocationProvider extends AbstractLocationProvider imp
     private AlarmManager alarmManager;
     private NotificationManager notificationManager;
 
-    public DistanceFilterLocationProvider(LocationDAO dao, Config config, Context context) {
-        super(dao, config, context);
+    public DistanceFilterLocationProvider(LocationService context) {
+        super(context);
     }
 
     @Override
