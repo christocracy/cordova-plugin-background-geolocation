@@ -56,9 +56,11 @@
                 android:clearTaskOnLaunch="true"
                 android:finishOnTaskLaunch="true"
                 />
-            <service android:enabled="true" android:exported="false" android:name="com.marianhello.cordova.bgloc.LocationService"
-                     android:process=":remote" android:stopWithTask="false">
-            </service>
+            <service
+                android:enabled="true"
+                android:exported="false"
+                android:name="com.marianhello.cordova.bgloc.LocationService"
+                />
             <receiver
                   android:name="com.marianhello.cordova.bgloc.BootCompletedReceiver"
                   android:enabled="true"
