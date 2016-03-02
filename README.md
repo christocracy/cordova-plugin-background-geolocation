@@ -12,6 +12,11 @@ On Android you can choose from two location location providers:
 
 See wiki [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/blob/next/PROVIDERS.md) for more information about providers.
 
+## IMPORTANT
+
+This file refers to dev version (next) of the plugin. For stable version, read docs
+of MASTER branch.
+
 ## Migration to 2.0
 
 As version 2.0 platform support for Windows Phone 8 was removed.
@@ -25,8 +30,10 @@ Some incompatible changes were introduced:
 
 ## Installing the plugin
 
+While still in development, you can install latest dev version by appending @next suffix.
+
 ```
-cordova plugin add cordova-plugin-mauron85-background-geolocation
+cordova plugin add cordova-plugin-mauron85-background-geolocation@next
 ```
 
 ## Registering plugin for Adobe® PhoneGap™ Build
