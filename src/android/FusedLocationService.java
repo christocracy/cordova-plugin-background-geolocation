@@ -39,6 +39,7 @@ public class FusedLocationService extends AbstractLocationService implements Goo
 
     private Boolean startRecordingOnConnect = true;
     private Boolean isTracking = false;
+    private Boolean isFirstActivity = true;
     private DetectedActivity lastActivity;
 
     @Override
@@ -255,6 +256,10 @@ public class FusedLocationService extends AbstractLocationService implements Goo
             if (lastActivity.getType() == DetectedActivity.STILL) {
                 if (config.isDebugging()) {
                     Toast.makeText(context, "Detected STILL Activity", Toast.LENGTH_SHORT).show();
+                }
+                if (isFirstActivity) {
+                  startTracking();
+                  isFirstActivity = false;
                 }
                 // stopTracking();
                 // we will delay stop tracking after position is found

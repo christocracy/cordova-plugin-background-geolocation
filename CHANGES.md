@@ -1,5 +1,9 @@
 ## Changelog
 
+### [0.9.5] - 2016-04-05
+#### Fixed
+- Android ANDROID_FUSED_LOCATION startTracking when STILL after app has started
+
 ### [0.9.4] - 2016-01-31
 #### Fixed
 - Android 6.0 permissions issue #21
