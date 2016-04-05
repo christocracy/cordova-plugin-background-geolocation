@@ -386,16 +386,6 @@ Plugin will not work in XDK emulator ('Unimplemented API Emulation: BackgroundGe
 ## Geofencing
 There is nice cordova plugin [cordova-plugin-geofence](https://github.com/cowbell/cordova-plugin-geofence), which does exactly that. Let's keep this plugin lightweight as much as possible.
 
-## Development
-
-There are many works of original christocracy's plugin. The most interesting repos I've found are:
-* [huttj](https://github.com/huttj/cordova-plugin-background-geolocation)
-* [erikkemperman](https://github.com/erikkemperman/cordova-plugin-background-geolocation/)
-* [codebling](https://github.com/codebling/cordova-plugin-background-geolocation)
-
-Lot of work has been done, but scattered all over the github. My intention is to maintain
-this version and adopt all those cool changes. You're more then welcome to pull your request here.
-
 ## Changelog
 
 See [CHANGES.md](/CHANGES.md)
