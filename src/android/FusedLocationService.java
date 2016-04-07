@@ -39,7 +39,7 @@ public class FusedLocationService extends AbstractLocationService implements Goo
 
     private Boolean startRecordingOnConnect = true;
     private Boolean isTracking = false;
-    private DetectedActivity lastActivity;
+    private DetectedActivity lastActivity = new DetectedActivity(DetectedActivity.UNKNOWN, 100);
 
     @Override
     public void onCreate() {
@@ -84,7 +84,6 @@ public class FusedLocationService extends AbstractLocationService implements Goo
     public void startRecording() {
         Log.d(TAG, "- locationUpdateReceiver STARTING RECORDING!!!!!!!!!!");
         this.startRecordingOnConnect = true;
-        startTracking();
         attachRecorder();
     }
 
@@ -131,6 +130,7 @@ public class FusedLocationService extends AbstractLocationService implements Goo
         if (googleApiClient == null) {
             connectToPlayAPI();
         } else if (googleApiClient.isConnected()) {
+            startTracking();
             ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 googleApiClient,
                 config.getActivitiesInterval(),
@@ -271,6 +271,7 @@ public class FusedLocationService extends AbstractLocationService implements Goo
 
     protected void cleanUp() {
         stopRecording();
+        unregisterReceiver(detectedActivitiesReceiver);
         googleApiClient.disconnect();
         wakeLock.release();
     }

@@ -1,5 +1,10 @@
 ## Changelog
 
+### [0.9.6] - 2016-04-07
+#### Fixed
+- Android ANDROID_FUSED_LOCATION fixing crash on start
+- Android ANDROID_FUSED_LOCATION unregisterReceiver on destroy
+
 ### [0.9.5] - 2016-04-05
 #### Fixed
 - Android ANDROID_FUSED_LOCATION startTracking when STILL after app has started
