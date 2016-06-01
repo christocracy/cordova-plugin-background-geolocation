@@ -1,4 +1,4 @@
-package com.marianhello.cordova.bgloc.data.sqlite;
+package com.marianhello.bgloc.data.sqlite;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,9 +9,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.marianhello.cordova.bgloc.data.LocationDAO;
-import com.marianhello.cordova.bgloc.data.BackgroundLocation;
-import com.marianhello.cordova.bgloc.data.sqlite.LocationContract.LocationEntry;
+import com.marianhello.bgloc.data.LocationDAO;
+import com.marianhello.bgloc.data.BackgroundLocation;
+import com.marianhello.bgloc.data.sqlite.LocationContract.LocationEntry;
 
 public class SQLiteLocationDAO implements LocationDAO {
   public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";

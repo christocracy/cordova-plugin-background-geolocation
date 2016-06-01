@@ -9,7 +9,7 @@ Differences to original version:
 1. location is not persisted to db anymore, but broadcasted using intents instead
 */
 
-package com.tenforwardconsulting.cordova.bgloc;
+package com.tenforwardconsulting.bgloc;
 
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -31,8 +31,8 @@ import static java.lang.Math.pow;
 import static java.lang.Math.round;
 import static java.lang.Math.abs;
 
-import com.marianhello.cordova.bgloc.AbstractLocationProvider;
-import com.marianhello.cordova.bgloc.LocationService;
+import com.marianhello.bgloc.AbstractLocationProvider;
+import com.marianhello.bgloc.LocationService;
 
 
 public class DistanceFilterLocationProvider extends AbstractLocationProvider implements LocationListener {

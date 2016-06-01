@@ -1,4 +1,4 @@
-package com.marianhello.cordova.bgloc.data;
+package com.marianhello.bgloc.data;
 
 import android.location.Location;
 import android.os.Parcel;
@@ -169,5 +169,3 @@ public class BackgroundLocation implements Parcelable {
         return json;
   	}
 }
-
-

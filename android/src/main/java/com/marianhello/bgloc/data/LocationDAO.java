@@ -1,4 +1,4 @@
-package com.marianhello.cordova.bgloc.data;
+package com.marianhello.bgloc.data;
 
 import java.util.Collection;
 

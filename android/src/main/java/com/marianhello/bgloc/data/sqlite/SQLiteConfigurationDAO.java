@@ -1,4 +1,4 @@
-package com.marianhello.cordova.bgloc.data.sqlite;
+package com.marianhello.bgloc.data.sqlite;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -14,9 +14,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.marianhello.cordova.bgloc.Config;
-import com.marianhello.cordova.bgloc.data.ConfigurationDAO;
-import com.marianhello.cordova.bgloc.data.sqlite.ConfigurationContract.ConfigurationEntry;
+import com.marianhello.bgloc.Config;
+import com.marianhello.bgloc.data.ConfigurationDAO;
+import com.marianhello.bgloc.data.sqlite.ConfigurationContract.ConfigurationEntry;
 
 public class SQLiteConfigurationDAO implements ConfigurationDAO {
   public static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm'Z'";

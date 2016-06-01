@@ -1,4 +1,4 @@
-package com.marianhello.cordova.bgloc;
+package com.marianhello.bgloc;
 
 import java.util.ArrayList;
 
@@ -21,15 +21,15 @@ import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.ActivityRecognitionResult;
 
-import com.marianhello.cordova.bgloc.Config;
-import com.marianhello.cordova.bgloc.data.LocationDAO;
+import com.marianhello.bgloc.Config;
+import com.marianhello.bgloc.data.LocationDAO;
 
 public class ActivityRecognitionLocationProvider extends AbstractLocationProvider implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, LocationListener {
     private final String PROVIDER_ID = "ANDROID_ACTIVITY_PROVIDER";
 
     private static final String TAG = "FusedLocationProvider";
-    private static final String P_NAME = " com.marianhello.cordova.bgloc";
+    private static final String P_NAME = " com.marianhello.bgloc";
     private static final String DETECTED_ACTIVITY_UPDATE = P_NAME + ".DETECTED_ACTIVITY_UPDATE";
 
     private PowerManager.WakeLock wakeLock;

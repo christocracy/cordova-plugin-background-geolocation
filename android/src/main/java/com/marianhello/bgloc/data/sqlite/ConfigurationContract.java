@@ -1,4 +1,4 @@
-package com.marianhello.cordova.bgloc.data.sqlite;
+package com.marianhello.bgloc.data.sqlite;
 
 import android.provider.BaseColumns;
 

@@ -19,28 +19,27 @@
 
     <!-- android -->
     <platform name="android">
-        <source-file src="src/android/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
-        <source-file src="src/android/DistanceFilterLocationProvider.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
-        <source-file src="src/android/BootCompletedReceiver.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/Config.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/Constant.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/LocationProviderFactory.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/LocationService.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/LocationProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/PermissionHelper.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/AbstractLocationProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/ActivityRecognitionLocationProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/DummyActivity.java" target-dir="src/com/marianhello/cordova/bgloc"/>
+        <source-file src="android/src/main/java/com/tenforwardconsulting/cordova/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/cordova"/>
+        <source-file src="android/src/main/java/com/tenforwardconsulting/bgloc/DistanceFilterLocationProvider.java" target-dir="src/com/tenforwardconsulting/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/BootCompletedReceiver.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/Config.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/LocationProviderFactory.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/LocationService.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/LocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/PermissionHelper.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/AbstractLocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/ActivityRecognitionLocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/DummyActivity.java" target-dir="src/com/marianhello/bgloc"/>
 
-        <source-file src="src/android/data/BackgroundLocation.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
-        <source-file src="src/android/data/DAOFactory.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
-        <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
-        <source-file src="src/android/data/ConfigurationDAO.java" target-dir="src/com/marianhello/cordova/bgloc/data" />
-        <source-file src="src/android/data/sqlite/LocationContract.java" target-dir="src/com/marianhello/cordova/bgloc/data/sqlite" />
-        <source-file src="src/android/data/sqlite/ConfigurationContract.java" target-dir="src/com/marianhello/cordova/bgloc/data/sqlite" />
-        <source-file src="src/android/data/sqlite/SQLiteOpenHelper.java" target-dir="src/com/marianhello/cordova/bgloc/data/sqlite" />
-        <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/marianhello/cordova/bgloc/data/sqlite" />
-        <source-file src="src/android/data/sqlite/SQLiteConfigurationDAO.java" target-dir="src/com/marianhello/cordova/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/BackgroundLocation.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/DAOFactory.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/LocationDAO.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/ConfigurationDAO.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/LocationContract.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/ConfigurationContract.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/SQLiteOpenHelper.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/SQLiteConfigurationDAO.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
@@ -110,8 +109,8 @@
         <framework src="CoreLocation.framework" />
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
-        <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
-        <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
+        <source-file src="ios/src/CDVBackgroundGeoLocation.m" />
+        <header-file src="ios/src/CDVBackgroundGeoLocation.h" />
      </platform>
 
 </plugin>

@@ -1,4 +1,4 @@
-package com.marianhello.cordova.bgloc;
+package com.marianhello.bgloc;
 
 import android.app.Activity;
 import android.os.Bundle;

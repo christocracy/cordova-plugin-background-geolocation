@@ -9,7 +9,7 @@ Differences to original version:
 1. new methods isLocationEnabled, mMessageReciever, handleMessage
 */
 
-package com.tenforwardconsulting.cordova.bgloc;
+package com.tenforwardconsulting.cordova;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -40,13 +40,13 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.marianhello.cordova.bgloc.Config;
-import com.marianhello.cordova.bgloc.LocationService;
-import com.marianhello.cordova.bgloc.PermissionHelper;
-import com.marianhello.cordova.bgloc.data.LocationDAO;
-import com.marianhello.cordova.bgloc.data.ConfigurationDAO;
-import com.marianhello.cordova.bgloc.data.DAOFactory;
-import com.marianhello.cordova.bgloc.data.BackgroundLocation;
+import com.marianhello.bgloc.Config;
+import com.marianhello.bgloc.LocationService;
+import com.marianhello.bgloc.PermissionHelper;
+import com.marianhello.bgloc.data.LocationDAO;
+import com.marianhello.bgloc.data.ConfigurationDAO;
+import com.marianhello.bgloc.data.DAOFactory;
+import com.marianhello.bgloc.data.BackgroundLocation;
 import java.util.Collection;
 
 public class BackgroundGeolocationPlugin extends CordovaPlugin {
