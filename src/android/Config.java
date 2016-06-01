@@ -35,6 +35,7 @@ public class Config implements Parcelable
     private Integer interval = 600000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
     private Integer activitiesInterval = 1000; //milliseconds
+    private Boolean stopOnStillActivity = true;
 
     public int describeContents() {
         return 0;
@@ -57,6 +58,7 @@ public class Config implements Parcelable
         out.writeInt(getInterval());
         out.writeInt(getFastestInterval());
         out.writeInt(getActivitiesInterval());
+        out.writeValue(getStopOnStillActivity());
     }
 
     public static final Parcelable.Creator<Config> CREATOR
@@ -90,6 +92,7 @@ public class Config implements Parcelable
         setInterval(in.readInt());
         setFastestInterval(in.readInt());
         setActivitiesInterval(in.readInt());
+        setStopOnStillActivity((Boolean) in.readValue(null));
     }
 
     public float getStationaryRadius() {
@@ -236,6 +239,14 @@ public class Config implements Parcelable
         return activityType;
     }
 
+    public Boolean getStopOnStillActivity() {
+        return stopOnStillActivity;
+    }
+
+    public void setStopOnStillActivity(Boolean stopOnStillActivity) {
+        this.stopOnStillActivity = stopOnStillActivity;
+    }
+
     @Override
     public String toString () {
         return new StringBuffer()
@@ -253,6 +264,7 @@ public class Config implements Parcelable
                 .append(" interval: "              + getInterval())
                 .append(" fastestInterval: "       + getFastestInterval())
                 .append(" activitiesInterval: "    + getActivitiesInterval())
+                .append(" stopOnStillActivity: "   + getStopOnStillActivity())
                 .toString();
     }
 
@@ -287,6 +299,7 @@ public class Config implements Parcelable
         config.setInterval(data.getInt(12));
         config.setFastestInterval(data.getInt(13));
         config.setActivitiesInterval(data.getInt(14));
+        config.setStopOnStillActivity(data.getBoolean(15));
 
         return config;
     }

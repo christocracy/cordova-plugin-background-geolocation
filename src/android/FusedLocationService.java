@@ -131,11 +131,13 @@ public class FusedLocationService extends AbstractLocationService implements Goo
             connectToPlayAPI();
         } else if (googleApiClient.isConnected()) {
             startTracking();
-            ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+            if (config.getStopOnStillActivity()) {
+                ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
                 googleApiClient,
                 config.getActivitiesInterval(),
                 detectedActivitiesPI
-            );
+                );
+            }
         } else {
             googleApiClient.connect();
         }

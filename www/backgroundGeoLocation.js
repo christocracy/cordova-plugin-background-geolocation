@@ -54,7 +54,8 @@ var backgroundGeoLocation = {
             //Android FusedLocation config
             interval              = (config.interval >= 0) ? config.interval : locationTimeout * 1000, // milliseconds
             fastestInterval       = (config.fastestInterval >= 0) ? config.fastestInterval : 120000, // milliseconds
-            activitiesInterval    = config.activitiesInterval || 1000;
+            activitiesInterval    = config.activitiesInterval || 1000,
+            stopOnStillActivity   = (config.stopOnStillActivity === false) ? false : true;
 
         exec(success || function() {},
             failure || function() {},
@@ -74,7 +75,8 @@ var backgroundGeoLocation = {
                 locationService,
                 interval,
                 fastestInterval,
-                activitiesInterval
+                activitiesInterval,
+                stopOnStillActivity
             ]
         );
     },

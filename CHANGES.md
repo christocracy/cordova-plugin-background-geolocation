@@ -1,5 +1,9 @@
 ## Changelog
 
+### [1.0.0] - 2016-06-01
+#### Added
+- Android ANDROID_FUSED_LOCATION stopOnStillActivity (enhancement #69)
+
 ### [0.9.6] - 2016-04-07
 #### Fixed
 - Android ANDROID_FUSED_LOCATION fixing crash on start
