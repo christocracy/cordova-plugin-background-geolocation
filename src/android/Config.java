@@ -42,6 +42,7 @@ public class Config implements Parcelable
     private Boolean stopOnTerminate = true;
     private Boolean startOnBoot = false;
     private Boolean startForeground = true;
+    private Boolean stopOnStillActivity = true;
 
     public Config () {
     }
@@ -68,6 +69,7 @@ public class Config implements Parcelable
         out.writeInt(getInterval());
         out.writeInt(getFastestInterval());
         out.writeInt(getActivitiesInterval());
+        out.writeValue(getStopOnStillActivity());
     }
 
     public static final Parcelable.Creator<Config> CREATOR
@@ -98,6 +100,7 @@ public class Config implements Parcelable
         setInterval(in.readInt());
         setFastestInterval(in.readInt());
         setActivitiesInterval(in.readInt());
+        setStopOnStillActivity((Boolean) in.readValue(null));
     }
 
     public float getStationaryRadius() {
@@ -230,6 +233,14 @@ public class Config implements Parcelable
         this.activitiesInterval = activitiesInterval;
     }
 
+    public Boolean getStopOnStillActivity() {
+        return stopOnStillActivity;
+    }
+
+    public void setStopOnStillActivity(Boolean stopOnStillActivity) {
+        this.stopOnStillActivity = stopOnStillActivity;
+    }
+
     @Override
     public String toString () {
         return new StringBuffer()
@@ -249,6 +260,7 @@ public class Config implements Parcelable
                 .append(" interval: ").append(getInterval())
                 .append(" fastestInterval: ").append(getFastestInterval())
                 .append(" activitiesInterval: ").append(getActivitiesInterval())
+                .append(" stopOnStillActivity: ").append(getStopOnStillActivity())
                 .toString();
     }
 
@@ -285,6 +297,7 @@ public class Config implements Parcelable
         config.setLargeNotificationIcon(jObject.optString("notificationIconLarge", config.getLargeNotificationIcon()));
         config.setSmallNotificationIcon(jObject.optString("notificationIconSmall", config.getSmallNotificationIcon()));
         config.setStartForeground(jObject.optBoolean("startForeground", config.getStartForeground()));
+        config.setStopOnStillActivity(jObject.optBoolean("stopOnStillActivity", config.getStopOnStillActivity()));
 
         return config;
     }
@@ -307,6 +320,7 @@ public class Config implements Parcelable
         json.put("interval", getInterval());
         json.put("fastestInterval", getFastestInterval());
         json.put("activitiesInterval", getActivitiesInterval());
+        json.put("stopOnStillActivity", getStopOnStillActivity());
 
         return json;
   	}

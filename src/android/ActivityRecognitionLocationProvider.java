@@ -39,7 +39,7 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
     private Boolean startRecordingOnConnect = true;
     private Boolean isTracking = false;
     private Boolean isWatchingActivity = false;
-    private DetectedActivity lastActivity;
+    private DetectedActivity lastActivity = new DetectedActivity(DetectedActivity.UNKNOWN, 100);
 
     public ActivityRecognitionLocationProvider(LocationService context) {
         super(context);
@@ -92,6 +92,7 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
         Log.i(TAG, "stopRecording");
         this.startRecordingOnConnect = false;
         detachRecorder();
+        stopTracking();
     }
 
     public void startTracking() {
@@ -138,13 +139,15 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
             connectToPlayAPI();
         } else if (googleApiClient.isConnected()) {
             if (isWatchingActivity) { return; }
-
-            ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
-                googleApiClient,
-                config.getActivitiesInterval(),
-                detectedActivitiesPI
-            );
-            isWatchingActivity = true;
+            startTracking();
+            if (config.getStopOnStillActivity()) {
+                ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(
+                    googleApiClient,
+                    config.getActivitiesInterval(),
+                    detectedActivitiesPI
+                );
+                isWatchingActivity = true;
+            }
         } else {
             googleApiClient.connect();
         }
@@ -275,10 +278,9 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
-        unregisterReceiver(detectedActivitiesReceiver);
-        stopTracking();
         stopRecording();
         disconnectFromPlayAPI();
+        unregisterReceiver(detectedActivitiesReceiver);
         wakeLock.release();
     }
 }
