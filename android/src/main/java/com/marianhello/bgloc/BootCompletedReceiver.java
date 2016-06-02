@@ -14,6 +14,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import org.json.JSONException;
+
 import com.marianhello.bgloc.Config;
 import com.marianhello.bgloc.LocationService;
 import com.marianhello.bgloc.data.DAOFactory;
@@ -28,7 +30,14 @@ public class BootCompletedReceiver extends BroadcastReceiver {
      public void onReceive(Context context, Intent intent) {
         Log.i(TAG, "Received boot completed");
         ConfigurationDAO dao = DAOFactory.createConfigurationDAO(context);
-        Config config = dao.retrieveConfiguration();
+        Config config = null;
+
+        try {
+            config = dao.retrieveConfiguration();
+        } catch (JSONException e) {
+            //noop
+        }
+
         if (config == null) { return; }
 
         Log.i(TAG, "Config: " + config.toString());

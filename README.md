@@ -127,7 +127,7 @@ Parameter | Type | Platform     | Description
 `option.stopOnTerminate` | `Boolean` | iOS, Android | Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app). (default true)
 `option.startOnBoot` | `Boolean` | Android | Start background service on device boot. (default false)
 `option.startForeground` | `Boolean` | Android | If false location service will not be started in foreground and no notification will be shown. (default true)
-`option.interval` | `Number` | Android | The minimum time interval between location updates in seconds. **@see** [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent) for more information.
+`option.interval` | `Number` | Android | The minimum time interval between location updates in milliseconds. **@see** [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent) for more information.
 `option.notificationTitle` | `String` optional | Android | Custom notification title in the drawer.
 `option.notificationText` | `String` optional | Android | Custom notification text in the drawer.
 `option.notificationIconColor` | `String` optional| Android | The accent color to use for notification. Eg. **#4CAF50**.
@@ -135,6 +135,8 @@ Parameter | Type | Platform     | Description
 `option.notificationIconSmall` | `String` optional | Android | The filename of a custom notification icon. See android quirks.
 `option.locationProvider` | `Number` | Android | Set location provider **@see** [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers)
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
+`options.url` | `String` | Android | Server url where to send HTTP POST with recorded locations
+`options.httpHeaders` | `Object` | Android | Optional HTTP headers sent along in HTTP request
 
 Following options are specific to provider as defined by locationProvider option
 ### ANDROID_ACTIVITY_PROVIDER provider options
@@ -151,7 +153,8 @@ Success callback will be called with one argument - location object, which tries
 Callback parameter | Type | Description
 ------------------ | ---- | -----------
 `locationId` | `Number` | ID of location as stored in DB (or null)
-`serviceProvider` | `String` | Service provider
+`provider` | `String` | gps, network, passive or fused
+`locationProvider` | `Number` | Location provider
 `debug` | `Boolean` | true if location recorded as part of debug
 `time` | `Number` |UTC time of this fix, in milliseconds since January 1, 1970.
 `latitude` | `Number` | latitude, in degrees.
@@ -233,9 +236,9 @@ NOTE: Android only
 
 Delete all stored locations.
 
-### Example config
+## Example config
 
-#### Android:
+### Android:
 
 ```javascript
 backgroundGeoLocation.configure(callbackFn, failureFn, {
@@ -249,11 +252,15 @@ backgroundGeoLocation.configure(callbackFn, failureFn, {
     stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
     locationProvider: backgroundGeoLocation.provider.ANDROID_ACTIVITY_PROVIDER,
     interval: 60000, // <!-- poll for position every minute
-    fastestInterval: 120000
+    fastestInterval: 120000,
+    url: 'http://server_ip:port/path',
+    httpHeaders: {
+        "X-FOO": "bar"
+    }
 });
 ```
 
-#### iOS:
+### iOS:
 
 ```javascript
 backgroundGeoLocation.configure(callbackFn, failureFn, {
@@ -264,6 +271,31 @@ backgroundGeoLocation.configure(callbackFn, failureFn, {
     debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
     stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
 });
+```
+
+## HTTP location posting 
+
+When options `url` and optional `httpHeaders` are set, plugin will try to POST location JSON to given url. If server is not responding or response status code is not 200, location will be persisted into sqlite db. Stored locations and later retrieved with `backgroundGeoLocation.getLocations` method.
+
+### Example of express (nodejs) server
+```javascript
+var express    = require('express');
+var bodyParser = require('body-parser');
+
+var app = express();
+
+// parse application/json
+app.use(bodyParser.json());
+
+app.post('/path', function(request, response){
+    console.log('Headers:\n', request.headers);
+    console.log('Body:\n', request.body);
+    console.log('------------------------------');
+    response.sendStatus(200);
+});
+
+app.listen(3000);
+console.log('Server started...');
 ```
 
 ## Quirks

@@ -4,7 +4,7 @@ import java.util.Collection;
 
 public interface LocationDAO {
     public Collection<BackgroundLocation> getAllLocations();
-    public boolean persistLocation(BackgroundLocation l);
-    public void deleteLocation(Integer locationId);
+    public Long persistLocation(BackgroundLocation l);
+    public void deleteLocation(Long locationId);
     public void deleteAllLocations();
 }

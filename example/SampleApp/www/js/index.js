@@ -284,8 +284,14 @@ var app = {
             startOnBoot: false,
             stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
             locationProvider: backgroundGeoLocation.provider[ENV.settings.locationProvider],
+            interval: 10000,
             fastestInterval: 5000,
-            activitiesInterval: 10000
+            activitiesInterval: 10000,
+            stopOnStillActivity: false,
+            url: 'http://192.168.81.15:3000/location',
+            httpHeaders: {
+                "X-FOO": "bar"
+            }
         });
 
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

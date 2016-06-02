@@ -24,7 +24,7 @@ import com.marianhello.bgloc.data.BackgroundLocation;
 public abstract class AbstractLocationProvider implements LocationProvider {
     private static final String TAG = "AbstractLocationProvider";
 
-    protected final String PROVIDER_ID = "";
+    protected Integer PROVIDER_ID;
     protected LocationService context;
     protected Location lastLocation;
     protected Config config;

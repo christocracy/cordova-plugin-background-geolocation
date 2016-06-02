@@ -38,7 +38,6 @@ import com.marianhello.bgloc.LocationService;
 public class DistanceFilterLocationProvider extends AbstractLocationProvider implements LocationListener {
     private static final String TAG = "DistanceFilterLocationProvider";
     private static final String P_NAME = "com.tenforwardconsulting.cordova.bgloc";
-    private final String PROVIDER_ID = "ANDROID_DISTANCE_FILTER_PROVIDER";
 
     private static final String STATIONARY_REGION_ACTION        = P_NAME + ".STATIONARY_REGION_ACTION";
     private static final String STATIONARY_ALARM_ACTION         = P_NAME + ".STATIONARY_ALARM_ACTION";
@@ -75,6 +74,7 @@ public class DistanceFilterLocationProvider extends AbstractLocationProvider imp
 
     public DistanceFilterLocationProvider(LocationService context) {
         super(context);
+        PROVIDER_ID = 0;
     }
 
     @Override

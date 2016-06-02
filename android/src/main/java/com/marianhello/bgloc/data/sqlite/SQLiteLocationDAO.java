@@ -74,7 +74,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     return all;
   }
 
-  public boolean persistLocation(BackgroundLocation location) {
+  public Long persistLocation(BackgroundLocation location) {
     SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
     db.beginTransaction();
     ContentValues values = getContentValues(location);
@@ -83,15 +83,10 @@ public class SQLiteLocationDAO implements LocationDAO {
     db.setTransactionSuccessful();
     db.endTransaction();
     db.close();
-    if (rowId > -1) {
-      // location.setId(rowId);
-      return true;
-    } else {
-      return false;
-    }
+    return rowId;
   }
 
-  public void deleteLocation(Integer locationId) {
+  public void deleteLocation(Long locationId) {
     String whereClause = LocationEntry._ID + " = ?";
     String[] whereArgs = { String.valueOf(locationId) };
     SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
@@ -121,7 +116,7 @@ public class SQLiteLocationDAO implements LocationDAO {
     l.setAltitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_ALTITUDE)));
     l.setLatitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_LATITUDE)));
     l.setLongitude(c.getDouble(c.getColumnIndex(LocationEntry.COLUMN_NAME_LONGITUDE)));
-    l.setLocationProvider(c.getString(c.getColumnIndex(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER)));
+    l.setLocationProvider(c.getInt(c.getColumnIndex(LocationEntry.COLUMN_NAME_LOCATION_PROVIDER)));
     l.setDebug( (c.getInt(c.getColumnIndex(LocationEntry.COLUMN_NAME_DEBUG)) == 1) ? true : false);
 
     return l;

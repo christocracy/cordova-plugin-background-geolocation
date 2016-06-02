@@ -27,5 +27,7 @@ public final class ConfigurationContract {
         public static final String COLUMN_NAME_INTERVAL = "interval";
         public static final String COLUMN_NAME_FASTEST_INTERVAL = "fastest_interval";
         public static final String COLUMN_NAME_ACTIVITIES_INTERVAL = "activities_interval";
+        public static final String COLUMN_NAME_URL = "url";
+        public static final String COLUMN_NAME_HEADERS = "http_headers";
     }
 }

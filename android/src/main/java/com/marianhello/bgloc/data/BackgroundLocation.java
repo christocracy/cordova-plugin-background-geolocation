@@ -8,12 +8,12 @@ import org.json.JSONObject;
 import org.json.JSONException;
 
 public class BackgroundLocation implements Parcelable {
-    private Long locationId = Long.valueOf(-1);
-    private String locationProvider;
+    private Long locationId = null; //Long.valueOf(-1);
+    private Integer locationProvider;
     private Location location;
     private Boolean debug = false;
 
-    public BackgroundLocation(String locationProvider, Location location) {
+    public BackgroundLocation(Integer locationProvider, Location location) {
         this.location = location;
         this.locationProvider = locationProvider;
     }
@@ -28,7 +28,7 @@ public class BackgroundLocation implements Parcelable {
 
     private BackgroundLocation(Parcel in) {
         setLocationId(in.readLong());
-        setLocationProvider(in.readString());
+        setLocationProvider(in.readInt());
         setLocation(Location.CREATOR.createFromParcel(in));
 //        setLocation((Location) in.readParcelable(Location.class.getClassLoader()));
         setDebug((Boolean) in.readValue(null));
@@ -42,7 +42,7 @@ public class BackgroundLocation implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(getLocationId());
-        dest.writeString(getLocationProvider());
+        dest.writeInt(getLocationProvider());
         location.writeToParcel(dest, flags);
         dest.writeValue(getDebug());
     }
@@ -56,6 +56,10 @@ public class BackgroundLocation implements Parcelable {
             return new BackgroundLocation[size];
         }
     };
+    
+    public BackgroundLocation makeClone() {
+        return new BackgroundLocation(this.locationProvider, this.location);
+    }
 
     public Long getLocationId() {
         return locationId;
@@ -137,11 +141,11 @@ public class BackgroundLocation implements Parcelable {
         location.setProvider(provider);
     }
 
-    public void setLocationProvider(String locationProvider) {
+    public void setLocationProvider(Integer locationProvider) {
         this.locationProvider = locationProvider;
     }
 
-    public String getLocationProvider() {
+    public Integer getLocationProvider() {
         return locationProvider;
     }
 
@@ -163,6 +167,7 @@ public class BackgroundLocation implements Parcelable {
         json.put("speed", getSpeed());
         json.put("altitude", getAltitude());
         json.put("bearing", getBearing());
+        json.put("provider", getProvider());
         json.put("locationProvider", getLocationProvider());
         json.put("debug", getDebug());
 

@@ -26,7 +26,6 @@ import com.marianhello.bgloc.data.LocationDAO;
 
 public class ActivityRecognitionLocationProvider extends AbstractLocationProvider implements GoogleApiClient.ConnectionCallbacks,
     GoogleApiClient.OnConnectionFailedListener, LocationListener {
-    private final String PROVIDER_ID = "ANDROID_ACTIVITY_PROVIDER";
 
     private static final String TAG = "FusedLocationProvider";
     private static final String P_NAME = " com.marianhello.bgloc";
@@ -43,6 +42,7 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
 
     public ActivityRecognitionLocationProvider(LocationService context) {
         super(context);
+        PROVIDER_ID = 1;
     }
 
     public void onCreate() {

@@ -21,6 +21,7 @@
     <platform name="android">
         <source-file src="android/src/main/java/com/tenforwardconsulting/cordova/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/cordova"/>
         <source-file src="android/src/main/java/com/tenforwardconsulting/bgloc/DistanceFilterLocationProvider.java" target-dir="src/com/tenforwardconsulting/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/HttpPostService.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/BootCompletedReceiver.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/Config.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/LocationProviderFactory.java" target-dir="src/com/marianhello/bgloc"/>
@@ -44,7 +45,7 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
             <activity
-                android:name="com.marianhello.cordova.bgloc.DummyActivity"
+                android:name="com.marianhello.bgloc.DummyActivity"
                 android:theme="@android:style/Theme.NoDisplay"
                 android:enabled="true"
                 android:allowTaskReparenting="true"
@@ -58,10 +59,10 @@
             <service
                 android:enabled="true"
                 android:exported="false"
-                android:name="com.marianhello.cordova.bgloc.LocationService"
+                android:name="com.marianhello.bgloc.LocationService"
                 />
             <receiver
-                  android:name="com.marianhello.cordova.bgloc.BootCompletedReceiver"
+                  android:name="com.marianhello.bgloc.BootCompletedReceiver"
                   android:enabled="true"
                   android:exported="true">
                <intent-filter>
@@ -82,7 +83,7 @@
         </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="com.tenforwardconsulting.cordova.bgloc.BackgroundGeolocationPlugin"/>
+                <param name="android-package" value="com.tenforwardconsulting.cordova.BackgroundGeolocationPlugin"/>
             </feature>
         </config-file>
         <framework src="com.google.android.gms:play-services-location:+" />

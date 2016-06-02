@@ -14,9 +14,13 @@ import org.json.JSONObject;
 import org.json.JSONException;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.Bundle;
 
 import org.json.JSONObject;
 import org.json.JSONException;
+
+import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * Config class
@@ -38,11 +42,13 @@ public class Config implements Parcelable
     private Integer locationProvider = ANDROID_DISTANCE_FILTER_PROVIDER;
     private Integer interval = 600000; //milliseconds
     private Integer fastestInterval = 120000; //milliseconds
-    private Integer activitiesInterval = 1000; //milliseconds
+    private Integer activitiesInterval = 10000; //milliseconds
     private Boolean stopOnTerminate = true;
     private Boolean startOnBoot = false;
     private Boolean startForeground = true;
     private Boolean stopOnStillActivity = true;
+    private String url;
+    private HashMap httpHeaders = new HashMap<String, String>();
 
     public Config () {
     }
@@ -70,6 +76,10 @@ public class Config implements Parcelable
         out.writeInt(getFastestInterval());
         out.writeInt(getActivitiesInterval());
         out.writeValue(getStopOnStillActivity());
+        out.writeString(getUrl());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("httpHeaders", getHttpHeaders());
+        out.writeBundle(bundle);
     }
 
     public static final Parcelable.Creator<Config> CREATOR
@@ -101,6 +111,9 @@ public class Config implements Parcelable
         setFastestInterval(in.readInt());
         setActivitiesInterval(in.readInt());
         setStopOnStillActivity((Boolean) in.readValue(null));
+        setUrl(in.readString());
+        Bundle bundle = in.readBundle();
+        setHttpHeaders((HashMap<String, String>) bundle.getSerializable("httpHeaders"));
     }
 
     public float getStationaryRadius() {
@@ -241,6 +254,34 @@ public class Config implements Parcelable
         this.stopOnStillActivity = stopOnStillActivity;
     }
 
+    public String getUrl() {
+        return this.url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public HashMap getHttpHeaders() {
+        return this.httpHeaders;
+    }
+
+    public void setHttpHeaders(HashMap httpHeaders) {
+        this.httpHeaders = httpHeaders;
+    }
+
+    public void setHttpHeaders(JSONObject httpHeaders) throws JSONException {
+        this.httpHeaders = new HashMap<String, String>();
+        if (httpHeaders == null) {
+            return;
+        }
+        Iterator<?> it = httpHeaders.keys();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            this.httpHeaders.put(key, httpHeaders.getString(key));
+        }
+    }
+
     @Override
     public String toString () {
         return new StringBuffer()
@@ -261,6 +302,8 @@ public class Config implements Parcelable
                 .append(" fastestInterval: ").append(getFastestInterval())
                 .append(" activitiesInterval: ").append(getActivitiesInterval())
                 .append(" stopOnStillActivity: ").append(getStopOnStillActivity())
+                .append(" url: ").append(getUrl())
+                .append(" httpHeaders: ").append(getHttpHeaders().toString())
                 .toString();
     }
 
@@ -298,6 +341,8 @@ public class Config implements Parcelable
         config.setSmallNotificationIcon(jObject.optString("notificationIconSmall", config.getSmallNotificationIcon()));
         config.setStartForeground(jObject.optBoolean("startForeground", config.getStartForeground()));
         config.setStopOnStillActivity(jObject.optBoolean("stopOnStillActivity", config.getStopOnStillActivity()));
+        config.setUrl(jObject.optString("url"));
+        config.setHttpHeaders(jObject.optJSONObject("httpHeaders"));
 
         return config;
     }
@@ -321,6 +366,8 @@ public class Config implements Parcelable
         json.put("fastestInterval", getFastestInterval());
         json.put("activitiesInterval", getActivitiesInterval());
         json.put("stopOnStillActivity", getStopOnStillActivity());
+        json.put("url", getUrl());
+        json.put("httpHeaders", new JSONObject(getHttpHeaders()));
 
         return json;
   	}

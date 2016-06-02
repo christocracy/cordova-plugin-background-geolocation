@@ -14,6 +14,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.json.JSONObject;
+import org.json.JSONException;
+
 import com.marianhello.bgloc.Config;
 import com.marianhello.bgloc.data.ConfigurationDAO;
 import com.marianhello.bgloc.data.sqlite.ConfigurationContract.ConfigurationEntry;
@@ -27,7 +30,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
       this.context = context;
   }
 
-  public Config retrieveConfiguration() {
+  public Config retrieveConfiguration() throws JSONException {
     SQLiteDatabase db = null;
     Cursor cursor = null;
 
@@ -48,7 +51,9 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
       ConfigurationEntry.COLUMN_NAME_LOCATION_PROVIDER,
       ConfigurationEntry.COLUMN_NAME_INTERVAL,
       ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL,
-      ConfigurationEntry.COLUMN_NAME_ACTIVITIES_INTERVAL
+      ConfigurationEntry.COLUMN_NAME_ACTIVITIES_INTERVAL,
+      ConfigurationEntry.COLUMN_NAME_URL,
+      ConfigurationEntry.COLUMN_NAME_HEADERS
     };
 
     String whereClause = null;
@@ -83,7 +88,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     return config;
   }
 
-  public boolean persistConfiguration(Config config) {
+  public boolean persistConfiguration(Config config) throws NullPointerException {
     SQLiteDatabase db = new SQLiteOpenHelper(context).getWritableDatabase();
     db.beginTransaction();
     db.delete(ConfigurationEntry.TABLE_NAME, null, null);
@@ -99,7 +104,7 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     }
   }
 
-  private Config hydrate(Cursor c) {
+  private Config hydrate(Cursor c) throws JSONException {
     Config config = new Config();
     config.setStationaryRadius(c.getFloat(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_RADIUS)));
     config.setDistanceFilter(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_DISTANCE_FILTER)));
@@ -117,11 +122,13 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     config.setInterval(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_INTERVAL)));
     config.setFastestInterval(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL)));
     config.setActivitiesInterval(c.getInt(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_ACTIVITIES_INTERVAL)));
+    config.setUrl(c.getString(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_URL)));
+    config.setHttpHeaders(new JSONObject(c.getString(c.getColumnIndex(ConfigurationEntry.COLUMN_NAME_HEADERS))));
 
     return config;
   }
 
-  private ContentValues getContentValues(Config config) {
+  private ContentValues getContentValues(Config config) throws NullPointerException {
     ContentValues values = new ContentValues();
     values.put(ConfigurationEntry.COLUMN_NAME_RADIUS, config.getStationaryRadius());
     values.put(ConfigurationEntry.COLUMN_NAME_DISTANCE_FILTER, config.getDistanceFilter());
@@ -139,6 +146,8 @@ public class SQLiteConfigurationDAO implements ConfigurationDAO {
     values.put(ConfigurationEntry.COLUMN_NAME_INTERVAL, config.getInterval());
     values.put(ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL, config.getFastestInterval());
     values.put(ConfigurationEntry.COLUMN_NAME_ACTIVITIES_INTERVAL, config.getActivitiesInterval());
+    values.put(ConfigurationEntry.COLUMN_NAME_URL, config.getUrl());
+    values.put(ConfigurationEntry.COLUMN_NAME_HEADERS, new JSONObject(config.getHttpHeaders()).toString());
 
     return values;
   }

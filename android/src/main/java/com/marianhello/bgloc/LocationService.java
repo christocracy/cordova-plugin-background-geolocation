@@ -23,15 +23,20 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.marianhello.bgloc.data.BackgroundLocation;
 import com.marianhello.bgloc.data.DAOFactory;
 import com.marianhello.bgloc.data.LocationDAO;
+import com.marianhello.bgloc.HttpPostService;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import org.json.JSONException;
 
 public class LocationService extends Service {
     private static final String TAG = "LocationService";
@@ -208,12 +213,7 @@ public class LocationService extends Service {
     }
 
     public void handleLocation (BackgroundLocation location) {
-        Boolean shouldPersists = mClients.size() == 0;
-
-        if (config.isDebugging()) {
-            location.setDebug(true);
-            persistLocation(location);
-        }
+        // Boolean shouldPersists = mClients.size() == 0;
 
         for (int i=mClients.size()-1; i>=0; i--) {
             try {
@@ -227,21 +227,41 @@ public class LocationService extends Service {
                 // we are going through the list from back to front
                 // so this is safe to do inside the loop.
                 mClients.remove(i);
-                shouldPersists = true;
+                // shouldPersists = true;
             }
         }
 
-        if (shouldPersists) {
-            Log.d(TAG, "Persisting location. Reason: Main activity was probably killed.");
-            persistLocation(location);
+        if (config.getUrl() != null) {
+            postLocation(location);
         }
+
+        if (config.isDebugging()) {
+            BackgroundLocation cloned = location.makeClone();
+            cloned.setDebug(true);
+            persistLocation(cloned);
+        }
+
+        // if (shouldPersists) {
+        //     Log.d(TAG, "Persisting location. Reason: Main activity was probably killed.");
+        //     persistLocation(location);
+        // }
     }
 
     public void persistLocation (BackgroundLocation location) {
-        if (dao.persistLocation(location)) {
+        if (dao.persistLocation(location) > -1) {
             Log.d(TAG, "Persisted Location: " + location.toString());
         } else {
             Log.w(TAG, "Failed to persist location");
+        }
+    }
+
+    public void postLocation(BackgroundLocation location) {
+        PostLocationTask task = new LocationService.PostLocationTask();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, location);
+        }
+        else {
+            task.execute(location);
         }
     }
 
@@ -262,4 +282,36 @@ public class LocationService extends Service {
         this.config = config;
     }
 
+    private class PostLocationTask extends AsyncTask<BackgroundLocation, Integer, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(BackgroundLocation... locations) {
+            Log.d(TAG, "Executing PostLocationTask#doInBackground");
+            int count = locations.length;
+            for (int i = 0; i < count; i++) {
+                BackgroundLocation location = locations[i];
+                Long locationId = location.getLocationId();
+                try {
+                    if (HttpPostService.postJSON(config.getUrl(), location.toJSONObject(), config.getHttpHeaders())) {
+                        if (locationId != null) {
+                            dao.deleteLocation(locationId);
+                        }
+                    } else {
+                        if (locationId == null) {
+                            persistLocation(location);
+                        }
+                    }
+                } catch (JSONException e) {
+                    Log.w(TAG, "location to json failed" + location.toString());
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            Log.d(TAG, "PostLocationTask#onPostExecture");
+        }
+    }
 }

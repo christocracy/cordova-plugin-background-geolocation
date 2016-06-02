@@ -201,6 +201,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                 // callbackContext.success(); //we cannot do this
             } catch (JSONException e) {
                 callbackContext.error("Configuration error: " + e.getMessage());
+            } catch (NullPointerException e) {
+                callbackContext.error("Configuration error: " + e.getMessage());
             }
 
             return true;
@@ -241,7 +243,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             return true;
         } else if (ACTION_DELETE_LOCATION.equals(action)) {
             try {
-                deleteLocation(data.getInt(0));
+                deleteLocation(data.getLong(0));
                 callbackContext.success();
             } catch (JSONException e) {
                 callbackContext.error("Configuration error: " + e.getMessage());
@@ -398,7 +400,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         return jsonLocationsArray;
     }
 
-    public void deleteLocation(Integer locationId) {
+    public void deleteLocation(Long locationId) {
         dao.deleteLocation(locationId);
     }
 
@@ -406,7 +408,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         dao.deleteAllLocations();
     }
 
-    public void persistConfiguration(Config config) {
+    public void persistConfiguration(Config config) throws NullPointerException {
         Context context = this.cordova.getActivity().getApplicationContext();
         ConfigurationDAO dao = DAOFactory.createConfigurationDAO(context);
 

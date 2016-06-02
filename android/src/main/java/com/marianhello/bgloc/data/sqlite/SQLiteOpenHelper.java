@@ -10,7 +10,7 @@ import com.marianhello.bgloc.data.sqlite.ConfigurationContract.ConfigurationEntr
 
 public class SQLiteOpenHelper extends android.database.sqlite.SQLiteOpenHelper {
     private static final String SQLITE_DATABASE_NAME = "cordova_bg_geolocation.db";
-    private static final int DATABASE_VERSION = 9;
+    private static final int DATABASE_VERSION = 10;
     private static final String TEXT_TYPE = " TEXT";
     private static final String INTEGER_TYPE = " INTEGER";
     private static final String REAL_TYPE = " REAL";
@@ -49,7 +49,9 @@ public class SQLiteOpenHelper extends android.database.sqlite.SQLiteOpenHelper {
         ConfigurationEntry.COLUMN_NAME_LOCATION_PROVIDER + TEXT_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_INTERVAL + INTEGER_TYPE + COMMA_SEP +
         ConfigurationEntry.COLUMN_NAME_FASTEST_INTERVAL + INTEGER_TYPE + COMMA_SEP +
-        ConfigurationEntry.COLUMN_NAME_ACTIVITIES_INTERVAL + INTEGER_TYPE +
+        ConfigurationEntry.COLUMN_NAME_ACTIVITIES_INTERVAL + INTEGER_TYPE + COMMA_SEP +
+        ConfigurationEntry.COLUMN_NAME_URL + TEXT_TYPE + COMMA_SEP +
+        ConfigurationEntry.COLUMN_NAME_HEADERS + TEXT_TYPE +
         " )";
 
     private static final String SQL_DELETE_CONFIG_TABLE =

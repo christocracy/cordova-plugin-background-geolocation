@@ -11,6 +11,7 @@
 #### Added
 - Android startOnBoot option
 - Android startForeground option
+- Android http posting of locations (options url and httpHeaders)
 
 #### Removed
 - WP8 platform
