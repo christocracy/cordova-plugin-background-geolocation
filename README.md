@@ -166,15 +166,17 @@ Callback parameter | Type | Description
 
 
 ### backgroundGeoLocation.start()
+Platform: iOS, Android
 
 Start background geolocation.
 
 ### backgroundGeoLocation.stop()
+Platform: iOS, Android
 
 Stop background geolocation.
 
 ### backgroundGeoLocation.isLocationEnabled(success, fail)
-NOTE: Android only
+Platform: Android
 
 One time check for status of location services. In case of error, fail callback will be executed.
 
@@ -183,12 +185,12 @@ Success callback parameter | Type | Description
 `enabled` | `Boolean` | true/false (true when location services are enabled)
 
 ### backgroundGeoLocation.showLocationSettings()
-NOTE: Android only
+Platform: iOS >= 8.0, Android
 
 Show system settings to allow configuration of current location sources.
 
 ### backgroundGeoLocation.watchLocationMode(success, fail)
-NOTE: Android only
+Platform: Android
 
 Method can be used to detect user changes in location services settings.
 If user enable or disable location services then success callback will be executed.
@@ -199,12 +201,12 @@ Success callback parameter | Type | Description
 `enabled` | `Boolean` | true/false (true when location services are enabled)
 
 ### backgroundGeoLocation.stopWatchingLocationMode()
-NOTE: Android only
+Platform: Android
 
 Stop watching for location mode changes.
 
 ### backgroundGeoLocation.getLocations(success, fail)
-NOTE: Android only
+Platform: Android
 
 Method will return all stored locations.
 
@@ -227,12 +229,12 @@ Debug locations can be filtered:
 ```
 
 ### backgroundGeoLocation.deleteLocation(locationId, success, fail)
-NOTE: Android only
+Platform: Android
 
 Delete stored location by given locationId.
 
 ### backgroundGeoLocation.deleteAllLocations(success, fail)
-NOTE: Android only
+Platform: Android
 
 Delete all stored locations.
 

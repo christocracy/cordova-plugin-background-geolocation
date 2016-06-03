@@ -472,7 +472,10 @@
 
 - (void) showLocationSettings:(CDVInvokedUrlCommand*)command
 {
-    // TODO: yet to be implemented
+    BOOL canGoToSettings = (UIApplicationOpenSettingsURLString != NULL);
+    if (canGoToSettings) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+    }
 }
 
 - (void) watchLocationMode:(CDVInvokedUrlCommand*)command
