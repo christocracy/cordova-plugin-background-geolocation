@@ -288,7 +288,9 @@
     NSString* message = nil;
     NSLog(@"- CDVBackgroundGeoLocation starting attempt");
 
-    [locationManager requestAlwaysAuthorization];
+    if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+        [locationManager requestAlwaysAuthorization];
+    }
     
     if ([self isLocationServicesEnabled] == NO) {
         message = @"Location services are disabled.";
@@ -351,9 +353,7 @@
     NSLog(@"- CDVBackgroundGeoLocation start (background? %ld)", (long)state);
     
     [locationManager startMonitoringSignificantLocationChanges];
-    if (state == UIApplicationStateBackground) {
-        [self setPace:isMoving];
-    }
+    [self setPace:isMoving];
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
