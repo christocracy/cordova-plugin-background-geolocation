@@ -7,6 +7,7 @@
 - Android option locationService renamed to locationProvider
 - Android providers renamed (see README.md)
 - Android bugfixing
+- SampleApp moved into separate repo
 
 #### Added
 - Android startOnBoot option

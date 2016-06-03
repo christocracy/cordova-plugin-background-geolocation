@@ -144,18 +144,31 @@
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
-    // Params.
-    //    0                    1               2                 3           4          5                  6                7               8
-    //[stationaryRadius, distanceFilter, locationTimeout, desiredAccuracy, debug, notificationTitle, notificationText, activityType, stopOnTerminate]
+    NSLog(@"CDVBackgroundGeoLocation configure called");
 
-    // UNUSED ANDROID VARS
-    stationaryRadius    = [[command.arguments objectAtIndex: 0] intValue];
-    distanceFilter      = [[command.arguments objectAtIndex: 1] intValue];
-    locationTimeout     = [[command.arguments objectAtIndex: 2] intValue];
-    desiredAccuracy     = [self decodeDesiredAccuracy:[[command.arguments objectAtIndex: 3] intValue]];
-    isDebugging         = [[command.arguments objectAtIndex: 4] boolValue];
-    activityType        = [self decodeActivityType:[command.arguments objectAtIndex:7]];
-    stopOnTerminate     = [[command.arguments objectAtIndex: 8] boolValue];
+    NSDictionary *config = [command.arguments objectAtIndex:0];
+
+    if (config[@"stationaryRadius"]) {
+        stationaryRadius = [config[@"stationaryRadius"] intValue];
+    }
+    if (config[@"distanceFilter"]) {
+        distanceFilter = [config[@"distanceFilter"] intValue];
+    }
+    if (config[@"locationTimeout"]) {
+        locationTimeout = [config[@"locationTimeout"] intValue];
+    }
+    if (config[@"desiredAccuracy"]) {
+        desiredAccuracy = [self decodeDesiredAccuracy:[config[@"desiredAccuracy"] floatValue]];
+    }
+    if (config[@"debug"]) {
+        isDebugging = [config[@"debug"] boolValue];
+    }
+    if (config[@"activityType"]) {
+        activityType = [self decodeActivityType:config[@"activityType"]];
+    }
+    if (config[@"stopOnTerminate"]) {
+        stopOnTerminate = [config[@"stopOnTerminate"] boolValue];
+    }
 
     self.syncCallbackId = command.callbackId;
 
@@ -169,7 +182,7 @@
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
     NSLog(@"  - desiredAccuracy: %ld", (long)desiredAccuracy);
-    NSLog(@"  - activityType: %@", [command.arguments objectAtIndex:7]);
+    NSLog(@"  - activityType: %@", config[@"activityType"]);
     NSLog(@"  - debug: %d", isDebugging);
     NSLog(@"  - stopOnTerminate: %d", stopOnTerminate);
 
