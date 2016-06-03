@@ -470,12 +470,17 @@
     // TODO: yet to be implemented
 }
 
-- (void) showLocationSettings:(CDVInvokedUrlCommand*)command
+- (void) showAppSettings:(CDVInvokedUrlCommand*)command
 {
     BOOL canGoToSettings = (UIApplicationOpenSettingsURLString != NULL);
     if (canGoToSettings) {
         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
     }
+}
+
+- (void) showLocationSettings:(CDVInvokedUrlCommand*)command
+{
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"prefs:root=LOCATION_SERVICES"]];
 }
 
 - (void) watchLocationMode:(CDVInvokedUrlCommand*)command

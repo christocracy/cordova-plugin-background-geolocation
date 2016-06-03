@@ -184,8 +184,13 @@ Success callback parameter | Type | Description
 -------------------------- | ---- | -----------
 `enabled` | `Boolean` | true/false (true when location services are enabled)
 
+### backgroundGeoLocation.showAppSettings()
+Platform: iOS >= 8.0
+
+Show app settings to allow change of app location permissions.
+
 ### backgroundGeoLocation.showLocationSettings()
-Platform: iOS >= 8.0, Android
+Platform: iOS, Android
 
 Show system settings to allow configuration of current location sources.
 

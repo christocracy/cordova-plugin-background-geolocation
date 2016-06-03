@@ -29,6 +29,7 @@ typedef NSUInteger CDVLocationStatus;
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) isLocationEnabled:(CDVInvokedUrlCommand*)command;
+- (void) showAppSettings:(CDVInvokedUrlCommand*)command;
 - (void) showLocationSettings:(CDVInvokedUrlCommand*)command;
 - (void) watchLocationMode:(CDVInvokedUrlCommand*)command;
 - (void) stopWatchingLocationMode:(CDVInvokedUrlCommand*)command;

@@ -102,6 +102,19 @@
             </array>
         </config-file>
 
+        <config-file target="*-Info.plist" parent="CFBundleURLTypes">
+            <array>
+              <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                  <string>prefs</string>
+                </array>
+              </dict>
+            </array>
+        </config-file>
+
         <config-file target="config.xml" parent="/*">
             <feature name="BackgroundGeoLocation">
                 <param name="ios-package" value="CDVBackgroundGeoLocation"/>

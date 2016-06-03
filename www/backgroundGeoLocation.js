@@ -134,6 +134,13 @@ var backgroundGeoLocation = {
             'isLocationEnabled', []);
     },
 
+    showAppSettings: function() {
+        exec(function() {},
+            function() {},
+            'BackgroundGeoLocation',
+            'showAppSettings', []);
+    },
+
     showLocationSettings: function() {
         exec(function() {},
             function() {},

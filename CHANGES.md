@@ -14,6 +14,7 @@
 - Android startForeground option
 - Android http posting of locations (options url and httpHeaders)
 - iOS showLocationSettings
+- iOS showAppSettings
 
 #### Removed
 - WP8 platform
