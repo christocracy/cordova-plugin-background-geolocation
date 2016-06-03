@@ -24,10 +24,8 @@
 //Edited by kingalione: END
 
 @implementation CDVBackgroundGeoLocation {
-    BOOL isDebugging;
     BOOL enabled;
     BOOL isUpdatingLocation;
-    BOOL stopOnTerminate;
 
     UIBackgroundTaskIdentifier bgTask;
     NSDate *lastBgTaskAt;
@@ -59,7 +57,9 @@
     NSInteger distanceFilter;
     NSInteger locationTimeout;
     NSInteger desiredAccuracy;
-    CLActivityType activityType;
+    BOOL isDebugging;
+    NSString* activityType;
+    BOOL stopOnTerminate;
 }
 
 @synthesize syncCallbackId;
@@ -88,7 +88,13 @@
     isUpdatingLocation = NO;
     stationaryLocation = nil;
     stationaryRegion = nil;
+
+    stationaryRadius = 50;
+    distanceFilter = 500;
+    locationTimeout = 60;
+    desiredAccuracy = 100;
     isDebugging = NO;
+    activityType = @"OTHER";
     stopOnTerminate = NO;
 
     maxStationaryLocationAttempts   = 4;
@@ -164,7 +170,7 @@
         isDebugging = [config[@"debug"] boolValue];
     }
     if (config[@"activityType"]) {
-        activityType = [self decodeActivityType:config[@"activityType"]];
+        activityType = config[@"activityType"];
     }
     if (config[@"stopOnTerminate"]) {
         stopOnTerminate = [config[@"stopOnTerminate"] boolValue];
@@ -172,7 +178,7 @@
 
     self.syncCallbackId = command.callbackId;
 
-    locationManager.activityType = activityType;
+    locationManager.activityType = [self decodeActivityType:activityType];
     locationManager.pausesLocationUpdatesAutomatically = YES;
     locationManager.distanceFilter = distanceFilter; // meters
     locationManager.desiredAccuracy = desiredAccuracy;
@@ -182,7 +188,7 @@
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
     NSLog(@"  - desiredAccuracy: %ld", (long)desiredAccuracy);
-    NSLog(@"  - activityType: %@", config[@"activityType"]);
+    NSLog(@"  - activityType: %@", activityType);
     NSLog(@"  - debug: %d", isDebugging);
     NSLog(@"  - stopOnTerminate: %d", stopOnTerminate);
 
@@ -301,8 +307,10 @@
     NSString* message = nil;
     NSLog(@"- CDVBackgroundGeoLocation starting attempt");
 
-    [locationManager requestAlwaysAuthorization];
-    
+    if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+        [locationManager requestAlwaysAuthorization];
+    }
+
     if ([self isLocationServicesEnabled] == NO) {
         message = @"Location services are disabled.";
         NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
