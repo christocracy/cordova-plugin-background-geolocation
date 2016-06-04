@@ -27,6 +27,7 @@ Some incompatible changes were introduced:
 * android providers are now ANDROID_DISTANCE_FILTER_PROVIDER and ANDROID_ACTIVITY_PROVIDER
 * removed locationTimeout option (use interval instead)
 * notificationIcon was replaced with two separate options (notificationIconSmall and notificationIconLarge)
+* js object backgroundGeoLocation is deprecated use backgroundGeolocation instead
 
 ## Installing the plugin
 
@@ -73,7 +74,7 @@ function onDeviceReady () {
     * This callback will be executed every time a geolocation is recorded in the background.
     */
     var callbackFn = function(location) {
-        console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
+        console.log('[js] BackgroundGeolocation callback:  ' + location.latitude + ',' + location.longitude);
 
         // Do your HTTP request here to POST location to your server.
         // jQuery.post(url, JSON.stringify(location));
@@ -83,15 +84,15 @@ function onDeviceReady () {
         and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
         IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
         */
-        backgroundGeoLocation.finish();
+        backgroundGeolocation.finish();
     };
 
     var failureFn = function(error) {
-        console.log('BackgroundGeoLocation error');
+        console.log('BackgroundGeolocation error');
     };
 
-    // BackgroundGeoLocation is highly configurable. See platform specific configuration options
-    backgroundGeoLocation.configure(callbackFn, failureFn, {
+    // BackgroundGeolocation is highly configurable. See platform specific configuration options
+    backgroundGeolocation.configure(callbackFn, failureFn, {
         desiredAccuracy: 10,
         stationaryRadius: 20,
         distanceFilter: 30,
@@ -100,10 +101,10 @@ function onDeviceReady () {
     });
 
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
-    backgroundGeoLocation.start();
+    backgroundGeolocation.start();
 
     // If you wish to turn OFF background-tracking, call the #stop method.
-    // backgroundGeoLocation.stop();
+    // backgroundGeolocation.stop();
 }
 ```
 
@@ -113,7 +114,7 @@ Checkout repository [cordova-plugin-background-geolocation-example](https://gith
 
 ## API
 
-### backgroundGeoLocation.configure(success, fail, option)
+### backgroundGeolocation.configure(success, fail, option)
 
 Parameter | Type | Platform     | Description
 --------- | ---- | ------------ | -----------
@@ -165,17 +166,17 @@ Callback parameter | Type | Description
 `bearing` | `Number` | bearing, in degrees.
 
 
-### backgroundGeoLocation.start()
+### backgroundGeolocation.start()
 Platform: iOS, Android
 
 Start background geolocation.
 
-### backgroundGeoLocation.stop()
+### backgroundGeolocation.stop()
 Platform: iOS, Android
 
 Stop background geolocation.
 
-### backgroundGeoLocation.isLocationEnabled(success, fail)
+### backgroundGeolocation.isLocationEnabled(success, fail)
 Platform: Android
 
 One time check for status of location services. In case of error, fail callback will be executed.
@@ -184,17 +185,17 @@ Success callback parameter | Type | Description
 -------------------------- | ---- | -----------
 `enabled` | `Boolean` | true/false (true when location services are enabled)
 
-### backgroundGeoLocation.showAppSettings()
+### backgroundGeolocation.showAppSettings()
 Platform: iOS >= 8.0
 
 Show app settings to allow change of app location permissions.
 
-### backgroundGeoLocation.showLocationSettings()
+### backgroundGeolocation.showLocationSettings()
 Platform: iOS, Android
 
 Show system settings to allow configuration of current location sources.
 
-### backgroundGeoLocation.watchLocationMode(success, fail)
+### backgroundGeolocation.watchLocationMode(success, fail)
 Platform: Android
 
 Method can be used to detect user changes in location services settings.
@@ -205,12 +206,12 @@ Success callback parameter | Type | Description
 -------------------------- | ---- | -----------
 `enabled` | `Boolean` | true/false (true when location services are enabled)
 
-### backgroundGeoLocation.stopWatchingLocationMode()
+### backgroundGeolocation.stopWatchingLocationMode()
 Platform: Android
 
 Stop watching for location mode changes.
 
-### backgroundGeoLocation.getLocations(success, fail)
+### backgroundGeolocation.getLocations(success, fail)
 Platform: Android
 
 Method will return all stored locations.
@@ -233,12 +234,12 @@ Debug locations can be filtered:
 });
 ```
 
-### backgroundGeoLocation.deleteLocation(locationId, success, fail)
+### backgroundGeolocation.deleteLocation(locationId, success, fail)
 Platform: Android
 
 Delete stored location by given locationId.
 
-### backgroundGeoLocation.deleteAllLocations(success, fail)
+### backgroundGeolocation.deleteAllLocations(success, fail)
 Platform: Android
 
 Delete all stored locations.
@@ -248,7 +249,7 @@ Delete all stored locations.
 ### Android:
 
 ```javascript
-backgroundGeoLocation.configure(callbackFn, failureFn, {
+backgroundGeolocation.configure(callbackFn, failureFn, {
     desiredAccuracy: 10,
     notificationIconColor: '#4CAF50',
     notificationTitle: 'Background tracking',
@@ -257,7 +258,7 @@ backgroundGeoLocation.configure(callbackFn, failureFn, {
     notificationIconSmall: 'icon_small', //filename without extension
     debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
     stopOnTerminate: false, // <-- enable this to clear background location settings when the app terminates
-    locationProvider: backgroundGeoLocation.provider.ANDROID_ACTIVITY_PROVIDER,
+    locationProvider: backgroundGeolocation.provider.ANDROID_ACTIVITY_PROVIDER,
     interval: 60000, // <!-- poll for position every minute
     fastestInterval: 120000,
     url: 'http://server_ip:port/path',
@@ -270,7 +271,7 @@ backgroundGeoLocation.configure(callbackFn, failureFn, {
 ### iOS:
 
 ```javascript
-backgroundGeoLocation.configure(callbackFn, failureFn, {
+backgroundGeolocation.configure(callbackFn, failureFn, {
     desiredAccuracy: 10,
     stationaryRadius: 20,
     distanceFilter: 30,
@@ -282,7 +283,7 @@ backgroundGeoLocation.configure(callbackFn, failureFn, {
 
 ## HTTP location posting 
 
-When options `url` and optional `httpHeaders` are set, plugin will try to POST location JSON to given url. If server is not responding or response status code is not 200, location will be persisted into sqlite db. Stored locations and later retrieved with `backgroundGeoLocation.getLocations` method.
+When options `url` and optional `httpHeaders` are set, plugin will try to POST location JSON to given url. If server is not responding or response status code is not 200, location will be persisted into sqlite db. Stored locations and later retrieved with `backgroundGeolocation.getLocations` method.
 
 ### Example of express (nodejs) server
 ```javascript
@@ -309,7 +310,7 @@ console.log('Server started...');
 
 ### iOS
 
-On iOS the plugin will execute your configured ```callbackFn```. You may manually POST the received ```GeoLocation``` to your server using standard XHR. The plugin uses iOS Significant Changes API, and starts triggering ```callbackFn``` only when a cell-tower switch is detected (i.e. the device exits stationary radius). The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
+On iOS the plugin will execute your configured ```callbackFn```. You may manually POST the received ```Geolocation``` to your server using standard XHR. The plugin uses iOS Significant Changes API, and starts triggering ```callbackFn``` only when a cell-tower switch is detected (i.e. the device exits stationary radius). The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
 
 #### `stationaryRadius`
 
@@ -369,13 +370,13 @@ With Adobe® PhoneGap™ Build icons must be placed into ```locales/android/draw
 
 ### Intel XDK
 
-Plugin will not work in XDK emulator ('Unimplemented API Emulation: BackgroundGeoLocation.start' in emulator). But will work on real device.
+Plugin will not work in XDK emulator ('Unimplemented API Emulation: BackgroundGeolocation.start' in emulator). But will work on real device.
 
 ## Debugging sounds
 |    | *ios* | *android* |
 | ------------- | ------------- | ------------- |
 | Exit stationary region  | Calendar event notification sound  | dialtone beep-beep-beep  |
-| GeoLocation recorded  | SMS sent sound  | tt short beep |
+| Geolocation recorded  | SMS sent sound  | tt short beep |
 | Aggressive geolocation engaged | SIRI listening sound |  |
 | Passive geolocation engaged | SIRI stop listening sound |  |
 | Acquiring stationary location sound | "tick,tick,tick" sound |  |

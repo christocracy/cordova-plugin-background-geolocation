@@ -181,7 +181,7 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
     }
 
     /**
-    * Translates a number representing desired accuracy of GeoLocation system from set [0, 10, 100, 1000].
+    * Translates a number representing desired accuracy of Geolocation system from set [0, 10, 100, 1000].
     * 0:  most aggressive, most accurate, worst battery drain
     * 1000:  least aggressive, least accurate, best for battery.
     */

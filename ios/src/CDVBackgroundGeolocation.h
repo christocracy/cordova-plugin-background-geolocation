@@ -1,5 +1,5 @@
 //
-//  CDVBackgroundGeoLocation.h
+//  CDVBackgroundGeolocation.h
 //
 //  Created by Chris Scott <chris@transistorsoft.com>
 //
@@ -15,7 +15,7 @@ enum CDVLocationStatus {
 };
 typedef NSUInteger CDVLocationStatus;
 
-@interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
+@interface CDVBackgroundGeolocation : CDVPlugin <CLLocationManagerDelegate>
 
 @property (nonatomic, strong) NSString* syncCallbackId;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;

@@ -42,7 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.marianhello.bgloc.Config;
 import com.marianhello.bgloc.LocationService;
-import com.marianhello.bgloc.PermissionHelper;
+import com.marianhello.cordova.PermissionHelper;
 import com.marianhello.bgloc.data.LocationDAO;
 import com.marianhello.bgloc.data.ConfigurationDAO;
 import com.marianhello.bgloc.data.DAOFactory;

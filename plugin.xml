@@ -4,17 +4,17 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
         version="2.0.0">
-    <name>CDVBackgroundGeoLocation</name>
-    <description>Cordova Background GeoLocation Plugin</description>
+    <name>CDVBackgroundGeolocation</name>
+    <description>Cordova Background Geolocation Plugin</description>
     <license>Apache-2.0</license>
-    <keywords>cordova,phonegap,background geolocation</keywords>
+    <keywords>cordova,phonegap,background,geolocation,gps,location</keywords>
 
     <engines>
         <engine name="cordova" version=">=3.0.0"/>
     </engines>
 
-    <js-module src="www/backgroundGeoLocation.js" name="backgroundGeoLocation">
-        <clobbers target="backgroundGeoLocation"/>
+    <js-module src="www/backgroundGeolocation.js" name="backgroundGeolocation">
+        <clobbers target="backgroundGeolocation"/>
     </js-module>
 
     <!-- android -->
@@ -27,7 +27,7 @@
         <source-file src="android/src/main/java/com/marianhello/bgloc/LocationProviderFactory.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/LocationService.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/LocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
-        <source-file src="android/src/main/java/com/marianhello/bgloc/PermissionHelper.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/cordova/PermissionHelper.java" target-dir="src/com/marianhello/cordova"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/AbstractLocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/ActivityRecognitionLocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/src/main/java/com/marianhello/bgloc/DummyActivity.java" target-dir="src/com/marianhello/bgloc"/>
@@ -82,7 +82,7 @@
             <uses-permission android:name="android.permission.WAKE_LOCK"/>
         </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="BackgroundGeoLocation">
+            <feature name="BackgroundGeolocation">
                 <param name="android-package" value="com.tenforwardconsulting.cordova.BackgroundGeolocationPlugin"/>
             </feature>
         </config-file>
@@ -116,15 +116,15 @@
         </config-file>
 
         <config-file target="config.xml" parent="/*">
-            <feature name="BackgroundGeoLocation">
-                <param name="ios-package" value="CDVBackgroundGeoLocation"/>
+            <feature name="BackgroundGeolocation">
+                <param name="ios-package" value="CDVBackgroundGeolocation"/>
             </feature>
         </config-file>
         <framework src="CoreLocation.framework" />
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
-        <source-file src="ios/src/CDVBackgroundGeoLocation.m" />
-        <header-file src="ios/src/CDVBackgroundGeoLocation.h" />
+        <source-file src="ios/src/CDVBackgroundGeolocation.m" />
+        <header-file src="ios/src/CDVBackgroundGeolocation.h" />
      </platform>
 
 </plugin>

@@ -11,7 +11,7 @@
 
 var exec = require('cordova/exec');
 
-var backgroundGeoLocation = {
+var backgroundGeolocation = {
     /**
      * @property {Object} stationaryRegion
      */
@@ -41,7 +41,7 @@ var backgroundGeoLocation = {
         this.config = config || {};
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'configure',
             [config]
         );
@@ -50,28 +50,28 @@ var backgroundGeoLocation = {
     start: function(success, failure) {
         exec(success || function() {},
             failure || function(err) { console.log(err); },
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'start', []);
     },
 
     stop: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'stop', []);
     },
 
     finish: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'finish', []);
     },
 
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'onPaceChange', [isMoving]);
     },
 
@@ -85,7 +85,7 @@ var backgroundGeoLocation = {
         this.apply(this.config, config);
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'setConfig', [config]);
     },
 
@@ -95,7 +95,7 @@ var backgroundGeoLocation = {
       }
       exec(success,
           failure || function() {},
-          'BackgroundGeoLocation',
+          'BackgroundGeolocation',
           'getConfig', []);
     },
 
@@ -105,7 +105,7 @@ var backgroundGeoLocation = {
     getStationaryLocation: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'getStationaryLocation', []);
     },
 
@@ -123,28 +123,28 @@ var backgroundGeoLocation = {
         };
         exec(callback,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'addStationaryRegionListener', []);
     },
 
     isLocationEnabled: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'isLocationEnabled', []);
     },
 
     showAppSettings: function() {
         exec(function() {},
             function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'showAppSettings', []);
     },
 
     showLocationSettings: function() {
         exec(function() {},
             function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'showLocationSettings', []);
     },
 
@@ -154,14 +154,14 @@ var backgroundGeoLocation = {
         }
         exec(success,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'watchLocationMode', []);
     },
 
     stopWatchingLocationMode: function() {
         exec(function() {},
             function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'stopWatchingLocationMode', []);
     },
 
@@ -171,21 +171,21 @@ var backgroundGeoLocation = {
         }
         exec(success,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'getLocations', []);
     },
 
     deleteLocation: function(locationId, success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'deleteLocation', [locationId]);
     },
 
     deleteAllLocations: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'deleteAllLocations', []);
     },
 
@@ -200,4 +200,7 @@ var backgroundGeoLocation = {
     }
 };
 
-module.exports = backgroundGeoLocation;
+/* @Deprecated */
+window.backgroundGeoLocation = backgroundGeolocation;
+
+module.exports = backgroundGeolocation;

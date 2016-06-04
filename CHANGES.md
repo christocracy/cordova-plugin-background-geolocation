@@ -8,6 +8,7 @@
 - Android providers renamed (see README.md)
 - Android bugfixing
 - SampleApp moved into separate repo
+- deprecated backgroundGeoLocation
 
 #### Added
 - Android startOnBoot option

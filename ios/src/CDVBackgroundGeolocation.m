@@ -1,9 +1,9 @@
 ////
-//  CDVBackgroundGeoLocation
+//  CDVBackgroundGeolocation
 //
 //  Created by Chris Scott <chris@transistorsoft.com> on 2013-06-15
 //
-#import "CDVBackgroundGeoLocation.h"
+#import "CDVBackgroundGeolocation.h"
 
 // Debug sounds for bg-geolocation life-cycle events.
 // http://iphonedevwiki.net/index.php/AudioServices
@@ -23,7 +23,7 @@
 #define SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(v)     ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedDescending)
 //Edited by kingalione: END
 
-@implementation CDVBackgroundGeoLocation {
+@implementation CDVBackgroundGeolocation {
     BOOL enabled;
     BOOL isUpdatingLocation;
 
@@ -72,7 +72,7 @@
 
     //Edited by kingalione: START
     if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"9.0")) {
-        NSLog(@"CDVBackgroundGeoLocation iOS9 detected");
+        NSLog(@"CDVBackgroundGeolocation iOS9 detected");
         locationManager.allowsBackgroundLocationUpdates = YES;
     }
     //Edited by kingalione: END
@@ -115,7 +115,7 @@
     if (authorizationStatusClassPropertyAvailable) {
         NSUInteger authStatus = [CLLocationManager authorizationStatus];
 #ifdef __IPHONE_8_0
-        NSLog(@"CDVBackgroundGeoLocation requestAlwaysAuthorization");
+        NSLog(@"CDVBackgroundGeolocation requestAlwaysAuthorization");
         if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {  //iOS 8.0+
             return (authStatus == kCLAuthorizationStatusAuthorizedWhenInUse) || (authStatus == kCLAuthorizationStatusAuthorizedAlways) || (authStatus == kCLAuthorizationStatusNotDetermined);
         }
@@ -150,7 +150,7 @@
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"CDVBackgroundGeoLocation configure called");
+    NSLog(@"CDVBackgroundGeolocation configure called");
 
     NSDictionary *config = [command.arguments objectAtIndex:0];
 
@@ -183,7 +183,7 @@
     locationManager.distanceFilter = distanceFilter; // meters
     locationManager.desiredAccuracy = desiredAccuracy;
 
-    NSLog(@"CDVBackgroundGeoLocation configure");
+    NSLog(@"CDVBackgroundGeolocation configure");
     NSLog(@"  - distanceFilter: %ld", (long)distanceFilter);
     NSLog(@"  - stationaryRadius: %ld", (long)stationaryRadius);
     NSLog(@"  - locationTimeout: %ld", (long)locationTimeout);
@@ -217,7 +217,7 @@
     // Sanity-check the duration of last bgTask:  If greater than 30s, kill it.
     if (bgTask != UIBackgroundTaskInvalid) {
         if (-[lastBgTaskAt timeIntervalSinceNow] > 30.0) {
-            NSLog(@"- CDVBackgroundGeoLocation#flushQueue has to kill an out-standing background-task!");
+            NSLog(@"- CDVBackgroundGeolocation#flushQueue has to kill an out-standing background-task!");
             if (isDebugging) {
                 [self notify:@"Outstanding bg-task was force-killed"];
             }
@@ -238,7 +238,7 @@
 }
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"- CDVBackgroundGeoLocation setConfig");
+    NSLog(@"- CDVBackgroundGeolocation setConfig");
     NSDictionary *config = [command.arguments objectAtIndex:0];
 
     if (config[@"desiredAccuracy"]) {
@@ -305,7 +305,7 @@
 - (void) start:(CDVInvokedUrlCommand*)command
 {
     NSString* message = nil;
-    NSLog(@"- CDVBackgroundGeoLocation starting attempt");
+    NSLog(@"- CDVBackgroundGeolocation starting attempt");
 
     if ([locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
         [locationManager requestAlwaysAuthorization];
@@ -329,7 +329,7 @@
             if (code == kCLAuthorizationStatusNotDetermined) {
                 // could return POSITION_UNAVAILABLE but need to coordinate with other platforms
                 message = @"User undecided on application's use of location services.";
-                NSLog(@"- CDVBackgroundGeoLocation start failed: %@)", message);
+                NSLog(@"- CDVBackgroundGeolocation start failed: %@)", message);
                 NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
                 [posError setObject:[NSNumber numberWithInt:PERMISSIONDENIED] forKey:@"code"];
                 [posError setObject:message forKey:@"message"];
@@ -340,7 +340,7 @@
                 // go ahead start service
             } else if (code == kCLAuthorizationStatusRestricted) {
                 message = @"Application's use of location services is restricted.";
-                NSLog(@"- CDVBackgroundGeoLocation start failed: %@)", message);
+                NSLog(@"- CDVBackgroundGeolocation start failed: %@)", message);
                 NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
                 [posError setObject:[NSNumber numberWithInt:PERMISSIONDENIED] forKey:@"code"];
                 [posError setObject:message forKey:@"message"];
@@ -351,7 +351,7 @@
                 return;
             } else if (code == kCLAuthorizationStatusDenied) {
                 message = @"User denied use of location services.";
-                NSLog(@"- CDVBackgroundGeoLocation start failed: %@)", message);
+                NSLog(@"- CDVBackgroundGeolocation start failed: %@)", message);
                 NSMutableDictionary* posError = [NSMutableDictionary dictionaryWithCapacity:2];
                 [posError setObject:[NSNumber numberWithInt:PERMISSIONDENIED] forKey:@"code"];
                 [posError setObject:message forKey:@"message"];
@@ -361,7 +361,7 @@
                 [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
                 return;
             } else {
-                NSLog(@"- CDVBackgroundGeoLocation start code %lu", (unsigned long)code);                
+                NSLog(@"- CDVBackgroundGeolocation start code %lu", (unsigned long)code);                
             }
         }
     }
@@ -369,7 +369,7 @@
     enabled = YES;
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     
-    NSLog(@"- CDVBackgroundGeoLocation start (background? %ld)", (long)state);
+    NSLog(@"- CDVBackgroundGeolocation start (background? %ld)", (long)state);
     
     [locationManager startMonitoringSignificantLocationChanges];
     [self setPace:isMoving];
@@ -382,7 +382,7 @@
  */
 - (void) stop:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"- CDVBackgroundGeoLocation stop");
+    NSLog(@"- CDVBackgroundGeolocation stop");
     enabled = NO;
     isMoving = NO;
 
@@ -405,7 +405,7 @@
 - (void) onPaceChange:(CDVInvokedUrlCommand *)command
 {
     isMoving = [[command.arguments objectAtIndex: 0] boolValue];
-    NSLog(@"- CDVBackgroundGeoLocation onPaceChange %d", isMoving);
+    NSLog(@"- CDVBackgroundGeolocation onPaceChange %d", isMoving);
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
@@ -417,7 +417,7 @@
  */
 - (void)setPace:(BOOL)value
 {
-    NSLog(@"- CDVBackgroundGeoLocation setPace %d, stationaryRegion? %d", value, stationaryRegion!=nil);
+    NSLog(@"- CDVBackgroundGeolocation setPace %d, stationaryRegion? %d", value, stationaryRegion!=nil);
     isMoving                        = value;
     isAcquiringStationaryLocation   = NO;
     isAcquiringSpeed                = NO;
@@ -450,7 +450,7 @@
  */
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command
 {
-    NSLog(@"- CDVBackgroundGeoLocation getStationaryLocation");
+    NSLog(@"- CDVBackgroundGeolocation getStationaryLocation");
 
     // Build a resultset for javascript callback.
     CDVPluginResult* result = nil;
@@ -531,7 +531,7 @@
  */
 -(void) finish:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"- CDVBackgroundGeoLocation finish");
+    NSLog(@"- CDVBackgroundGeolocation finish");
     [self stopBackgroundTask];
 }
 
@@ -540,7 +540,7 @@
  */
 -(void) onSuspend:(NSNotification *) notification
 {
-    NSLog(@"- CDVBackgroundGeoLocation suspend (enabled? %d)", enabled);
+    NSLog(@"- CDVBackgroundGeolocation suspend (enabled? %d)", enabled);
     suspendedAt = [NSDate date];
 
     if (enabled) {
@@ -563,7 +563,7 @@
  */
 -(void) onResume:(NSNotification *) notification
 {
-    NSLog(@"- CDVBackgroundGeoLocation resume");
+    NSLog(@"- CDVBackgroundGeolocation resume");
     if (enabled) {
         [self stopUpdatingLocation];
     }
@@ -576,9 +576,9 @@
  */
 -(void) onAppTerminate
 {
-    NSLog(@"- CDVBackgroundGeoLocation appTerminate");
+    NSLog(@"- CDVBackgroundGeolocation appTerminate");
     if (enabled && stopOnTerminate) {
-        NSLog(@"- CDVBackgroundGeoLocation stoping on terminate");
+        NSLog(@"- CDVBackgroundGeolocation stoping on terminate");
 
         enabled = NO;
         isMoving = NO;
@@ -595,7 +595,7 @@
 
 -(void) locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    NSLog(@"- CDVBackgroundGeoLocation didUpdateLocations (isMoving: %d)", isMoving);
+    NSLog(@"- CDVBackgroundGeolocation didUpdateLocations (isMoving: %d)", isMoving);
 
     locationError = nil;
     if (isMoving && !isUpdatingLocation) {
@@ -654,7 +654,7 @@
         // Adjust distanceFilter incrementally based upon current speed
         float newDistanceFilter = [self calculateDistanceFilter:location.speed];
         if (newDistanceFilter != locationManager.distanceFilter) {
-            NSLog(@"- CDVBackgroundGeoLocation updated distanceFilter, new: %f, old: %f", newDistanceFilter, locationManager.distanceFilter);
+            NSLog(@"- CDVBackgroundGeolocation updated distanceFilter, new: %f, old: %f", newDistanceFilter, locationManager.distanceFilter);
             [locationManager setDistanceFilter:newDistanceFilter];
             [self startUpdatingLocation];
         }
@@ -671,7 +671,7 @@
 */
 -(bool)locationIsBeyondStationaryRegion:(CLLocation*)location
 {
-    NSLog(@"- CDVBackgroundGeoLocation locationIsBeyondStationaryRegion");
+    NSLog(@"- CDVBackgroundGeolocation locationIsBeyondStationaryRegion");
     if (![stationaryRegion containsCoordinate:[location coordinate]]) {
         double pointDistance = [stationaryLocation distanceFromLocation:location];
         return (pointDistance - stationaryLocation.horizontalAccuracy - location.horizontalAccuracy) > stationaryRadius;
@@ -695,7 +695,7 @@
 
 -(void) queue:(CLLocation*)location type:(id)type
 {
-    NSLog(@"- CDVBackgroundGeoLocation queue %@", type);
+    NSLog(@"- CDVBackgroundGeolocation queue %@", type);
     NSMutableDictionary *data = [self locationToHash:location];
     [data setObject:type forKey:@"location_type"];
     [locationQueue addObject:data];
@@ -717,7 +717,7 @@
  */
 -(void) sync:(NSMutableDictionary*)data
 {
-    NSLog(@"- CDVBackgroundGeoLocation#sync");
+    NSLog(@"- CDVBackgroundGeolocation#sync");
     NSLog(@"  type: %@, position: %@,%@ speed: %@", [data objectForKey:@"location_type"], [data objectForKey:@"latitude"], [data objectForKey:@"longitude"], [data objectForKey:@"speed"]);
     if (isDebugging) {
         [self notify:[NSString stringWithFormat:@"Location update: %s\nSPD: %0.0f | DF: %ld | ACY: %0.0f",
@@ -739,14 +739,14 @@
         [result setKeepCallbackAsBool:YES];
         [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
     } else {
-        NSLog(@"- CDVBackgroundGeoLocation#sync could not determine location_type.");
+        NSLog(@"- CDVBackgroundGeolocation#sync could not determine location_type.");
         [self stopBackgroundTask];
     }
 }
 
 - (void) fireStationaryRegionListeners:(NSMutableDictionary*)data
 {
-    NSLog(@"- CDVBackgroundGeoLocation#fireStationaryRegionListener");
+    NSLog(@"- CDVBackgroundGeolocation#fireStationaryRegionListener");
     if (![self.stationaryRegionListeners count]) {
         [self stopBackgroundTask];
         return;
@@ -772,7 +772,7 @@
     [self queue:location type:@"stationary"];
 
     CLLocationCoordinate2D coord = [location coordinate];
-    NSLog(@"- CDVBackgroundGeoLocation createStationaryRegion (%f,%f)", coord.latitude, coord.longitude);
+    NSLog(@"- CDVBackgroundGeolocation createStationaryRegion (%f,%f)", coord.latitude, coord.longitude);
 
     if (isDebugging) {
         AudioServicesPlaySystemSound (acquiredLocationSound);
@@ -782,7 +782,7 @@
         [locationManager stopMonitoringForRegion:stationaryRegion];
     }
     isAcquiringStationaryLocation = NO;
-    stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeoLocation stationary region"];
+    stationaryRegion = [[CLCircularRegion alloc] initWithCenter: coord radius:stationaryRadius identifier:@"BackgroundGeolocation stationary region"];
     stationaryRegion.notifyOnExit = YES;
     [locationManager startMonitoringForRegion:stationaryRegion];
 
@@ -798,7 +798,7 @@
 - (void) stopBackgroundTask
 {
     UIApplication *app = [UIApplication sharedApplication];
-    NSLog(@"- CDVBackgroundGeoLocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
+    NSLog(@"- CDVBackgroundGeolocation stopBackgroundTask (remaining t: %f)", app.backgroundTimeRemaining);
     if (bgTask != UIBackgroundTaskInvalid)
     {
         [app endBackgroundTask:bgTask];
@@ -812,7 +812,7 @@
  */
 - (void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
 {
-    NSLog(@"- CDVBackgroundGeoLocation exit region");
+    NSLog(@"- CDVBackgroundGeolocation exit region");
     if (isDebugging) {
         AudioServicesPlaySystemSound (exitRegionSound);
         [self notify:@"Exit stationary region"];
@@ -827,7 +827,7 @@
  */
 - (void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager
 {
-    NSLog(@"- CDVBackgroundGeoLocation paused location updates");
+    NSLog(@"- CDVBackgroundGeolocation paused location updates");
     if (isDebugging) {
         [self notify:@"Stop detected"];
     }
@@ -847,7 +847,7 @@
  */
 - (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager
 {
-    NSLog(@"- CDVBackgroundGeoLocation resume location updates");
+    NSLog(@"- CDVBackgroundGeolocation resume location updates");
     if (isDebugging) {
         [self notify:@"Resume location updates"];
     }
@@ -856,7 +856,7 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-    NSLog(@"- CDVBackgroundGeoLocation locationManager failed:  %@", error);
+    NSLog(@"- CDVBackgroundGeolocation locationManager failed:  %@", error);
     if (isDebugging) {
         AudioServicesPlaySystemSound (locationErrorSound);
         [self notify:[NSString stringWithFormat:@"Location error: %@", error.localizedDescription]];
@@ -896,7 +896,7 @@
 
 - (void) locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
-    NSLog(@"- CDVBackgroundGeoLocation didChangeAuthorizationStatus %u", status);
+    NSLog(@"- CDVBackgroundGeolocation didChangeAuthorizationStatus %u", status);
     if (isDebugging) {
         [self notify:[NSString stringWithFormat:@"Authorization status changed %u", status]];
     }
