@@ -1,5 +1,9 @@
 ## Changelog
 
+### [1.0.2] - 2016-06-09
+#### Fixed
+- iOS queued locations are send FIFO (before fix LIFO)
+
 ### [1.0.1] - 2016-06-03
 #### Fixed
 - iOS7 crash on start

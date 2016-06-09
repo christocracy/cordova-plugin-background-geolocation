@@ -207,7 +207,7 @@
         return;
     }
     if ([locationQueue count] > 0) {
-        NSMutableDictionary *data = [locationQueue lastObject];
+        NSMutableDictionary *data = [locationQueue firstObject];
         [locationQueue removeObject:data];
 
         // Create a background-task and delegate to Javascript for syncing location
