@@ -102,6 +102,7 @@ NSString *databasePath;
     } else {
         NSLog(@"Retrieving locations failed code: %d: message: %s", sqlite3_errcode(database), sqlite3_errmsg(database));
     }
+    sqlite3_finalize(stmt);
 
     return locations;
 }
@@ -144,6 +145,7 @@ NSString *databasePath;
     } else {
         NSLog(@"Inserting location %@ failed code: %d: message: %s", location.time, sqlite3_errcode(database), sqlite3_errmsg(database));
     }
+    sqlite3_finalize(stmt);
 
     return locationId;
 }
@@ -161,6 +163,7 @@ NSString *databasePath;
     } else {
         NSLog(@"Delete location %@ failed code: %d: message: %s", locationId, sqlite3_errcode(database), sqlite3_errmsg(database));
     }
+    sqlite3_finalize(stmt);
     
     return result;
 }
