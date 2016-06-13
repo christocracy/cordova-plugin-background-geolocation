@@ -10,12 +10,9 @@
  */
 
 var exec = require('cordova/exec');
+var emptyFnc = function(){};
 
 var backgroundGeolocation = {
-    /**
-     * @property {Object} stationaryRegion
-     */
-    stationaryRegion: null,
 
     /**
      * @property {Object} provider
@@ -23,6 +20,11 @@ var backgroundGeolocation = {
     provider: {
         ANDROID_DISTANCE_FILTER_PROVIDER: 0,
         ANDROID_ACTIVITY_PROVIDER: 1
+    },
+    
+    mode: {
+        BACKGROUND: 0,
+        FOREGROUND: 1
     },
 
     accuracy: {
@@ -38,9 +40,8 @@ var backgroundGeolocation = {
     config: {},
 
     configure: function(success, failure, config) {
-        this.config = config || {};
-        exec(success || function() {},
-            failure || function() {},
+        exec(success || emptyFnc,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'configure',
             [config]
@@ -48,45 +49,36 @@ var backgroundGeolocation = {
     },
 
     start: function(success, failure) {
-        exec(success || function() {},
-            failure || function(err) { console.log(err); },
+        exec(success || emptyFnc,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'start', []);
     },
 
     stop: function(success, failure) {
-        exec(success || function() {},
-            failure || function() {},
+        exec(success || emptyFnc,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'stop', []);
     },
 
     finish: function(success, failure) {
-        exec(success || function() {},
-            failure || function() {},
+        exec(success || emptyFnc,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'finish', []);
     },
 
-    changePace: function(isMoving, success, failure) {
-        exec(success || function() {},
-            failure || function() {},
-            'BackgroundGeolocation',
-            'onPaceChange', [isMoving]);
+    changePace: function(mode, success, failure) {
+        console.log('[Warning]: changePace is deprecated. Use switchMode instead.')
+        this.switchMode(mode, success, failure);
     },
 
-    /**
-     * @param {Integer} stationaryRadius
-     * @param {Integer} desiredAccuracy
-     * @param {Integer} distanceFilter
-     * @param {Integer} timeout
-     */
-    setConfig: function(success, failure, config) {
-        this.apply(this.config, config);
-        exec(success || function() {},
-            failure || function() {},
+    switchMode: function(mode, success, failure) {
+        exec(success || emptyFnc,
+            failure || emptyFnc,
             'BackgroundGeolocation',
-            'setConfig', [config]);
+            'switchMode', [mode]);
     },
 
     getConfig: function(success, failure) {
@@ -94,7 +86,7 @@ var backgroundGeolocation = {
            throw 'BackgroundGeolocation#getConfig requires a success callback';
       }
       exec(success,
-          failure || function() {},
+          failure || emptyFnc,
           'BackgroundGeolocation',
           'getConfig', []);
     },
@@ -103,8 +95,11 @@ var backgroundGeolocation = {
      * Returns current stationaryLocation if available.  null if not
      */
     getStationaryLocation: function(success, failure) {
-        exec(success || function() {},
-            failure || function() {},
+        if (typeof(success) !== 'function') {
+             throw 'BackgroundGeolocation#getStationaryLocation requires a success callback';
+        }
+        exec(success,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'getStationaryLocation', []);
     },
@@ -115,35 +110,35 @@ var backgroundGeolocation = {
      * @param {Function} failure [optional] NOT IMPLEMENTED
      */
     onStationary: function(success, failure) {
-        var me = this;
-        success = success || function() {};
-        var callback = function(region) {
-            me.stationaryRegion = region;
-            success.apply(me, arguments);
-        };
-        exec(callback,
-            failure || function() {},
+        if (typeof(success) !== 'function') {
+             throw 'BackgroundGeolocation#onStationary requires a success callback';
+        }
+        exec(success,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'addStationaryRegionListener', []);
     },
 
     isLocationEnabled: function(success, failure) {
-        exec(success || function() {},
-            failure || function() {},
+        if (typeof(success) !== 'function') {
+             throw 'BackgroundGeolocation#isLocationEnabled requires a success callback';
+        }
+        exec(success,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'isLocationEnabled', []);
     },
 
     showAppSettings: function() {
-        exec(function() {},
-            function() {},
+        exec(emptyFnc,
+            emptyFnc,
             'BackgroundGeolocation',
             'showAppSettings', []);
     },
 
     showLocationSettings: function() {
-        exec(function() {},
-            function() {},
+        exec(emptyFnc,
+            emptyFnc,
             'BackgroundGeolocation',
             'showLocationSettings', []);
     },
@@ -153,14 +148,14 @@ var backgroundGeolocation = {
              throw 'BackgroundGeolocation#watchLocationMode requires a success callback';
         }
         exec(success,
-            failure || function() {},
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'watchLocationMode', []);
     },
 
     stopWatchingLocationMode: function() {
-        exec(function() {},
-            function() {},
+        exec(emptyFnc,
+            emptyFnc,
             'BackgroundGeolocation',
             'stopWatchingLocationMode', []);
     },
@@ -170,33 +165,23 @@ var backgroundGeolocation = {
              throw 'BackgroundGeolocation#getLocations requires a success callback';
         }
         exec(success,
-            failure || function() {},
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'getLocations', []);
     },
 
     deleteLocation: function(locationId, success, failure) {
-        exec(success || function() {},
-            failure || function() {},
+        exec(success || emptyFnc,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'deleteLocation', [locationId]);
     },
 
     deleteAllLocations: function(success, failure) {
-        exec(success || function() {},
-            failure || function() {},
+        exec(success || emptyFnc,
+            failure || emptyFnc,
             'BackgroundGeolocation',
             'deleteAllLocations', []);
-    },
-
-    apply: function(destination, source) {
-        source = source || {};
-        for (var property in source) {
-            if (source.hasOwnProperty(property)) {
-                destination[property] = source[property];
-            }
-        }
-        return destination;
     }
 };
 

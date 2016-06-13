@@ -1,0 +1,459 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		412A29631D07311B001EB0E5 /* CDVBackgroundGeolocation.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 412A29621D07311B001EB0E5 /* CDVBackgroundGeolocation.h */; };
+		412A29651D07311B001EB0E5 /* CDVBackgroundGeolocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 412A29641D07311B001EB0E5 /* CDVBackgroundGeolocation.m */; };
+		412A29771D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 412A29761D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m */; };
+		413B8F9B1D0AD2D800B836F5 /* SQLiteLocationDAO.m in Sources */ = {isa = PBXBuildFile; fileRef = 413B8F9A1D0AD2D700B836F5 /* SQLiteLocationDAO.m */; };
+		413B8FA11D0B015600B836F5 /* BackgroundLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 413B8FA01D0B015600B836F5 /* BackgroundLocation.m */; };
+		413B8FB21D0B3A9600B836F5 /* SQLiteLocationDAOTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 413B8FB11D0B3A9600B836F5 /* SQLiteLocationDAOTests.m */; };
+		413B8FB41D0B3A9600B836F5 /* libCDVBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 412A295F1D07311B001EB0E5 /* libCDVBackgroundGeolocation.a */; };
+		413B8FBD1D0B446900B836F5 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 413B8FBC1D0B446900B836F5 /* libsqlite3.tbd */; };
+		41737FD41D0DAECA0091738A /* BackgroundLocationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41737FD31D0DAECA0091738A /* BackgroundLocationTests.m */; };
+		41737FD61D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41737FD51D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m */; };
+		417380081D0ED3600091738A /* BackgroundTaskManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 417380071D0ED3600091738A /* BackgroundTaskManager.m */; };
+		41CF4FFE1D0CBADE00460361 /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = 41CF4FFD1D0CBADE00460361 /* Config.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		412A29701D073716001EB0E5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 412A296C1D073716001EB0E5 /* CordovaLib.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 68A32D7114102E1C006B237C;
+			remoteInfo = CordovaLib;
+		};
+		412A29731D0738B2001EB0E5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 412A296C1D073716001EB0E5 /* CordovaLib.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = D2AAC07D0554694100DB518D;
+			remoteInfo = CordovaLib;
+		};
+		413B8FB51D0B3A9600B836F5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 412A29571D07311A001EB0E5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 412A295E1D07311A001EB0E5;
+			remoteInfo = CDVBackgroundGeolocation;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		412A295D1D07311A001EB0E5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+				412A29631D07311B001EB0E5 /* CDVBackgroundGeolocation.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		412A295F1D07311B001EB0E5 /* libCDVBackgroundGeolocation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCDVBackgroundGeolocation.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		412A29621D07311B001EB0E5 /* CDVBackgroundGeolocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CDVBackgroundGeolocation.h; sourceTree = "<group>"; };
+		412A29641D07311B001EB0E5 /* CDVBackgroundGeolocation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CDVBackgroundGeolocation.m; sourceTree = "<group>"; };
+		412A296C1D073716001EB0E5 /* CordovaLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CordovaLib.xcodeproj; path = CordovaLib/CordovaLib.xcodeproj; sourceTree = "<group>"; };
+		412A29751D073BA6001EB0E5 /* BackgroundGeolocationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundGeolocationDelegate.h; sourceTree = "<group>"; };
+		412A29761D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundGeolocationDelegate.m; sourceTree = "<group>"; };
+		413B8F9A1D0AD2D700B836F5 /* SQLiteLocationDAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteLocationDAO.m; sourceTree = "<group>"; };
+		413B8F9C1D0AD4D700B836F5 /* SQLiteLocationDAO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLiteLocationDAO.h; sourceTree = "<group>"; };
+		413B8F9F1D0B012D00B836F5 /* BackgroundLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BackgroundLocation.h; sourceTree = "<group>"; };
+		413B8FA01D0B015600B836F5 /* BackgroundLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundLocation.m; sourceTree = "<group>"; };
+		413B8FAF1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CDVBackgroundGeolocationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		413B8FB11D0B3A9600B836F5 /* SQLiteLocationDAOTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SQLiteLocationDAOTests.m; sourceTree = "<group>"; };
+		413B8FB31D0B3A9600B836F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		413B8FBC1D0B446900B836F5 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		41737FD31D0DAECA0091738A /* BackgroundLocationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundLocationTests.m; sourceTree = "<group>"; };
+		41737FD51D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteLocationDAOThreadTests.m; sourceTree = "<group>"; };
+		417380061D0ED3510091738A /* BackgroundTaskManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundTaskManager.h; sourceTree = "<group>"; };
+		417380071D0ED3600091738A /* BackgroundTaskManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundTaskManager.m; sourceTree = "<group>"; };
+		41CF4FFC1D0CBACC00460361 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
+		41CF4FFD1D0CBADE00460361 /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Config.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		412A295C1D07311A001EB0E5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		413B8FAC1D0B3A9600B836F5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				413B8FBD1D0B446900B836F5 /* libsqlite3.tbd in Frameworks */,
+				413B8FB41D0B3A9600B836F5 /* libCDVBackgroundGeolocation.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		412A29561D07311A001EB0E5 = {
+			isa = PBXGroup;
+			children = (
+				413B8FBC1D0B446900B836F5 /* libsqlite3.tbd */,
+				412A296C1D073716001EB0E5 /* CordovaLib.xcodeproj */,
+				412A29611D07311B001EB0E5 /* CDVBackgroundGeolocation */,
+				413B8FB01D0B3A9600B836F5 /* CDVBackgroundGeolocationTests */,
+				412A29601D07311B001EB0E5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		412A29601D07311B001EB0E5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				412A295F1D07311B001EB0E5 /* libCDVBackgroundGeolocation.a */,
+				413B8FAF1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		412A29611D07311B001EB0E5 /* CDVBackgroundGeolocation */ = {
+			isa = PBXGroup;
+			children = (
+				412A29751D073BA6001EB0E5 /* BackgroundGeolocationDelegate.h */,
+				412A29761D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m */,
+				412A29621D07311B001EB0E5 /* CDVBackgroundGeolocation.h */,
+				412A29641D07311B001EB0E5 /* CDVBackgroundGeolocation.m */,
+				413B8F9A1D0AD2D700B836F5 /* SQLiteLocationDAO.m */,
+				413B8F9C1D0AD4D700B836F5 /* SQLiteLocationDAO.h */,
+				413B8F9F1D0B012D00B836F5 /* BackgroundLocation.h */,
+				413B8FA01D0B015600B836F5 /* BackgroundLocation.m */,
+				41CF4FFC1D0CBACC00460361 /* Config.h */,
+				41CF4FFD1D0CBADE00460361 /* Config.m */,
+				417380061D0ED3510091738A /* BackgroundTaskManager.h */,
+				417380071D0ED3600091738A /* BackgroundTaskManager.m */,
+			);
+			path = CDVBackgroundGeolocation;
+			sourceTree = "<group>";
+		};
+		412A296D1D073716001EB0E5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				412A29711D073716001EB0E5 /* libCordova.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		413B8FB01D0B3A9600B836F5 /* CDVBackgroundGeolocationTests */ = {
+			isa = PBXGroup;
+			children = (
+				413B8FB11D0B3A9600B836F5 /* SQLiteLocationDAOTests.m */,
+				413B8FB31D0B3A9600B836F5 /* Info.plist */,
+				41737FD31D0DAECA0091738A /* BackgroundLocationTests.m */,
+				41737FD51D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m */,
+			);
+			path = CDVBackgroundGeolocationTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		412A295E1D07311A001EB0E5 /* CDVBackgroundGeolocation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 412A29681D07311B001EB0E5 /* Build configuration list for PBXNativeTarget "CDVBackgroundGeolocation" */;
+			buildPhases = (
+				412A295B1D07311A001EB0E5 /* Sources */,
+				412A295C1D07311A001EB0E5 /* Frameworks */,
+				412A295D1D07311A001EB0E5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				412A29741D0738B2001EB0E5 /* PBXTargetDependency */,
+			);
+			name = CDVBackgroundGeolocation;
+			productName = CDVBackgroundGeolocation;
+			productReference = 412A295F1D07311B001EB0E5 /* libCDVBackgroundGeolocation.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		413B8FAE1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 413B8FB71D0B3A9600B836F5 /* Build configuration list for PBXNativeTarget "CDVBackgroundGeolocationTests" */;
+			buildPhases = (
+				413B8FAB1D0B3A9600B836F5 /* Sources */,
+				413B8FAC1D0B3A9600B836F5 /* Frameworks */,
+				413B8FAD1D0B3A9600B836F5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				413B8FB61D0B3A9600B836F5 /* PBXTargetDependency */,
+			);
+			name = CDVBackgroundGeolocationTests;
+			productName = CDVBackgroundGeolocationTests;
+			productReference = 413B8FAF1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		412A29571D07311A001EB0E5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = mauron85;
+				TargetAttributes = {
+					412A295E1D07311A001EB0E5 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+					413B8FAE1D0B3A9600B836F5 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 412A295A1D07311A001EB0E5 /* Build configuration list for PBXProject "CDVBackgroundGeolocation" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 412A29561D07311A001EB0E5;
+			productRefGroup = 412A29601D07311B001EB0E5 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 412A296D1D073716001EB0E5 /* Products */;
+					ProjectRef = 412A296C1D073716001EB0E5 /* CordovaLib.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				412A295E1D07311A001EB0E5 /* CDVBackgroundGeolocation */,
+				413B8FAE1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		412A29711D073716001EB0E5 /* libCordova.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCordova.a;
+			remoteRef = 412A29701D073716001EB0E5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		413B8FAD1D0B3A9600B836F5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		412A295B1D07311A001EB0E5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				41CF4FFE1D0CBADE00460361 /* Config.m in Sources */,
+				413B8FA11D0B015600B836F5 /* BackgroundLocation.m in Sources */,
+				412A29651D07311B001EB0E5 /* CDVBackgroundGeolocation.m in Sources */,
+				412A29771D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m in Sources */,
+				417380081D0ED3600091738A /* BackgroundTaskManager.m in Sources */,
+				413B8F9B1D0AD2D800B836F5 /* SQLiteLocationDAO.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		413B8FAB1D0B3A9600B836F5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				41737FD41D0DAECA0091738A /* BackgroundLocationTests.m in Sources */,
+				413B8FB21D0B3A9600B836F5 /* SQLiteLocationDAOTests.m in Sources */,
+				41737FD61D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		412A29741D0738B2001EB0E5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = CordovaLib;
+			targetProxy = 412A29731D0738B2001EB0E5 /* PBXContainerItemProxy */;
+		};
+		413B8FB61D0B3A9600B836F5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 412A295E1D07311A001EB0E5 /* CDVBackgroundGeolocation */;
+			targetProxy = 413B8FB51D0B3A9600B836F5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		412A29661D07311B001EB0E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		412A29671D07311B001EB0E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		412A29691D07311B001EB0E5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Debug;
+		};
+		412A296A1D07311B001EB0E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Release;
+		};
+		413B8FB81D0B3A9600B836F5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = CDVBackgroundGeolocationTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.marianhello.CDVBackgroundGeolocationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		413B8FB91D0B3A9600B836F5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = "$(PLATFORM_DIR)/Developer/Library/Frameworks";
+				INFOPLIST_FILE = CDVBackgroundGeolocationTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.marianhello.CDVBackgroundGeolocationTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		412A295A1D07311A001EB0E5 /* Build configuration list for PBXProject "CDVBackgroundGeolocation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				412A29661D07311B001EB0E5 /* Debug */,
+				412A29671D07311B001EB0E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		412A29681D07311B001EB0E5 /* Build configuration list for PBXNativeTarget "CDVBackgroundGeolocation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				412A29691D07311B001EB0E5 /* Debug */,
+				412A296A1D07311B001EB0E5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		413B8FB71D0B3A9600B836F5 /* Build configuration list for PBXNativeTarget "CDVBackgroundGeolocationTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				413B8FB81D0B3A9600B836F5 /* Debug */,
+				413B8FB91D0B3A9600B836F5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 412A29571D07311A001EB0E5 /* Project object */;
+}

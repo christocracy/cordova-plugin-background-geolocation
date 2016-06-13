@@ -7,8 +7,8 @@ Cross-platform geolocation for Cordova / PhoneGap with battery-saving "circular 
 Plugin is both foreground and background geolocation service. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But it can be used together with other geolocation providers (eg. html5 navigator.geolocation).
 
 On Android you can choose from two location location providers:
-* ANDROID_DISTANCE_FILTER_PROVIDER (forked from [cordova-plugin-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation))
-* ANDROID_ACTIVITY_PROVIDER
+* **ANDROID_DISTANCE_FILTER_PROVIDER** (forked from [cordova-plugin-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation))
+* **ANDROID_ACTIVITY_PROVIDER**
 
 See wiki [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/blob/next/PROVIDERS.md) for more information about providers.
 
@@ -19,15 +19,23 @@ of MASTER branch.
 
 ## Migration to 2.0
 
+Warning: `option.url` for posting locations is very experimental and missing features like remote
+server synchronization. Location database can get very long as currently there is no cleaning mechanism.
+Use it at own risk. Server synchronization will be implemented in version 3.0.
+
 As version 2.0 platform support for Windows Phone 8 was removed.
 Some incompatible changes were introduced:
 
-* option stopOnTerminate defaults to true
-* option locationService renamed to locationProvider
-* android providers are now ANDROID_DISTANCE_FILTER_PROVIDER and ANDROID_ACTIVITY_PROVIDER
-* removed locationTimeout option (use interval instead)
-* notificationIcon was replaced with two separate options (notificationIconSmall and notificationIconLarge)
-* js object backgroundGeoLocation is deprecated use backgroundGeolocation instead
+* option `stopOnTerminate` defaults to true
+* option `locationService` renamed to `locationProvider`
+* android providers are now **ANDROID_DISTANCE_FILTER_PROVIDER** and **ANDROID_ACTIVITY_PROVIDER**
+* removed `locationTimeout` option (use `interval` in milliseconds instead) 
+* `notificationIcon` was replaced with two separate options (`notificationIconSmall` and `notificationIconLarge`)
+* js object backgroundGeoLocation is deprecated use `backgroundGeolocation` instead
+* iOS foreground mode witch automatic background mode switch
+* iOS [switchMode][] allows to switch between foreground and background mode
+* setPace on iOS is deprecated use switchMode instead
+
 
 ## Installing the plugin
 
@@ -136,8 +144,8 @@ Parameter | Type | Platform     | Description
 `option.notificationIconSmall` | `String` optional | Android | The filename of a custom notification icon. See android quirks.
 `option.locationProvider` | `Number` | Android | Set location provider **@see** [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-providers)
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
-`options.url` | `String` | Android | Server url where to send HTTP POST with recorded locations
-`options.httpHeaders` | `Object` | Android | Optional HTTP headers sent along in HTTP request
+`options.url` | `String` | iOS, Android | Server url where to send HTTP POST with recorded locations
+`options.httpHeaders` | `Object` | iOS, Android | Optional HTTP headers sent along in HTTP request
 
 Following options are specific to provider as defined by locationProvider option
 ### ANDROID_ACTIVITY_PROVIDER provider options
@@ -177,7 +185,7 @@ Platform: iOS, Android
 Stop background geolocation.
 
 ### backgroundGeolocation.isLocationEnabled(success, fail)
-Platform: Android
+Platform: iOS, Android
 
 One time check for status of location services. In case of error, fail callback will be executed.
 
@@ -212,7 +220,7 @@ Platform: Android
 Stop watching for location mode changes.
 
 ### backgroundGeolocation.getLocations(success, fail)
-Platform: Android
+Platform: iOS, Android
 
 Method will return all stored locations.
 
@@ -235,14 +243,34 @@ Debug locations can be filtered:
 ```
 
 ### backgroundGeolocation.deleteLocation(locationId, success, fail)
-Platform: Android
+Platform: iOS, Android
 
 Delete stored location by given locationId.
 
 ### backgroundGeolocation.deleteAllLocations(success, fail)
-Platform: Android
+Platform: iOS, Android
 
 Delete all stored locations.
+
+### backgroundGeolocation.switchMode(modeId, success, fail)
+Platform: iOS
+
+Normally plugin will handle switching between **BACKGROUND** and **FOREGROUND** mode itself.
+Calling switchMode you can override plugin behavior and force plugin to switch into other mode.
+
+In **FOREGROUND** mode plugin uses iOS local manager to receive locations and behavior is affected
+by `option.desiredAccuracy` and `option.distanceFilter`.
+
+In **BACKGROUND** mode plugin uses significant changes and region monitoring to recieve locations
+and uses `option.stationaryRadius` only.
+
+```
+// switch to FOREGROUND mode
+backgroundGeolocation.switchMode(backgroundGeolocation.mode.FOREGROUND);
+
+// switch to BACKGROUND mode
+backgroundGeolocation.switchMode(backgroundGeolocation.mode.BACKGROUND);
+```
 
 ## Example config
 
@@ -280,10 +308,9 @@ backgroundGeolocation.configure(callbackFn, failureFn, {
     stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
 });
 ```
+## HTTP locations posting
 
-## HTTP location posting 
-
-When options `url` and optional `httpHeaders` are set, plugin will try to POST location JSON to given url. If server is not responding or response status code is not 200, location will be persisted into sqlite db. Stored locations and later retrieved with `backgroundGeolocation.getLocations` method.
+When options `url` and optional `httpHeaders` are set, plugin will try to POST locations array as JSON to given url. If server is not responding or response status code is not 200, locations will be persisted into sqlite db. Stored locations and later retrieved with `backgroundGeolocation.getLocations` method. Request body is always array, even when only one location is sent.
 
 ### Example of express (nodejs) server
 ```javascript
@@ -293,7 +320,7 @@ var bodyParser = require('body-parser');
 var app = express();
 
 // parse application/json
-app.use(bodyParser.json());
+app.use(bodyParser.json({ type : '*/*' })); // force json
 
 app.post('/path', function(request, response){
     console.log('Headers:\n', request.headers);

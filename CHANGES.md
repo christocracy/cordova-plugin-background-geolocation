@@ -9,18 +9,26 @@
 - Android bugfixing
 - SampleApp moved into separate repo
 - deprecated backgroundGeoLocation
+- iOS split cordova specific code to allow code sharing with react-native-background-geolocation
+- desiredAccuracy map any number
+- Android locationTimeout option renamed to interval
+- iOS switchMode (formerly setPace)
 
 #### Added
 - Android startOnBoot option
 - Android startForeground option
-- Android http posting of locations (options url and httpHeaders)
+- iOS, Android http posting of locations (options url and httpHeaders)
 - iOS showLocationSettings
 - iOS showAppSettings
+- iOS isLocationEnabled
+- iOS getLocations
+- iOS deleteLocation
+- iOS deleteAllLocations
+- iOS foreground mode
 
 #### Removed
 - WP8 platform
 - Android deprecated window.plugins.backgroundGeoLocation
-- Android locationTimeout option (use interval instead)
 
 ### [1.0.0] - 2016-06-01
 #### Added

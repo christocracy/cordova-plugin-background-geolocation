@@ -117,14 +117,24 @@
 
         <config-file target="config.xml" parent="/*">
             <feature name="BackgroundGeolocation">
-                <param name="ios-package" value="CDVBackgroundGeolocation"/>
+                <param name="ios-package" value="CDVBackgroundGeolocation" />
+                <param name="onload" value="true" />
             </feature>
         </config-file>
         <framework src="CoreLocation.framework" />
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
-        <source-file src="ios/src/CDVBackgroundGeolocation.m" />
-        <header-file src="ios/src/CDVBackgroundGeolocation.h" />
+        <framework src="libsqlite3.dylib" weak="true" />
+        <source-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/BackgroundGeolocationDelegate.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/BackgroundGeolocationDelegate.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/BackgroundLocation.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/BackgroundLocation.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/Config.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/Config.h" />
      </platform>
 
 </plugin>
