@@ -186,26 +186,23 @@ public class ActivityRecognitionLocationProvider extends AbstractLocationProvide
     * 1000:  least aggressive, least accurate, best for battery.
     */
     private Integer translateDesiredAccuracy(Integer accuracy) {
-        switch (accuracy) {
-            case 10000:
-                accuracy = LocationRequest.PRIORITY_NO_POWER;
-                break;
-            case 1000:
-                accuracy = LocationRequest.PRIORITY_LOW_POWER;
-                break;
-            case 100:
-                accuracy = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
-                break;
-            case 10:
-                accuracy = LocationRequest.PRIORITY_HIGH_ACCURACY;
-                break;
-            case 0:
-                accuracy = LocationRequest.PRIORITY_HIGH_ACCURACY;
-                break;
-            default:
-                accuracy = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+        if (accuracy >= 10000) {
+            return LocationRequest.PRIORITY_NO_POWER;
         }
-        return accuracy;
+        if (accuracy >= 1000) {
+            return LocationRequest.PRIORITY_LOW_POWER;
+        }
+        if (accuracy >= 100) {
+            return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+        }
+        if (accuracy >= 10) {
+            return LocationRequest.PRIORITY_HIGH_ACCURACY;
+        }
+        if (accuracy >= 0) {
+            return LocationRequest.PRIORITY_HIGH_ACCURACY;
+        }
+
+        return LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
     }
 
 

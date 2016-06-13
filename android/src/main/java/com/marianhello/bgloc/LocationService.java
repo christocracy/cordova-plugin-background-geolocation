@@ -36,6 +36,7 @@ import com.marianhello.bgloc.HttpPostService;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 
 public class LocationService extends Service {
@@ -215,7 +216,7 @@ public class LocationService extends Service {
     public void handleLocation (BackgroundLocation location) {
         // Boolean shouldPersists = mClients.size() == 0;
 
-        for (int i=mClients.size()-1; i>=0; i--) {
+        for (int i = mClients.size() - 1; i >= 0; i--) {
             try {
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("location", location);
@@ -231,7 +232,7 @@ public class LocationService extends Service {
             }
         }
 
-        if (config.getUrl() != null) {
+        if (config.getUrl() != null && !config.getUrl().isEmpty()) {
             postLocation(location);
         }
 
@@ -287,22 +288,32 @@ public class LocationService extends Service {
         @Override
         protected Boolean doInBackground(BackgroundLocation... locations) {
             Log.d(TAG, "Executing PostLocationTask#doInBackground");
-            int count = locations.length;
-            for (int i = 0; i < count; i++) {
-                BackgroundLocation location = locations[i];
-                Long locationId = location.getLocationId();
+            JSONArray jsonLocations = new JSONArray();
+            for (BackgroundLocation location : locations) {
                 try {
-                    if (HttpPostService.postJSON(config.getUrl(), location.toJSONObject(), config.getHttpHeaders())) {
-                        if (locationId != null) {
-                            dao.deleteLocation(locationId);
-                        }
-                    } else {
-                        if (locationId == null) {
-                            persistLocation(location);
-                        }
-                    }
+                    jsonLocations.put(location.toJSONObject());
                 } catch (JSONException e) {
                     Log.w(TAG, "location to json failed" + location.toString());
+                    return false;
+                }
+            }
+
+            Log.d(TAG, "Posting json to url: " + config.getUrl() + " headers: " + config.getHttpHeaders());
+            int response = HttpPostService.postJSON(config.getUrl(), jsonLocations, config.getHttpHeaders());
+
+            if (response == 200) {
+                for (BackgroundLocation location : locations) {
+                    Long locationId = location.getLocationId();
+                    if (locationId != null) {
+                        dao.deleteLocation(locationId);
+                    }
+                }
+            } else {
+                for (BackgroundLocation location : locations) {
+                    Long locationId = location.getLocationId();
+                    if (locationId == null) {
+                        persistLocation(location);
+                    }
                 }
             }
 

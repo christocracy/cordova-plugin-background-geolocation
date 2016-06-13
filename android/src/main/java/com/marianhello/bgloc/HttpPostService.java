@@ -4,6 +4,8 @@ import android.util.Log;
 
 import java.util.Map;
 import java.util.Iterator;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URL;
@@ -12,19 +14,19 @@ import java.io.OutputStreamWriter;
 
 public class HttpPostService {
 
-    private static final String TAG = "BGPlugin/HttpPostService";
+    private static final String TAG = "BGPlugin";
 
-    public static boolean postJSON(String url, JSONObject json, Map headers)	{
+    public static int postJSON(String url, Object json, Map headers)	{
         try {
-            Log.d(TAG, "Posting json: " + json.toString() + " to url: " + url + " headers: " + headers.toString());
-
+            String jsonString = json.toString();
             HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
             // conn.setConnectTimeout(5000);
-            conn.setChunkedStreamingMode(0);
-            conn.setDoOutput(true);
             // conn.setDoInput(true);
+            conn.setDoOutput(true);
+            conn.setFixedLengthStreamingMode(jsonString.length());
+            // conn.setChunkedStreamingMode(0);
             conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+             conn.setRequestProperty("Content-Type", "application/json");
             Iterator<Map.Entry<String, String>> it = headers.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, String> pair = it.next();
@@ -36,18 +38,12 @@ public class HttpPostService {
             os.flush();
             os.close();
 
-            Log.d(TAG, "Posting json response code: " + conn.getResponseCode());
-
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                return true;
-            }
-            
-            return false;
+            return conn.getResponseCode();
 
         } catch (Throwable e) {
             Log.w(TAG, "Exception posting json: " + e);
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 }
