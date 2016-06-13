@@ -30,6 +30,15 @@
 - WP8 platform
 - Android deprecated window.plugins.backgroundGeoLocation
 
+### [1.0.2] - 2016-06-09
+#### Fixed
+- iOS queued locations are send FIFO (before fix LIFO)
+
+### [1.0.1] - 2016-06-03
+#### Fixed
+- iOS7 crash on start
+- iOS attempt to fix #46 and #39
+
 ### [1.0.0] - 2016-06-01
 #### Added
 - Android ANDROID_FUSED_LOCATION stopOnStillActivity (enhancement #69)
