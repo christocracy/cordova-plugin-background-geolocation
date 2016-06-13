@@ -20,8 +20,8 @@ of MASTER branch.
 ## Migration to 2.0
 
 Warning: `option.url` for posting locations is very experimental and missing features like remote
-server synchronization. Location database can get very long as currently there is no cleaning mechanism.
-Use it at own risk. Server synchronization will be implemented in version 3.0.
+server synchronization. Location database can get very big as currently there is no cleaning mechanism.
+Use it at own risk. Proper server synchronization will be implemented in version 3.0.
 
 As version 2.0 platform support for Windows Phone 8 was removed.
 Some incompatible changes were introduced:
@@ -39,10 +39,8 @@ Some incompatible changes were introduced:
 
 ## Installing the plugin
 
-While still in development, you can install latest dev version by appending @next suffix.
-
 ```
-cordova plugin add cordova-plugin-mauron85-background-geolocation@next
+cordova plugin add cordova-plugin-mauron85-background-geolocation
 ```
 
 ## Registering plugin for Adobe® PhoneGap™ Build
