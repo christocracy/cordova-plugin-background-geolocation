@@ -1,5 +1,35 @@
 ## Changelog
 
+### [2.0.0] - unreleased
+#### Changed
+- Android notificationIcon option split into small and large!!!
+- Android stopOnTerminate defaults to true
+- Android option locationService renamed to locationProvider
+- Android providers renamed (see README.md)
+- Android bugfixing
+- SampleApp moved into separate repo
+- deprecated backgroundGeoLocation
+- iOS split cordova specific code to allow code sharing with react-native-background-geolocation
+- desiredAccuracy map any number
+- Android locationTimeout option renamed to interval
+- iOS switchMode (formerly setPace)
+
+#### Added
+- Android startOnBoot option
+- Android startForeground option
+- iOS, Android http posting of locations (options url and httpHeaders)
+- iOS showLocationSettings
+- iOS showAppSettings
+- iOS isLocationEnabled
+- iOS getLocations
+- iOS deleteLocation
+- iOS deleteAllLocations
+- iOS foreground mode
+
+#### Removed
+- WP8 platform
+- Android deprecated window.plugins.backgroundGeoLocation
+
 ### [1.0.2] - 2016-06-09
 #### Fixed
 - iOS queued locations are send FIFO (before fix LIFO)

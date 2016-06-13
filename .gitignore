@@ -1,5 +1,13 @@
+server
+
 .idea
 .DS_Store
 npm-debug.log
 example/SampleApp/platforms
 example/SampleApp/plugins
+node_modules/
+
+# Xcode
+xcuserdata
+project.xcworkspace
+ios/CordovaLib

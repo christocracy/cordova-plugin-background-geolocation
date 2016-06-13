@@ -3,51 +3,76 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
-        version="1.0.2">
-    <name>CDVBackgroundGeoLocation</name>
-    <description>Cordova Background GeoLocation Plugin</description>
+        version="2.0.0-rc.1">
+    <name>CDVBackgroundGeolocation</name>
+    <description>Cordova Background Geolocation Plugin</description>
     <license>Apache-2.0</license>
-    <keywords>cordova,phonegap,background geolocation</keywords>
+    <keywords>cordova,phonegap,background,geolocation,gps,location</keywords>
 
     <engines>
         <engine name="cordova" version=">=3.0.0"/>
     </engines>
 
-    <js-module src="www/backgroundGeoLocation.js" name="backgroundGeoLocation">
-        <clobbers target="backgroundGeoLocation"/>
+    <js-module src="www/backgroundGeolocation.js" name="backgroundGeolocation">
+        <clobbers target="backgroundGeolocation"/>
     </js-module>
 
     <!-- android -->
     <platform name="android">
-        <source-file src="src/android/Config.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/Constant.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/ServiceProvider.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/PermissionHelper.java" target-dir="src/com/marianhello/cordova/bgloc"/>
-        <source-file src="src/android/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
-        <source-file src="src/android/AbstractLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
-        <source-file src="src/android/DistanceFilterLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
-        <source-file src="src/android/FusedLocationService.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc"/>
+        <source-file src="android/src/main/java/com/tenforwardconsulting/cordova/BackgroundGeolocationPlugin.java" target-dir="src/com/tenforwardconsulting/cordova"/>
+        <source-file src="android/src/main/java/com/tenforwardconsulting/bgloc/DistanceFilterLocationProvider.java" target-dir="src/com/tenforwardconsulting/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/HttpPostService.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/BootCompletedReceiver.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/Config.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/LocationProviderFactory.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/LocationService.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/LocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/cordova/PermissionHelper.java" target-dir="src/com/marianhello/cordova"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/AbstractLocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/ActivityRecognitionLocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
+        <source-file src="android/src/main/java/com/marianhello/bgloc/DummyActivity.java" target-dir="src/com/marianhello/bgloc"/>
 
-        <source-file src="src/android/data/LocationProxy.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
-        <source-file src="src/android/data/DAOFactory.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
-        <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
-        <source-file src="src/android/data/sqlite/LocationContract.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
-        <source-file src="src/android/data/sqlite/LocationOpenHelper.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
-        <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/BackgroundLocation.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/DAOFactory.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/LocationDAO.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/ConfigurationDAO.java" target-dir="src/com/marianhello/bgloc/data" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/LocationContract.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/ConfigurationContract.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/SQLiteOpenHelper.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
+        <source-file src="android/src/main/java/com/marianhello/bgloc/data/sqlite/SQLiteConfigurationDAO.java" target-dir="src/com/marianhello/bgloc/data/sqlite" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-
-            <service android:enabled="true" android:exported="false" android:name="com.tenforwardconsulting.cordova.bgloc.DistanceFilterLocationService"
-                     android:process=":remote" android:stopWithTask="false">
-            </service>
-
-            <service android:enabled="true" android:exported="false" android:name="com.tenforwardconsulting.cordova.bgloc.FusedLocationService"
-                     android:process=":remote" android:stopWithTask="false">
-            </service>
+            <activity
+                android:name="com.marianhello.bgloc.DummyActivity"
+                android:theme="@android:style/Theme.NoDisplay"
+                android:enabled="true"
+                android:allowTaskReparenting="true"
+                android:noHistory="true"
+                android:excludeFromRecents="true"
+                android:alwaysRetainTaskState="false"
+                android:stateNotNeeded="true"
+                android:clearTaskOnLaunch="true"
+                android:finishOnTaskLaunch="true"
+                />
+            <service
+                android:enabled="true"
+                android:exported="false"
+                android:name="com.marianhello.bgloc.LocationService"
+                />
+            <receiver
+                  android:name="com.marianhello.bgloc.BootCompletedReceiver"
+                  android:enabled="true"
+                  android:exported="true">
+               <intent-filter>
+                  <action android:name="android.intent.action.BOOT_COMPLETED" />
+               </intent-filter>
+            </receiver>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
             <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
             <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -57,8 +82,8 @@
             <uses-permission android:name="android.permission.WAKE_LOCK"/>
         </config-file>
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="BackgroundGeoLocation">
-                <param name="android-package" value="com.tenforwardconsulting.cordova.bgloc.BackgroundGeolocationPlugin"/>
+            <feature name="BackgroundGeolocation">
+                <param name="android-package" value="com.tenforwardconsulting.cordova.BackgroundGeolocationPlugin"/>
             </feature>
         </config-file>
         <framework src="com.google.android.gms:play-services-location:+" />
@@ -77,48 +102,39 @@
             </array>
         </config-file>
 
+        <config-file target="*-Info.plist" parent="CFBundleURLTypes">
+            <array>
+              <dict>
+                <key>CFBundleTypeRole</key>
+                <string>Editor</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                  <string>prefs</string>
+                </array>
+              </dict>
+            </array>
+        </config-file>
+
         <config-file target="config.xml" parent="/*">
-            <feature name="BackgroundGeoLocation">
-                <param name="ios-package" value="CDVBackgroundGeoLocation"/>
+            <feature name="BackgroundGeolocation">
+                <param name="ios-package" value="CDVBackgroundGeolocation" />
+                <param name="onload" value="true" />
             </feature>
         </config-file>
         <framework src="CoreLocation.framework" />
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
-        <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
-        <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
+        <framework src="libsqlite3.dylib" weak="true" />
+        <source-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/BackgroundGeolocationDelegate.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/BackgroundGeolocationDelegate.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/BackgroundLocation.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/BackgroundLocation.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/Config.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/Config.h" />
      </platform>
-
-	<!-- wp8 -->
-	<platform name="wp8">
-		<config-file target="config.xml" parent="/*">
-			<feature name="BackgroundGeoLocation">
-				<param name="wp-package" value="BackgroundGeoLocation" onload="true" />
-				<param name="onload" value="true" />
-			</feature>
-		</config-file>
-
-		<config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Tasks/DefaultTask">
-			<BackgroundExecution>
-				<ExecutionType Name="LocationTracking" />
-			</BackgroundExecution>
-		</config-file>
-
-		<config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-			<Capability Name="ID_CAP_LOCATION" />
-		</config-file>
-		<source-file src="src/wp8/BackgroundGeoLocation.cs" />
-		<source-file src="src/wp8/BackgroundGeoLocationOptions.cs" />
-		<source-file src="src/wp8/DebugNotifier.cs" />
-		<source-file src="src/wp8/ExtensionMethods.cs" />
-        <source-file src="src/wp8/GeolocatorWrapper.cs" />
-        <source-file src="src/wp8/GeolocatorWrapperPositionChangedEventArgs.cs" />
-        <source-file src="src/wp8/IBackgroundGeoLocation.cs" />
-        <source-file src="src/wp8/UpdateScaledDistanceFilterResult.cs" />
-        <source-file src="src/wp8/Position.cs" />
-        <source-file src="src/wp8/PositionPath.cs" />
-        <source-file src="src/wp8/PostionUpdateDebugData.cs" />
-        <source-file src="src/wp8/StationaryManager.cs" />
-	</platform>
 
 </plugin>
