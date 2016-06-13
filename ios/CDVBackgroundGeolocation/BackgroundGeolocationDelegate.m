@@ -451,8 +451,6 @@ enum {
         [self switchMode:operationMode];
     }
     
-    NSMutableArray<BackgroundLocation*> *validLocations = [[NSMutableArray alloc] init];
-
     for (CLLocation *location in locations) {
         BackgroundLocation *bgloc = [BackgroundLocation fromCLLocation:location];
         bgloc.type = @"current";
@@ -473,8 +471,6 @@ enum {
             NSLog(@"Better location found: %@", bgloc);
             lastLocation = bgloc;
         }
-        
-        [validLocations addObject:bgloc];
     }
     
     if (lastLocation == nil) {
@@ -547,9 +543,12 @@ enum {
  * Called when user exits their stationary radius (ie: they walked ~50m away from their last recorded location.
  *
  */
-- (void) locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region
+- (void) locationManager:(CLLocationManager *)manager didExitRegion:(CLCircularRegion *)region
 {
-    NSLog(@"BackgroundGeolocationDelegate exit region");
+    CLLocationDistance radius = [region radius];
+    CLLocationCoordinate2D coordinate = [region center];
+
+    NSLog(@"BackgroundGeolocationDelegate didExitRegion {%f,%f,%f}", coordinate.latitude, coordinate.longitude, radius);
     if (_config.isDebugging) {
         AudioServicesPlaySystemSound (exitRegionSound);
         [self notify:@"Exit stationary region"];
@@ -598,7 +597,7 @@ enum {
             break;
     }
     
-    [self.onError error];
+    self.onError(error);
     
 }
 
@@ -642,11 +641,11 @@ enum {
  */
 - (void) startMonitoringStationaryRegion:(BackgroundLocation*)location {
     CLLocationCoordinate2D coord = [location coordinate];
-    NSLog(@"BackgroundGeolocationDelegate createStationaryRegion {%f,%f}", coord.latitude, coord.longitude);
+    NSLog(@"BackgroundGeolocationDelegate startMonitoringStationaryRegion {%f,%f,%ld}", coord.latitude, coord.longitude, (long)_config.stationaryRadius);
     
     if (_config.isDebugging) {
         AudioServicesPlaySystemSound (acquiredLocationSound);
-        [self notify:[NSString stringWithFormat:@"Monitoring region {%f,%f}", location.coordinate.latitude,location.coordinate.longitude]];
+        [self notify:[NSString stringWithFormat:@"Monitoring region {%f,%f,%ld}", location.coordinate.latitude, location.coordinate.longitude, (long)_config.stationaryRadius]];
     }
     
     [self stopMonitoringForRegion];

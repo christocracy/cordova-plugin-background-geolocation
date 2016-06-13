@@ -67,18 +67,19 @@ enum {
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:10];
 
-    if (id) [dict setObject:id forKey:@"id"];
-    if (time) [dict setObject:[NSNumber numberWithDouble:([time timeIntervalSince1970] * 1000)] forKey:@"time"];
-    if (accuracy) [dict setObject:accuracy forKey:@"accuracy"];
-    if (altitudeAccuracy) [dict setObject:altitudeAccuracy forKey:@"altitudeAccuracy"];
-    if (speed) [dict setObject:speed forKey:@"speed"];
-    if (heading) [dict setObject:heading forKey:@"heading"];
-    if (altitude) [dict setObject:altitude forKey:@"altitude"];
-    if (latitude) [dict setObject:latitude forKey:@"latitude"];
-    if (longitude) [dict setObject:longitude forKey:@"longitude"];
-    if (provider) [dict setObject:provider forKey:@"provider"];
-    if (service_provider) [dict setObject:service_provider forKey:@"service_provider"];
+    if (id != nil) [dict setObject:id forKey:@"id"];
+    if (time != nil) [dict setObject:[NSNumber numberWithDouble:([time timeIntervalSince1970] * 1000)] forKey:@"time"];
+    if (accuracy != nil) [dict setObject:accuracy forKey:@"accuracy"];
+    if (altitudeAccuracy != nil) [dict setObject:altitudeAccuracy forKey:@"altitudeAccuracy"];
+    if (speed != nil) [dict setObject:speed forKey:@"speed"];
+    if (heading != nil) [dict setObject:heading forKey:@"heading"];
+    if (altitude != nil) [dict setObject:altitude forKey:@"altitude"];
+    if (latitude != nil) [dict setObject:latitude forKey:@"latitude"];
+    if (longitude != nil) [dict setObject:longitude forKey:@"longitude"];
+    if (provider != nil) [dict setObject:provider forKey:@"provider"];
+    if (service_provider != nil) [dict setObject:service_provider forKey:@"service_provider"];
     if (debug) [dict setObject:[NSNumber numberWithBool:debug] forKey:@"debug"];
+    if (type != nil) [dict setObject:type forKey:@"location_type"];
     
     return dict;
 }
