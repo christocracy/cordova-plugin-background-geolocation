@@ -139,6 +139,26 @@
     XCTAssertTrue([moreAccurate isBetterLocation:lessAccurate]);
 }
 
+- (void)testIflLocationWithNilAccuracyIsInvalid
+{
+    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    XCTAssertTrue(![loc isValid]);
+}
+
+- (void) testIfLocationWithZeroAccuracyIsInvalid
+{
+    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    loc.accuracy = [NSNumber numberWithInt:0];
+    XCTAssertTrue([loc isValid]);
+}
+
+- (void) testIfLocationWithAccuracyAboveZeroIsValid
+{
+    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    loc.accuracy = [NSNumber numberWithInt:10];
+    XCTAssertTrue([loc isValid]);
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{
