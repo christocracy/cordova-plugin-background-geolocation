@@ -1,14 +1,16 @@
-.idea
-.DS_Store
-npm-debug.log
-node_modules/
-server
-tracks
+# prevent accidental commits by exclude everything
+/*
 
-# Xcode
-xcuserdata
-project.xcworkspace
-ios/CordovaLib
-ios/CDVBackgroundGeolocation.xcodeproj
-ios/CDVBackgroundGeolocationTests
-ios/CDVBackgroundGeolocation.swift
+# only include project files
+!/.npmignore
+!/*.md
+!/*.png
+!/plugin.xml
+!/package.json
+!/www
+!/android
+/android/*
+!/android/src
+!/ios
+/ios/*
+!/ios/CDVBackgroundGeolocation

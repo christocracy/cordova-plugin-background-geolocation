@@ -1,12 +1,23 @@
-server
-tracks
+# prevent accidental commits by exclude everything
+/*
 
-.idea
-.DS_Store
-npm-debug.log
-node_modules/
-
-# Xcode
-xcuserdata
-project.xcworkspace
-ios/CordovaLib
+# only include project files
+!/.npmignore
+!/*.md
+!/*.png
+!/plugin.xml
+!/package.json
+!/www
+!/android
+/android/*
+!/android/src
+!/ios
+/ios/*
+!/ios/CDVBackgroundGeolocation.xcodeproj
+/ios/CDVBackgroundGeolocation.xcodeproj/*
+!/ios/CDVBackgroundGeolocation.xcodeproj/project.pbxproj
+!/ios/CDVBackgroundGeolocation
+!/ios/CDVBackgroundGeolocationTests
+!/ios/CordovaLib
+/ios/CordovaLib/*
+!/ios/CordovaLib/README.md
