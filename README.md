@@ -12,11 +12,6 @@ On Android you can choose from two location location providers:
 
 See wiki [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/blob/next/PROVIDERS.md) for more information about providers.
 
-## IMPORTANT
-
-This file refers to dev version (next) of the plugin. For stable version, read docs
-of MASTER branch.
-
 ## Migration to 2.0
 
 Warning: `option.url` for posting locations is very experimental and missing features like remote

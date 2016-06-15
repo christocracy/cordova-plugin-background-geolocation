@@ -1,2 +1,14 @@
-ios/CDVBackgroundGeolocation.xcodeproj
+.idea
+.DS_Store
+npm-debug.log
+node_modules/
+server
+tracks
+
+# Xcode
+xcuserdata
+project.xcworkspace
 ios/CordovaLib
+ios/CDVBackgroundGeolocation.xcodeproj
+ios/CDVBackgroundGeolocationTests
+ios/CDVBackgroundGeolocation.swift
