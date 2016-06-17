@@ -159,6 +159,22 @@
     XCTAssertTrue([loc isValid]);
 }
 
+- (void)testIflLocationWithTimeMoreThenOneDayFromNowIsInvalid
+{
+    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    loc.accuracy = [[NSNumber alloc] initWithInt:1];
+    loc.time = [[[NSDate alloc] init] dateByAddingTimeInterval:186400];
+    XCTAssertTrue(![loc isValid]);
+}
+
+- (void)testIflLocationWithTimeNowIsValid
+{
+    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    loc.accuracy = [[NSNumber alloc] initWithInt:1];
+    loc.time = [[NSDate alloc] init];
+    XCTAssertTrue([loc isValid]);
+}
+
 - (void)testPerformanceExample {
     // This is an example of a performance test case.
     [self measureBlock:^{

@@ -232,28 +232,26 @@ enum {
 {
     NSLog(@"BackgroundGeolocationDelegate switchMode %lu", (unsigned long)mode);
     
-    if (!isStarted) {
-        return;
-    }
-    
-    operationMode = mode;
-    aquireStartTime = [NSDate date];
+    if (!isStarted) return;
     
     if (_config.isDebugging) {
         AudioServicesPlaySystemSound (operationMode  == FOREGROUND ? paceChangeYesSound : paceChangeNoSound);
     }
     
-    if (operationMode == FOREGROUND) {
+    if (mode == FOREGROUND || !_config.saveBatteryOnBackground) {
         isAcquiringSpeed = YES;
         isAcquiringStationaryLocation = NO;
         [self stopMonitoringForRegion];
         [self stopMonitoringSignificantLocationChanges];
-    } else {
+    } else if (mode == BACKGROUND) {
         isAcquiringSpeed = NO;
         isAcquiringStationaryLocation = YES;
         [self startMonitoringSignificantLocationChanges];
     }
     
+    operationMode = mode;
+    aquireStartTime = [NSDate date];
+
     // Crank up the GPS power temporarily to get a good fix on our current location
     [self stopUpdatingLocation];
     locationManager.distanceFilter = kCLDistanceFilterNone;
@@ -445,15 +443,23 @@ enum {
     NSLog(@"BackgroundGeolocationDelegate didUpdateLocations (operationMode: %lu)", (unsigned long)operationMode);
     
     locationError = nil;
+    BGOperationMode actAsInMode = operationMode;
     
-    if (operationMode == FOREGROUND && !isUpdatingLocation) {
-        [self startUpdatingLocation];
+    if (actAsInMode == BACKGROUND) {
+        if (_config.saveBatteryOnBackground == NO) actAsInMode = FOREGROUND;
     }
     
-    if (operationMode == BACKGROUND && !isAcquiringStationaryLocation && !stationaryRegion) {
-        // Perhaps our GPS signal was interupted, re-acquire a stationaryLocation now.
-        [self switchMode:operationMode];
+    if (actAsInMode == FOREGROUND) {
+        if (!isUpdatingLocation) [self startUpdatingLocation];
     }
+
+    if (actAsInMode == BACKGROUND) {
+        if (!isAcquiringStationaryLocation && !stationaryRegion) {
+            // Perhaps our GPS signal was interupted, re-acquire a stationaryLocation now.
+            [self switchMode:operationMode];
+        }
+    }
+    
     
     for (CLLocation *location in locations) {
         BackgroundLocation *bgloc = [BackgroundLocation fromCLLocation:location];
@@ -525,7 +531,7 @@ enum {
         locationManager.distanceFilter = [self calculateDistanceFilter:[lastLocation.speed floatValue]];
         [self startUpdatingLocation];
         
-    } else if (operationMode == FOREGROUND) {
+    } else if (actAsInMode == FOREGROUND) {
         // Adjust distanceFilter incrementally based upon current speed
         float newDistanceFilter = [self calculateDistanceFilter:[lastLocation.speed floatValue]];
         if (newDistanceFilter != locationManager.distanceFilter) {

@@ -1,5 +1,10 @@
 ## Changelog
 
+### [2.1.0] - unreleased
+### Added
+- iOS option saveBatteryOnBackground
+- iOS time validation rule for location
+
 ### [2.0.0] - 2016-06-17
 ### Fixed
 - iOS prevent unintentional start when in background

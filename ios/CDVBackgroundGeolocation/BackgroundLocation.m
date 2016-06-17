@@ -9,7 +9,8 @@
 #import "BackgroundLocation.h"
 
 enum {
-    TWO_MINUTES = 120
+    TWO_MINUTES = 120,
+    MAX_SECONDS_FROM_NOW = 86400
 };
 
 @implementation BackgroundLocation
@@ -163,7 +164,8 @@ enum {
 
 - (BOOL) isValid
 {
-    if (!accuracy || accuracy < 0) return NO;
+    if (accuracy == nil || accuracy < 0) return NO;
+    if (time != nil && [time timeIntervalSinceNow] > MAX_SECONDS_FROM_NOW) return NO;
 
     return YES;
 }

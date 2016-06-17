@@ -10,7 +10,7 @@
 
 @implementation Config
 
-@synthesize stationaryRadius, distanceFilter, desiredAccuracy, isDebugging, activityType, stopOnTerminate, url, httpHeaders;
+@synthesize stationaryRadius, distanceFilter, desiredAccuracy, isDebugging, activityType, stopOnTerminate, url, httpHeaders, saveBatteryOnBackground;
 
 -(id) init {
     self = [super init];
@@ -25,6 +25,7 @@
     isDebugging = NO;
     activityType = @"OTHER";
     stopOnTerminate = NO;
+    saveBatteryOnBackground = YES;
     
     return self;
 }
@@ -56,6 +57,9 @@
     }
     if (config[@"httpHeaders"]) {
         instance.httpHeaders = config[@"httpHeaders"];
+    }
+    if (config[@"saveBatteryOnBackground"]) {
+        instance.saveBatteryOnBackground = [config[@"saveBatteryOnBackground"] boolValue];
     }
 
     return instance;

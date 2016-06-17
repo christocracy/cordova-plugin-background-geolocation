@@ -20,6 +20,7 @@
 @property BOOL stopOnTerminate;
 @property NSString* url;
 @property NSMutableDictionary* httpHeaders;
+@property BOOL saveBatteryOnBackground;
 
 + (instancetype) fromDictionary:(NSDictionary*)config;
 - (CLActivityType) decodeActivityType;
