@@ -235,7 +235,7 @@ enum {
     if (!isStarted) return;
     
     if (_config.isDebugging) {
-        AudioServicesPlaySystemSound (operationMode  == FOREGROUND ? paceChangeYesSound : paceChangeNoSound);
+        AudioServicesPlaySystemSound (mode  == FOREGROUND ? paceChangeYesSound : paceChangeNoSound);
     }
     
     if (mode == FOREGROUND || !_config.saveBatteryOnBackground) {
