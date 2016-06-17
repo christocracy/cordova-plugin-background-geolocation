@@ -1,6 +1,10 @@
 ## Changelog
 
-### [2.1.0] - unreleased
+### [2.1.1] - unreleased
+### Fixed
+- iOS switching mode
+
+### [2.1.0] - skipped
 ### Added
 - iOS option saveBatteryOnBackground
 - iOS time validation rule for location
