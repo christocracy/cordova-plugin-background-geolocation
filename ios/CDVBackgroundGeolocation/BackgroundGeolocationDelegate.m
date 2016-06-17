@@ -231,25 +231,26 @@ enum {
 - (void) switchMode:(BGOperationMode)mode
 {
     NSLog(@"BackgroundGeolocationDelegate switchMode %lu", (unsigned long)mode);
-    
+
+    operationMode = mode;
+
     if (!isStarted) return;
     
     if (_config.isDebugging) {
-        AudioServicesPlaySystemSound (mode  == FOREGROUND ? paceChangeYesSound : paceChangeNoSound);
+        AudioServicesPlaySystemSound (operationMode  == FOREGROUND ? paceChangeYesSound : paceChangeNoSound);
     }
     
-    if (mode == FOREGROUND || !_config.saveBatteryOnBackground) {
+    if (operationMode == FOREGROUND || !_config.saveBatteryOnBackground) {
         isAcquiringSpeed = YES;
         isAcquiringStationaryLocation = NO;
         [self stopMonitoringForRegion];
         [self stopMonitoringSignificantLocationChanges];
-    } else if (mode == BACKGROUND) {
+    } else if (operationMode == BACKGROUND) {
         isAcquiringSpeed = NO;
         isAcquiringStationaryLocation = YES;
         [self startMonitoringSignificantLocationChanges];
     }
     
-    operationMode = mode;
     aquireStartTime = [NSDate date];
 
     // Crank up the GPS power temporarily to get a good fix on our current location
