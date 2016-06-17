@@ -1,6 +1,15 @@
 ## Changelog
 
-### [2.0.0] - unreleased
+### [2.0.0] - 2016-06-17
+### Fixed
+- iOS prevent unintentional start when in background
+- Android Destroy Existing Provider Before Creating New One (#94)
+
+### [2.0.0-rc.3] - 2016-06-13
+#### Fixed
+- iOS memory leak
+
+### [2.0.0-rc.1] - 2016-06-13
 #### Changed
 - Android notificationIcon option split into small and large!!!
 - Android stopOnTerminate defaults to true

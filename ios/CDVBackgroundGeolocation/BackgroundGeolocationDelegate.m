@@ -189,8 +189,8 @@ enum {
 #endif
     }
     
-    [self switchMode:FOREGROUND];
     isStarted = YES;
+    [self switchMode:FOREGROUND];
     
     return YES;
 }
@@ -231,6 +231,10 @@ enum {
 - (void) switchMode:(BGOperationMode)mode
 {
     NSLog(@"BackgroundGeolocationDelegate switchMode %lu", (unsigned long)mode);
+    
+    if (!isStarted) {
+        return;
+    }
     
     operationMode = mode;
     aquireStartTime = [NSDate date];
