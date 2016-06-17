@@ -142,6 +142,8 @@ Parameter | Type | Platform     | Description
 `option.activityType` | `String` | iOS | [AutomotiveNavigation, OtherNavigation, Fitness, Other] Presumably, this affects iOS GPS algorithm. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 `options.url` | `String` | iOS, Android | Server url where to send HTTP POST with recorded locations
 `options.httpHeaders` | `Object` | iOS, Android | Optional HTTP headers sent along in HTTP request
+`options.saveBatteryOnBackground` | `Boolean` | iOS | If enabled it will automatically switch to less accurate significant changes and region monitory when in background (default)
+
 
 Following options are specific to provider as defined by locationProvider option
 ### ANDROID_ACTIVITY_PROVIDER provider options
@@ -152,7 +154,6 @@ Parameter | Type | Platform     | Description
 `option.fastestInterval` | `Number` | Android | Fastest rate in milliseconds at which your app can handle location updates. **@see** [android  docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#getFastestInterval()).
 `option.activitiesInterval` | `Number` | Android | Rate in milliseconds at which activity recognition occurs. Larger values will result in fewer activity detections while improving battery life.
 `option.stopOnStillActivity` | `Boolean` | Android | stop() is forced, when the STILL activity is detected (default is true)
-`options.saveBatteryOnBackground` | `Boolean` | iOS | If enabled it will automatically switch to less accurate significant changes and region monitory only when in background (default)
 
 Success callback will be called with one argument - location object, which tries to mimic w3c [Coordinates interface](http://dev.w3.org/geo/api/spec-source.html#coordinates_interface).
 
