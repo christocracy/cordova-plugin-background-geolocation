@@ -40,12 +40,13 @@
 
 - (void)testGetAllLocationsMultiThread {
     SQLiteLocationDAO *locationDAO = [SQLiteLocationDAO sharedInstance];
-    long unsigned waitForThreads = 100;
-
+    long unsigned threadsCount = 100;
+    
     dispatch_queue_t queue = dispatch_queue_create("com.marianhello.SQLiteLocationDAOThreadTests", DISPATCH_QUEUE_CONCURRENT);
-
-    for (int i = 0; i < waitForThreads; i++) {
-        dispatch_async(queue, ^{
+    dispatch_group_t group = dispatch_group_create();
+    
+    for (int i = 0; i < threadsCount; i++) {
+        dispatch_group_async(group, queue, ^{
             BackgroundLocation *location = [[BackgroundLocation alloc] init];
             location.time = [NSDate dateWithTimeIntervalSince1970:100+i];
             location.accuracy = [NSNumber numberWithDouble:i];
@@ -62,14 +63,14 @@
         });
     }
 
-    sleep(10); //very naive, help needed
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     
     NSMutableArray *locations = [NSMutableArray arrayWithArray:[locationDAO getAllLocations]];
     [locations sortUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"time" ascending:YES]]];
 
-    XCTAssertEqual([locations count], waitForThreads, @"Number of stored location is %lu expecting %lu", (unsigned long)[locations count], waitForThreads);
+    XCTAssertEqual([locations count], threadsCount, @"Number of stored location is %lu expecting %lu", (unsigned long)[locations count], threadsCount);
     
-    for (int i = 0; i < waitForThreads; i++) {
+    for (int i = 0; i < threadsCount; i++) {
         BackgroundLocation *result = [locations objectAtIndex:i];
         XCTAssertTrue([result.time isEqualToDate:[NSDate dateWithTimeIntervalSince1970:100+i]], "time is %@ expecting %@", result.time, [NSDate dateWithTimeIntervalSince1970:100+i]);
         XCTAssertTrue([result.accuracy isEqualToNumber:[NSNumber numberWithDouble:i]], "accuracy is %@ expecting %@", result.accuracy, [NSNumber numberWithDouble:i]);
