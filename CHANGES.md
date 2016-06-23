@@ -1,10 +1,14 @@
 ## Changelog
 
-### [2.1.1] - unreleased
+### [2.1.2] - 2016-06-23
+### Fixed
+- iOS database not created
+
+### [2.1.1] - private release
 ### Fixed
 - iOS switching mode
 
-### [2.1.0] - skipped
+### [2.1.0] - private release
 ### Added
 - iOS option saveBatteryOnBackground
 - iOS time validation rule for location

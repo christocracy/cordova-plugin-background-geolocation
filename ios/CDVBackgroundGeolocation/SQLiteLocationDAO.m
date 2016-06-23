@@ -50,7 +50,7 @@ NSString *databasePath;
 - (id) init {
     if (self = [super init]) {
         databasePath = [self getDatabasePath];
-        if (sqlite3_open_v2([databasePath UTF8String], &database, SQLITE_OPEN_READWRITE|SQLITE_OPEN_FULLMUTEX, NULL) != SQLITE_OK) {
+        if (sqlite3_open_v2([databasePath UTF8String], &database, SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE|SQLITE_OPEN_FULLMUTEX, NULL) != SQLITE_OK) {
             sqlite3_close(database);
         } else {
             [self prepareDatabase];
