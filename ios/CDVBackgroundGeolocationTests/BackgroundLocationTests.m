@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import "BackgroundLocation.h"
+#import "Location.h"
 
 @interface BackgroundLocationTests : XCTestCase
 
@@ -32,7 +32,7 @@
     RFC3339DateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
     NSString *string = @"2016-01-01T00:00:00+01:00";
     
-    BackgroundLocation *bgloc1 = [[BackgroundLocation alloc] init];
+    Location *bgloc1 = [[Location alloc] init];
     bgloc1.time = [RFC3339DateFormatter dateFromString:string];
     
     NSDictionary *data = [bgloc1 toDictionary];
@@ -42,12 +42,12 @@
 }
 
 - (void)testObjectCopying {
-    BackgroundLocation *bgloc1 = [[BackgroundLocation alloc] init];
+    Location *bgloc1 = [[Location alloc] init];
     bgloc1.latitude = [NSNumber numberWithDouble:12];
     bgloc1.longitude = [NSNumber numberWithDouble:11];
     bgloc1.type = @"current";
     
-    BackgroundLocation *stationaryLocation = [bgloc1 copy];
+    Location *stationaryLocation = [bgloc1 copy];
     stationaryLocation.type = @"stationary";
     
     XCTAssertTrue([bgloc1.type isEqualToString:@"current"]);
@@ -62,8 +62,8 @@
     const double latitude2 = 49.1260825;
     const double longitude2 = 20.4350187;
     
-    BackgroundLocation *bgloc1 = [[BackgroundLocation alloc] init];
-    BackgroundLocation *bgloc2 = [[BackgroundLocation alloc] init];
+    Location *bgloc1 = [[Location alloc] init];
+    Location *bgloc2 = [[Location alloc] init];
     bgloc1.latitude = [NSNumber numberWithDouble:latitude1];
     bgloc1.longitude = [NSNumber numberWithDouble:longitude1];
     bgloc2.latitude = [NSNumber numberWithDouble:latitude2];
@@ -84,8 +84,8 @@
     const double latitude2 = 49.14088;
     const double longitude2 = 20.225382;
     
-    BackgroundLocation *bgloc1 = [[BackgroundLocation alloc] init];
-    BackgroundLocation *bgloc2 = [[BackgroundLocation alloc] init];
+    Location *bgloc1 = [[Location alloc] init];
+    Location *bgloc2 = [[Location alloc] init];
     bgloc1.latitude = [NSNumber numberWithDouble:latitude1];
     bgloc1.longitude = [NSNumber numberWithDouble:longitude1];
     bgloc2.latitude = [NSNumber numberWithDouble:latitude2];
@@ -104,8 +104,8 @@
     const int oldtime = 1451602800; //Fri Jan 01 2016 00:00:00 GMT+0100 (CET)
     const int newtime = 1451610000; //Fri Jan 01 2016 00:02:00 GMT+0100 (CET)
     
-    BackgroundLocation *older = [[BackgroundLocation alloc] init];
-    BackgroundLocation *newer = [[BackgroundLocation alloc] init];
+    Location *older = [[Location alloc] init];
+    Location *newer = [[Location alloc] init];
     older.latitude = [NSNumber numberWithDouble:latitude1];
     older.longitude = [NSNumber numberWithDouble:longitude1];
     older.time = [[NSDate alloc]initWithTimeIntervalSince1970:oldtime];
@@ -125,8 +125,8 @@
     const double betterAccuracy = 100;
     const int time = 1451602800;
     
-    BackgroundLocation *lessAccurate = [[BackgroundLocation alloc] init];
-    BackgroundLocation *moreAccurate = [[BackgroundLocation alloc] init];
+    Location *lessAccurate = [[Location alloc] init];
+    Location *moreAccurate = [[Location alloc] init];
     lessAccurate.latitude = [NSNumber numberWithDouble:latitude1];
     lessAccurate.longitude = [NSNumber numberWithDouble:longitude1];
     lessAccurate.time = [[NSDate alloc]initWithTimeIntervalSince1970:time];
@@ -141,35 +141,35 @@
 
 - (void)testIflLocationWithNilAccuracyIsInvalid
 {
-    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
-    XCTAssertTrue(![loc isValid]);
+    Location *loc = [[Location alloc] init];
+    XCTAssertFalse([loc hasAccuracy]);
 }
 
 - (void) testIfLocationWithZeroAccuracyIsInvalid
 {
-    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    Location *loc = [[Location alloc] init];
     loc.accuracy = [NSNumber numberWithInt:0];
-    XCTAssertTrue([loc isValid]);
+    XCTAssertTrue([loc hasAccuracy]);
 }
 
 - (void) testIfLocationWithAccuracyAboveZeroIsValid
 {
-    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    Location *loc = [[Location alloc] init];
     loc.accuracy = [NSNumber numberWithInt:10];
     XCTAssertTrue([loc isValid]);
 }
 
 - (void)testIflLocationWithTimeMoreThenOneDayFromNowIsInvalid
 {
-    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    Location *loc = [[Location alloc] init];
     loc.accuracy = [[NSNumber alloc] initWithInt:1];
     loc.time = [[[NSDate alloc] init] dateByAddingTimeInterval:186400];
-    XCTAssertTrue(![loc isValid]);
+    XCTAssertTrue(![loc hasTime]);
 }
 
 - (void)testIflLocationWithTimeNowIsValid
 {
-    BackgroundLocation *loc = [[BackgroundLocation alloc] init];
+    Location *loc = [[Location alloc] init];
     loc.accuracy = [[NSNumber alloc] initWithInt:1];
     loc.time = [[NSDate alloc] init];
     XCTAssertTrue([loc isValid]);

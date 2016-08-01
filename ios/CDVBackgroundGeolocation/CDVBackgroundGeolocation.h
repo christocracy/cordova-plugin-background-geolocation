@@ -10,13 +10,9 @@
 //  https://github.com/christocracy/cordova-plugin-background-geolocation
 
 #import <Cordova/CDVPlugin.h>
-#import "BackgroundGeolocationDelegate.h"
+#import "LocationManager.h"
 
-@interface CDVBackgroundGeolocation : CDVPlugin
-
-@property (nonatomic, strong) NSString* syncCallbackId;
-@property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
-@property (nonatomic, strong) BackgroundGeolocationDelegate* bgDelegate;
+@interface CDVBackgroundGeolocation : CDVPlugin <LocationManagerDelegate>
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
@@ -31,8 +27,10 @@
 - (void) stopWatchingLocationMode:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) getLocations:(CDVInvokedUrlCommand*)command;
+- (void) getValidLocations:(CDVInvokedUrlCommand*)command;
 - (void) deleteLocation:(CDVInvokedUrlCommand*)command;
 - (void) deleteAllLocations:(CDVInvokedUrlCommand*)command;
+- (void) getLogEntries:(CDVInvokedUrlCommand*)command;
 - (void) onPause:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
 - (void) onAppTerminate;

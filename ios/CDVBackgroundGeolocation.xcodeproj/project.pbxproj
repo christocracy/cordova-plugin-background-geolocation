@@ -7,21 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		410E67C41D4B869E004F6BD1 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 410E67C31D4B869E004F6BD1 /* Reachability.m */; };
+		411675011D2802D6004BC2F4 /* SQLiteLocationDAO.m in Sources */ = {isa = PBXBuildFile; fileRef = 411675001D2802D5004BC2F4 /* SQLiteLocationDAO.m */; };
+		411675041D2806A0004BC2F4 /* GeolocationOpenHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 411675031D2806A0004BC2F4 /* GeolocationOpenHelper.m */; };
+		411675B71D284737004BC2F4 /* Logging.m in Sources */ = {isa = PBXBuildFile; fileRef = 411675B61D284737004BC2F4 /* Logging.m */; };
+		411675DB1D2A64DC004BC2F4 /* CocoaLumberjack.m in Sources */ = {isa = PBXBuildFile; fileRef = 411675D81D2A64DC004BC2F4 /* CocoaLumberjack.m */; };
+		411675DC1D2A64DC004BC2F4 /* FMDBLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 411675DA1D2A64DC004BC2F4 /* FMDBLogger.m */; };
+		4126862E1D27178300F6D605 /* FMDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4126862D1D27178300F6D605 /* FMDB.m */; };
+		412686311D271C1700F6D605 /* SQLiteOpenHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 412686301D271C1700F6D605 /* SQLiteOpenHelperTests.m */; };
+		412686331D271C5500F6D605 /* GeolocationOpenHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 412686321D271C5500F6D605 /* GeolocationOpenHelperTests.m */; };
 		412A29631D07311B001EB0E5 /* CDVBackgroundGeolocation.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 412A29621D07311B001EB0E5 /* CDVBackgroundGeolocation.h */; };
 		412A29651D07311B001EB0E5 /* CDVBackgroundGeolocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 412A29641D07311B001EB0E5 /* CDVBackgroundGeolocation.m */; };
-		412A29771D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 412A29761D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m */; };
-		413B8F9B1D0AD2D800B836F5 /* SQLiteLocationDAO.m in Sources */ = {isa = PBXBuildFile; fileRef = 413B8F9A1D0AD2D700B836F5 /* SQLiteLocationDAO.m */; };
-		413B8FA11D0B015600B836F5 /* BackgroundLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = 413B8FA01D0B015600B836F5 /* BackgroundLocation.m */; };
+		412A29771D073BA6001EB0E5 /* LocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 412A29761D073BA6001EB0E5 /* LocationManager.m */; };
+		413B8FA11D0B015600B836F5 /* Location.m in Sources */ = {isa = PBXBuildFile; fileRef = 413B8FA01D0B015600B836F5 /* Location.m */; };
 		413B8FB21D0B3A9600B836F5 /* SQLiteLocationDAOTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 413B8FB11D0B3A9600B836F5 /* SQLiteLocationDAOTests.m */; };
 		413B8FB41D0B3A9600B836F5 /* libCDVBackgroundGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 412A295F1D07311B001EB0E5 /* libCDVBackgroundGeolocation.a */; };
 		413B8FBD1D0B446900B836F5 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 413B8FBC1D0B446900B836F5 /* libsqlite3.tbd */; };
+		414D1A941D21B3D800B50F3D /* SQLiteHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 414D1A931D21B3D800B50F3D /* SQLiteHelper.m */; };
+		414D1A971D21B48600B50F3D /* SQLiteOpenHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 414D1A961D21B48600B50F3D /* SQLiteOpenHelper.m */; };
+		414D1A9E1D21B81800B50F3D /* SQLiteHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 414D1A9D1D21B81800B50F3D /* SQLiteHelper.m */; };
 		41737FD41D0DAECA0091738A /* BackgroundLocationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41737FD31D0DAECA0091738A /* BackgroundLocationTests.m */; };
 		41737FD61D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41737FD51D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m */; };
 		417380081D0ED3600091738A /* BackgroundTaskManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 417380071D0ED3600091738A /* BackgroundTaskManager.m */; };
+		417858531D21B363003538C7 /* LocationContract.m in Sources */ = {isa = PBXBuildFile; fileRef = 417858521D21B363003538C7 /* LocationContract.m */; };
 		41CF4FFE1D0CBADE00460361 /* Config.m in Sources */ = {isa = PBXBuildFile; fileRef = 41CF4FFD1D0CBADE00460361 /* Config.m */; };
+		41F3D1CC1D2E79FB002448B2 /* LocationUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 41F3D1CB1D2E79FB002448B2 /* LocationUploader.m */; };
+		41F3D1D01D2EAD80002448B2 /* LocationUploaderTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 41F3D1CF1D2EAD80002448B2 /* LocationUploaderTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		411675641D282BF7004BC2F4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 412A29571D07311A001EB0E5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 411675431D282BB6004BC2F4;
+			remoteInfo = CocoaLumberjack;
+		};
 		412A29701D073716001EB0E5 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 412A296C1D073716001EB0E5 /* CordovaLib.xcodeproj */;
@@ -46,6 +67,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		411675421D282BB6004BC2F4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/$(PRODUCT_NAME)";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		412A295D1D07311A001EB0E5 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -59,29 +89,61 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		410E67C21D4B864F004F6BD1 /* Reachability.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		410E67C31D4B869E004F6BD1 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		411675001D2802D5004BC2F4 /* SQLiteLocationDAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteLocationDAO.m; sourceTree = "<group>"; };
+		411675031D2806A0004BC2F4 /* GeolocationOpenHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeolocationOpenHelper.m; sourceTree = "<group>"; };
+		411675441D282BB6004BC2F4 /* libCocoaLumberjack.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCocoaLumberjack.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		411675AB1D2839BD004BC2F4 /* Logging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
+		411675B61D284737004BC2F4 /* Logging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Logging.m; sourceTree = "<group>"; };
+		411675D71D2A64DC004BC2F4 /* CocoaLumberjack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CocoaLumberjack.h; sourceTree = "<group>"; };
+		411675D81D2A64DC004BC2F4 /* CocoaLumberjack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CocoaLumberjack.m; sourceTree = "<group>"; };
+		411675D91D2A64DC004BC2F4 /* FMDBLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDBLogger.h; sourceTree = "<group>"; };
+		411675DA1D2A64DC004BC2F4 /* FMDBLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDBLogger.m; sourceTree = "<group>"; };
+		4126862C1D27178300F6D605 /* FMDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDB.h; sourceTree = "<group>"; };
+		4126862D1D27178300F6D605 /* FMDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDB.m; sourceTree = "<group>"; };
+		412686301D271C1700F6D605 /* SQLiteOpenHelperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteOpenHelperTests.m; sourceTree = "<group>"; };
+		412686321D271C5500F6D605 /* GeolocationOpenHelperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeolocationOpenHelperTests.m; sourceTree = "<group>"; };
 		412A295F1D07311B001EB0E5 /* libCDVBackgroundGeolocation.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCDVBackgroundGeolocation.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		412A29621D07311B001EB0E5 /* CDVBackgroundGeolocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CDVBackgroundGeolocation.h; sourceTree = "<group>"; };
 		412A29641D07311B001EB0E5 /* CDVBackgroundGeolocation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CDVBackgroundGeolocation.m; sourceTree = "<group>"; };
 		412A296C1D073716001EB0E5 /* CordovaLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CordovaLib.xcodeproj; path = CordovaLib/CordovaLib.xcodeproj; sourceTree = "<group>"; };
-		412A29751D073BA6001EB0E5 /* BackgroundGeolocationDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundGeolocationDelegate.h; sourceTree = "<group>"; };
-		412A29761D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundGeolocationDelegate.m; sourceTree = "<group>"; };
-		413B8F9A1D0AD2D700B836F5 /* SQLiteLocationDAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteLocationDAO.m; sourceTree = "<group>"; };
+		412A29751D073BA6001EB0E5 /* LocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocationManager.h; sourceTree = "<group>"; };
+		412A29761D073BA6001EB0E5 /* LocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationManager.m; sourceTree = "<group>"; };
 		413B8F9C1D0AD4D700B836F5 /* SQLiteLocationDAO.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLiteLocationDAO.h; sourceTree = "<group>"; };
-		413B8F9F1D0B012D00B836F5 /* BackgroundLocation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BackgroundLocation.h; sourceTree = "<group>"; };
-		413B8FA01D0B015600B836F5 /* BackgroundLocation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundLocation.m; sourceTree = "<group>"; };
+		413B8F9F1D0B012D00B836F5 /* Location.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Location.h; sourceTree = "<group>"; };
+		413B8FA01D0B015600B836F5 /* Location.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Location.m; sourceTree = "<group>"; };
 		413B8FAF1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CDVBackgroundGeolocationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		413B8FB11D0B3A9600B836F5 /* SQLiteLocationDAOTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SQLiteLocationDAOTests.m; sourceTree = "<group>"; };
 		413B8FB31D0B3A9600B836F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		413B8FBC1D0B446900B836F5 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		414D1A921D21B3B500B50F3D /* SQLiteHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLiteHelper.h; sourceTree = "<group>"; };
+		414D1A931D21B3D800B50F3D /* SQLiteHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteHelper.m; sourceTree = "<group>"; };
+		414D1A951D21B45100B50F3D /* SQLiteOpenHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SQLiteOpenHelper.h; sourceTree = "<group>"; };
+		414D1A961D21B48600B50F3D /* SQLiteOpenHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteOpenHelper.m; sourceTree = "<group>"; };
+		414D1A9A1D21B51600B50F3D /* GeolocationOpenHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeolocationOpenHelper.h; sourceTree = "<group>"; };
+		414D1A9D1D21B81800B50F3D /* SQLiteHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteHelper.m; sourceTree = "<group>"; };
 		41737FD31D0DAECA0091738A /* BackgroundLocationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundLocationTests.m; sourceTree = "<group>"; };
 		41737FD51D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SQLiteLocationDAOThreadTests.m; sourceTree = "<group>"; };
 		417380061D0ED3510091738A /* BackgroundTaskManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackgroundTaskManager.h; sourceTree = "<group>"; };
 		417380071D0ED3600091738A /* BackgroundTaskManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackgroundTaskManager.m; sourceTree = "<group>"; };
+		417858511D21B340003538C7 /* LocationContract.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocationContract.h; sourceTree = "<group>"; };
+		417858521D21B363003538C7 /* LocationContract.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationContract.m; sourceTree = "<group>"; };
 		41CF4FFC1D0CBACC00460361 /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
 		41CF4FFD1D0CBADE00460361 /* Config.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Config.m; sourceTree = "<group>"; };
+		41F3D1CA1D2E79A0002448B2 /* LocationUploader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocationUploader.h; sourceTree = "<group>"; };
+		41F3D1CB1D2E79FB002448B2 /* LocationUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationUploader.m; sourceTree = "<group>"; };
+		41F3D1CF1D2EAD80002448B2 /* LocationUploaderTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocationUploaderTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		411675411D282BB6004BC2F4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		412A295C1D07311A001EB0E5 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -117,6 +179,7 @@
 			children = (
 				412A295F1D07311B001EB0E5 /* libCDVBackgroundGeolocation.a */,
 				413B8FAF1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests.xctest */,
+				411675441D282BB6004BC2F4 /* libCocoaLumberjack.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -124,18 +187,38 @@
 		412A29611D07311B001EB0E5 /* CDVBackgroundGeolocation */ = {
 			isa = PBXGroup;
 			children = (
-				412A29751D073BA6001EB0E5 /* BackgroundGeolocationDelegate.h */,
-				412A29761D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m */,
+				4126862C1D27178300F6D605 /* FMDB.h */,
+				4126862D1D27178300F6D605 /* FMDB.m */,
+				411675D71D2A64DC004BC2F4 /* CocoaLumberjack.h */,
+				411675D81D2A64DC004BC2F4 /* CocoaLumberjack.m */,
+				411675D91D2A64DC004BC2F4 /* FMDBLogger.h */,
+				411675DA1D2A64DC004BC2F4 /* FMDBLogger.m */,
+				411675AB1D2839BD004BC2F4 /* Logging.h */,
+				411675B61D284737004BC2F4 /* Logging.m */,
+				412A29751D073BA6001EB0E5 /* LocationManager.h */,
+				412A29761D073BA6001EB0E5 /* LocationManager.m */,
+				41F3D1CA1D2E79A0002448B2 /* LocationUploader.h */,
+				41F3D1CB1D2E79FB002448B2 /* LocationUploader.m */,
 				412A29621D07311B001EB0E5 /* CDVBackgroundGeolocation.h */,
 				412A29641D07311B001EB0E5 /* CDVBackgroundGeolocation.m */,
-				413B8F9A1D0AD2D700B836F5 /* SQLiteLocationDAO.m */,
+				414D1A921D21B3B500B50F3D /* SQLiteHelper.h */,
+				414D1A931D21B3D800B50F3D /* SQLiteHelper.m */,
+				414D1A951D21B45100B50F3D /* SQLiteOpenHelper.h */,
+				414D1A961D21B48600B50F3D /* SQLiteOpenHelper.m */,
+				414D1A9A1D21B51600B50F3D /* GeolocationOpenHelper.h */,
+				411675031D2806A0004BC2F4 /* GeolocationOpenHelper.m */,
+				417858511D21B340003538C7 /* LocationContract.h */,
+				417858521D21B363003538C7 /* LocationContract.m */,
 				413B8F9C1D0AD4D700B836F5 /* SQLiteLocationDAO.h */,
-				413B8F9F1D0B012D00B836F5 /* BackgroundLocation.h */,
-				413B8FA01D0B015600B836F5 /* BackgroundLocation.m */,
+				411675001D2802D5004BC2F4 /* SQLiteLocationDAO.m */,
+				413B8F9F1D0B012D00B836F5 /* Location.h */,
+				413B8FA01D0B015600B836F5 /* Location.m */,
 				41CF4FFC1D0CBACC00460361 /* Config.h */,
 				41CF4FFD1D0CBADE00460361 /* Config.m */,
 				417380061D0ED3510091738A /* BackgroundTaskManager.h */,
 				417380071D0ED3600091738A /* BackgroundTaskManager.m */,
+				410E67C21D4B864F004F6BD1 /* Reachability.h */,
+				410E67C31D4B869E004F6BD1 /* Reachability.m */,
 			);
 			path = CDVBackgroundGeolocation;
 			sourceTree = "<group>";
@@ -151,10 +234,14 @@
 		413B8FB01D0B3A9600B836F5 /* CDVBackgroundGeolocationTests */ = {
 			isa = PBXGroup;
 			children = (
-				413B8FB11D0B3A9600B836F5 /* SQLiteLocationDAOTests.m */,
 				413B8FB31D0B3A9600B836F5 /* Info.plist */,
 				41737FD31D0DAECA0091738A /* BackgroundLocationTests.m */,
+				413B8FB11D0B3A9600B836F5 /* SQLiteLocationDAOTests.m */,
 				41737FD51D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m */,
+				414D1A9D1D21B81800B50F3D /* SQLiteHelper.m */,
+				412686301D271C1700F6D605 /* SQLiteOpenHelperTests.m */,
+				412686321D271C5500F6D605 /* GeolocationOpenHelperTests.m */,
+				41F3D1CF1D2EAD80002448B2 /* LocationUploaderTests.m */,
 			);
 			path = CDVBackgroundGeolocationTests;
 			sourceTree = "<group>";
@@ -162,6 +249,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		411675431D282BB6004BC2F4 /* CocoaLumberjack */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4116754A1D282BB6004BC2F4 /* Build configuration list for PBXNativeTarget "CocoaLumberjack" */;
+			buildPhases = (
+				411675401D282BB6004BC2F4 /* Sources */,
+				411675411D282BB6004BC2F4 /* Frameworks */,
+				411675421D282BB6004BC2F4 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CocoaLumberjack;
+			productName = CocoaLumberjack;
+			productReference = 411675441D282BB6004BC2F4 /* libCocoaLumberjack.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 		412A295E1D07311A001EB0E5 /* CDVBackgroundGeolocation */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 412A29681D07311B001EB0E5 /* Build configuration list for PBXNativeTarget "CDVBackgroundGeolocation" */;
@@ -173,6 +277,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				411675651D282BF7004BC2F4 /* PBXTargetDependency */,
 				412A29741D0738B2001EB0E5 /* PBXTargetDependency */,
 			);
 			name = CDVBackgroundGeolocation;
@@ -207,6 +312,9 @@
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = mauron85;
 				TargetAttributes = {
+					411675431D282BB6004BC2F4 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 					412A295E1D07311A001EB0E5 = {
 						CreatedOnToolsVersion = 7.3.1;
 					};
@@ -235,6 +343,7 @@
 			targets = (
 				412A295E1D07311A001EB0E5 /* CDVBackgroundGeolocation */,
 				413B8FAE1D0B3A9600B836F5 /* CDVBackgroundGeolocationTests */,
+				411675431D282BB6004BC2F4 /* CocoaLumberjack */,
 			);
 		};
 /* End PBXProject section */
@@ -260,16 +369,33 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		411675401D282BB6004BC2F4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		412A295B1D07311A001EB0E5 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				417858531D21B363003538C7 /* LocationContract.m in Sources */,
+				4126862E1D27178300F6D605 /* FMDB.m in Sources */,
+				411675DC1D2A64DC004BC2F4 /* FMDBLogger.m in Sources */,
 				41CF4FFE1D0CBADE00460361 /* Config.m in Sources */,
-				413B8FA11D0B015600B836F5 /* BackgroundLocation.m in Sources */,
+				411675011D2802D6004BC2F4 /* SQLiteLocationDAO.m in Sources */,
+				413B8FA11D0B015600B836F5 /* Location.m in Sources */,
+				41F3D1CC1D2E79FB002448B2 /* LocationUploader.m in Sources */,
+				414D1A941D21B3D800B50F3D /* SQLiteHelper.m in Sources */,
+				411675041D2806A0004BC2F4 /* GeolocationOpenHelper.m in Sources */,
+				414D1A971D21B48600B50F3D /* SQLiteOpenHelper.m in Sources */,
+				410E67C41D4B869E004F6BD1 /* Reachability.m in Sources */,
 				412A29651D07311B001EB0E5 /* CDVBackgroundGeolocation.m in Sources */,
-				412A29771D073BA6001EB0E5 /* BackgroundGeolocationDelegate.m in Sources */,
+				412A29771D073BA6001EB0E5 /* LocationManager.m in Sources */,
+				411675DB1D2A64DC004BC2F4 /* CocoaLumberjack.m in Sources */,
 				417380081D0ED3600091738A /* BackgroundTaskManager.m in Sources */,
-				413B8F9B1D0AD2D800B836F5 /* SQLiteLocationDAO.m in Sources */,
+				411675B71D284737004BC2F4 /* Logging.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -277,15 +403,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				412686331D271C5500F6D605 /* GeolocationOpenHelperTests.m in Sources */,
 				41737FD41D0DAECA0091738A /* BackgroundLocationTests.m in Sources */,
 				413B8FB21D0B3A9600B836F5 /* SQLiteLocationDAOTests.m in Sources */,
+				412686311D271C1700F6D605 /* SQLiteOpenHelperTests.m in Sources */,
+				41F3D1D01D2EAD80002448B2 /* LocationUploaderTests.m in Sources */,
 				41737FD61D0DDD0C0091738A /* SQLiteLocationDAOThreadTests.m in Sources */,
+				414D1A9E1D21B81800B50F3D /* SQLiteHelper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		411675651D282BF7004BC2F4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 411675431D282BB6004BC2F4 /* CocoaLumberjack */;
+			targetProxy = 411675641D282BF7004BC2F4 /* PBXContainerItemProxy */;
+		};
 		412A29741D0738B2001EB0E5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = CordovaLib;
@@ -299,6 +434,29 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		4116754B1D282BB6004BC2F4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4116754C1D282BB6004BC2F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		412A29661D07311B001EB0E5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -426,6 +584,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4116754A1D282BB6004BC2F4 /* Build configuration list for PBXNativeTarget "CocoaLumberjack" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4116754B1D282BB6004BC2F4 /* Debug */,
+				4116754C1D282BB6004BC2F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		412A295A1D07311A001EB0E5 /* Build configuration list for PBXProject "CDVBackgroundGeolocation" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

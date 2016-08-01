@@ -1,25 +1,25 @@
 //
-//  BackgroundLocation.m
+//  Location.m
 //  CDVBackgroundGeolocation
 //
 //  Created by Marian Hello on 10/06/16.
 //
 
 #import <Foundation/Foundation.h>
-#import "BackgroundLocation.h"
+#import "Location.h"
 
 enum {
     TWO_MINUTES = 120,
     MAX_SECONDS_FROM_NOW = 86400
 };
 
-@implementation BackgroundLocation
+@implementation Location
 
-@synthesize id, time, accuracy, altitudeAccuracy, speed, heading, altitude, latitude, longitude, provider, service_provider, type, debug;
+@synthesize id, time, accuracy, altitudeAccuracy, speed, heading, altitude, latitude, longitude, provider, serviceProvider, type, isValid;
 
 + (instancetype) fromCLLocation:(CLLocation*)location;
 {
-    BackgroundLocation *instance = [[BackgroundLocation alloc] init];
+    Location *instance = [[Location alloc] init];
     
     instance.time = location.timestamp;
     instance.accuracy = [NSNumber numberWithDouble:location.horizontalAccuracy];
@@ -55,6 +55,21 @@ enum {
     return dict;
 }
 
+- (id) init
+{
+    self = [super init];
+    if (self != nil) {
+        [self commonInit];
+    }
+    
+    return self;
+}
+
+- (void) commonInit
+{
+    isValid = true;
+}
+
 /*
  * Age of location measured from now in seconds
  *
@@ -64,11 +79,20 @@ enum {
     return -[time timeIntervalSinceNow];
 }
 
+- (NSMutableDictionary*) toDictionaryWithId
+{
+    NSMutableDictionary *dict = [self toDictionary];
+
+    // id is solely for internal purposes like deleteLocation method!!!
+    if (id != nil) [dict setObject:id forKey:@"id"];
+    
+    return dict;
+}
+
 - (NSMutableDictionary*) toDictionary
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:10];
-
-    if (id != nil) [dict setObject:id forKey:@"id"];
+    
     if (time != nil) [dict setObject:[NSNumber numberWithDouble:([time timeIntervalSince1970] * 1000)] forKey:@"time"];
     if (accuracy != nil) [dict setObject:accuracy forKey:@"accuracy"];
     if (altitudeAccuracy != nil) [dict setObject:altitudeAccuracy forKey:@"altitudeAccuracy"];
@@ -78,8 +102,7 @@ enum {
     if (latitude != nil) [dict setObject:latitude forKey:@"latitude"];
     if (longitude != nil) [dict setObject:longitude forKey:@"longitude"];
     if (provider != nil) [dict setObject:provider forKey:@"provider"];
-    if (service_provider != nil) [dict setObject:service_provider forKey:@"service_provider"];
-    if (debug) [dict setObject:[NSNumber numberWithBool:debug] forKey:@"debug"];
+    if (serviceProvider != nil) [dict setObject:serviceProvider forKey:@"service_provider"];
     if (type != nil) [dict setObject:type forKey:@"location_type"];
     
     return dict;
@@ -93,7 +116,7 @@ enum {
     return coordinate;
 }
 
-- (double) distanceFromLocation:(BackgroundLocation*)location
+- (double) distanceFromLocation:(Location*)location
 {
     const float EarthRadius = 6378137.0f;
     double a_lat = [self.latitude doubleValue];
@@ -109,11 +132,11 @@ enum {
 }
 
 /** 
- * Determines whether instance is better then BackgroundLocation reading
+ * Determines whether instance is better then Location reading
  * @param location  The new Location that you want to evaluate
  * Note: code taken from https://developer.android.com/guide/topics/location/strategies.html
  */
-- (BOOL) isBetterLocation:(BackgroundLocation*)location
+- (BOOL) isBetterLocation:(Location*)location
 {
     if (location == nil) {
         // A instance location is always better than no location
@@ -156,28 +179,64 @@ enum {
     return NO;
 }
 
-- (BOOL) isBeyond:(BackgroundLocation*)location radius:(NSInteger)radius
+- (BOOL) isBeyond:(Location*)location radius:(NSInteger)radius
 {
     double pointDistance = [self distanceFromLocation:location];
     return (pointDistance - [self.accuracy doubleValue] - [location.accuracy doubleValue]) > radius;
 }
 
-- (BOOL) isValid
+- (BOOL) hasAccuracy
 {
     if (accuracy == nil || accuracy < 0) return NO;
-    if (time != nil && [time timeIntervalSinceNow] > MAX_SECONDS_FROM_NOW) return NO;
+    return YES;
+}
 
+- (BOOL) hasTime
+{
+    if (time != nil && [time timeIntervalSinceNow] > MAX_SECONDS_FROM_NOW) return NO;
     return YES;
 }
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"BackgroundLocation: id=%ld time=%ld lat=%@ lon=%@ accu=%@ aaccu=%@ speed=%@ head=%@ alt=%@ type=%@ debug=%d", (long)id, (long)time, latitude, longitude, accuracy, altitudeAccuracy, speed, heading, altitude, type, debug];
+    return [NSString stringWithFormat:@"Location: id=%ld time=%ld lat=%@ lon=%@ accu=%@ aaccu=%@ speed=%@ head=%@ alt=%@ type=%@", (long)id, (long)time, latitude, longitude, accuracy, altitudeAccuracy, speed, heading, altitude, type];
+}
+
+- (BOOL) postAsJSON:(NSString*)url withHttpHeaders:(NSMutableDictionary*)httpHeaders error:(NSError * __autoreleasing *)outError;
+{
+    NSArray *locations = [[NSArray alloc] initWithObjects:[self toDictionary], nil];
+    //    NSArray *jsonArray = [NSJSONSerialization JSONObjectWithData: data options: NSJSONReadingMutableContainers error: &e];
+    NSData *data = [NSJSONSerialization dataWithJSONObject:locations options:0 error:outError];
+    if (!data) {
+        return NO;
+    }
+    
+    NSString *jsonStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPMethod:@"POST"];
+    if (httpHeaders != nil) {
+        for(id key in httpHeaders) {
+            id value = [httpHeaders objectForKey:key];
+            [request addValue:value forHTTPHeaderField:key];
+        }
+    }
+    [request setHTTPBody:[jsonStr dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    // Create url connection and fire request
+    NSHTTPURLResponse* urlResponse = nil;
+    [NSURLConnection sendSynchronousRequest:request returningResponse:&urlResponse error:outError];
+    
+    if (*outError == nil && [urlResponse statusCode] == 200) {
+        return YES;
+    }
+    
+    return NO;    
 }
 
 -(id) copyWithZone: (NSZone *) zone
 {
-    BackgroundLocation *copy = [[[self class] allocWithZone: zone] init];
+    Location *copy = [[[self class] allocWithZone: zone] init];
     if (copy) {
         copy.time = time;
         copy.accuracy = accuracy;
@@ -188,13 +247,12 @@ enum {
         copy.latitude = latitude;
         copy.longitude = longitude;
         copy.provider = provider;
-        copy.service_provider = service_provider;
+        copy.serviceProvider = serviceProvider;
         copy.type = type;
-        copy.debug = debug;        
+        copy.isValid = isValid;
     }
     
     return copy;
 }
-
 
 @end

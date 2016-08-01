@@ -92,8 +92,9 @@
 
     <platform name="ios">
         <!-- required background modes:  App registers for location updates -->
+        <preference name="ALWAYS_USAGE_DESCRIPTION" default="This app requires background location tracking" />
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
-            <string>This app requires background location tracking</string>
+            <string>$ALWAYS_USAGE_DESCRIPTION</string>
         </config-file>
 
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
@@ -122,19 +123,42 @@
             </feature>
         </config-file>
         <framework src="CoreLocation.framework" />
+        <framework src="SystemConfiguration.framework" />
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
         <framework src="libsqlite3.dylib" weak="true" />
-        <source-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/BackgroundTaskManager.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/BackgroundTaskManager.m" />
         <header-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.h" />
-        <source-file src="ios/CDVBackgroundGeolocation/BackgroundGeolocationDelegate.m" />
-        <header-file src="ios/CDVBackgroundGeolocation/BackgroundGeolocationDelegate.h" />
-        <source-file src="ios/CDVBackgroundGeolocation/BackgroundLocation.m" />
-        <header-file src="ios/CDVBackgroundGeolocation/BackgroundLocation.h" />
-        <source-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.m" />
-        <header-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.h" />
-        <source-file src="ios/CDVBackgroundGeolocation/Config.m" />
+        <source-file src="ios/CDVBackgroundGeolocation/CDVBackgroundGeolocation.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/CocoaLumberjack.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/CocoaLumberjack.m" />      
         <header-file src="ios/CDVBackgroundGeolocation/Config.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/Config.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/FMDB.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/FMDB.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/FMDBLogger.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/FMDBLogger.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/GeolocationOpenHelper.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/GeolocationOpenHelper.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/Location.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/Location.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/LocationContract.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/LocationContract.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/LocationManager.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/LocationManager.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/LocationUploader.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/LocationUploader.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/Logging.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/Logging.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/Reachability.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/Reachability.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/SQLiteHelper.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/SQLiteHelper.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/SQLiteLocationDAO.m" />
+        <header-file src="ios/CDVBackgroundGeolocation/SQLiteOpenHelper.h" />
+        <source-file src="ios/CDVBackgroundGeolocation/SQLiteOpenHelper.m" />
      </platform>
 
 </plugin>

@@ -10,7 +10,7 @@
 
 @implementation Config
 
-@synthesize stationaryRadius, distanceFilter, desiredAccuracy, isDebugging, activityType, stopOnTerminate, url, httpHeaders, saveBatteryOnBackground;
+@synthesize stationaryRadius, distanceFilter, desiredAccuracy, isDebugging, activityType, stopOnTerminate, url, syncUrl, syncThreshold, httpHeaders, saveBatteryOnBackground, maxLocations;
 
 -(id) init {
     self = [super init];
@@ -26,6 +26,8 @@
     activityType = @"OTHER";
     stopOnTerminate = NO;
     saveBatteryOnBackground = YES;
+    maxLocations = 10000;
+    syncThreshold = 100;
     
     return self;
 }
@@ -35,13 +37,13 @@
     Config *instance = [[Config alloc] init];
 
     if (config[@"stationaryRadius"]) {
-        instance.stationaryRadius = [config[@"stationaryRadius"] intValue];
+        instance.stationaryRadius = [config[@"stationaryRadius"] integerValue];
     }
     if (config[@"distanceFilter"]) {
-        instance.distanceFilter = [config[@"distanceFilter"] intValue];
+        instance.distanceFilter = [config[@"distanceFilter"] integerValue];
     }
     if (config[@"desiredAccuracy"]) {
-        instance.desiredAccuracy = [config[@"desiredAccuracy"] intValue];
+        instance.desiredAccuracy = [config[@"desiredAccuracy"] integerValue];
     }
     if (config[@"debug"]) {
         instance.isDebugging = [config[@"debug"] boolValue];
@@ -55,17 +57,38 @@
     if (config[@"url"]) {
         instance.url = config[@"url"];
     }
+    if (config[@"syncUrl"]) {
+        instance.syncUrl = config[@"syncUrl"];
+    } else if (config[@"url"]) {
+        instance.syncUrl = config[@"url"];
+    }
+    if (config[@"syncThreshold"]) {
+        instance.syncThreshold = [config[@"syncThreshold"] integerValue];
+    }
     if (config[@"httpHeaders"]) {
         instance.httpHeaders = config[@"httpHeaders"];
     }
     if (config[@"saveBatteryOnBackground"]) {
         instance.saveBatteryOnBackground = [config[@"saveBatteryOnBackground"] boolValue];
     }
+    if (config[@"maxLocations"]) {
+        instance.maxLocations = [config[@"maxLocations"] integerValue];
+    }
 
     return instance;
 }
 
-- (CLActivityType) decodeActivityType;
+- (BOOL) hasUrl
+{
+    return (url != nil && url.length > 0);
+}
+
+- (BOOL) hasSyncUrl
+{
+    return (syncUrl != nil && syncUrl.length > 0);
+}
+
+- (CLActivityType) decodeActivityType
 {
     if ([activityType caseInsensitiveCompare:@"AutomotiveNavigation"]) {
         return CLActivityTypeAutomotiveNavigation;

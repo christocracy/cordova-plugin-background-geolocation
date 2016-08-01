@@ -1,16 +1,16 @@
 //
-//  BackgroundLocation.h
+//  Location.h
 //  CDVBackgroundGeolocation
 //
 //  Created by Marian Hello on 10/06/16.
 //
 
-#ifndef BackgroundLocation_h
-#define BackgroundLocation_h
+#ifndef Location_h
+#define Location_h
 
 #import <CoreLocation/CoreLocation.h>
 
-@interface BackgroundLocation : NSObject <NSCopying>
+@interface Location : NSObject <NSCopying>
 
 @property (nonatomic, retain) NSNumber *id;
 @property (nonatomic, retain) NSDate *time;
@@ -22,22 +22,25 @@
 @property (nonatomic, retain) NSNumber *latitude;
 @property (nonatomic, retain) NSNumber *longitude;
 @property (nonatomic, retain) NSString *provider;
-@property (nonatomic, retain) NSNumber *service_provider;
+@property (nonatomic, retain) NSNumber *serviceProvider;
 @property (nonatomic, retain) NSString *type;
-@property BOOL debug;
+@property (nonatomic) BOOL isValid;
 
 + (instancetype) fromCLLocation:(CLLocation*)location;
 + (NSTimeInterval) locationAge:(CLLocation*)location;
 + (NSMutableDictionary*) toDictionary:(CLLocation*)location;;
 - (NSTimeInterval) locationAge;
 - (NSMutableDictionary*) toDictionary;
+- (NSMutableDictionary*) toDictionaryWithId;
 - (CLLocationCoordinate2D) coordinate;
-- (double) distanceFromLocation:(BackgroundLocation*)location;
-- (BOOL) isBetterLocation:(BackgroundLocation*)location;
-- (BOOL) isBeyond:(BackgroundLocation*)location radius:(NSInteger)radius;
-- (BOOL) isValid;
+- (BOOL) hasAccuracy;
+- (BOOL) hasTime;
+- (double) distanceFromLocation:(Location*)location;
+- (BOOL) isBetterLocation:(Location*)location;
+- (BOOL) isBeyond:(Location*)location radius:(NSInteger)radius;
+- (BOOL) postAsJSON:(NSString*)url withHttpHeaders:(NSMutableDictionary*)httpHeaders error:(NSError * __autoreleasing *)outError;
 - (id) copyWithZone: (NSZone *)zone;
 
 @end
 
-#endif /* BackgroundLocation_h */
+#endif /* Location_h */
