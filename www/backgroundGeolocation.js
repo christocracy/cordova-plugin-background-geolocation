@@ -21,7 +21,7 @@ var backgroundGeolocation = {
         ANDROID_DISTANCE_FILTER_PROVIDER: 0,
         ANDROID_ACTIVITY_PROVIDER: 1
     },
-    
+
     mode: {
         BACKGROUND: 0,
         FOREGROUND: 1
@@ -33,11 +33,6 @@ var backgroundGeolocation = {
         LOW: 1000,
         PASSIVE: 10000
     },
-
-    /**
-     * @property {Object} config
-     */
-    config: {},
 
     configure: function(success, failure, config) {
         exec(success || emptyFnc,
@@ -170,6 +165,16 @@ var backgroundGeolocation = {
             'getLocations', []);
     },
 
+    getValidLocations: function(success, failure) {
+        if (typeof(success) !== 'function') {
+             throw 'BackgroundGeolocation#getValidLocations requires a success callback';
+        }
+        exec(success,
+            failure || emptyFnc,
+            'BackgroundGeolocation',
+            'getValidLocations', []);
+    },
+
     deleteLocation: function(locationId, success, failure) {
         exec(success || emptyFnc,
             failure || emptyFnc,
@@ -178,10 +183,18 @@ var backgroundGeolocation = {
     },
 
     deleteAllLocations: function(success, failure) {
+        console.log('[Warning]: deleteAllLocations is deprecated and will be removed in future versions.')
         exec(success || emptyFnc,
             failure || emptyFnc,
             'BackgroundGeolocation',
             'deleteAllLocations', []);
+    },
+
+    getLogEntries: function(limit, success, failure) {
+        exec(success || emptyFnc,
+            failure || emptyFnc,
+            'BackgroundGeolocation',
+            'getLogEntries', [limit]);
     }
 };
 

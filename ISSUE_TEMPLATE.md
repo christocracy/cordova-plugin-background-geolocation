@@ -4,6 +4,7 @@
 <!--- Include as many relevant details about the environment you experienced the bug in -->
 * Plugin version:
 * Platform: iOS or Android
+* OS version:
 * Device manufacturer and model:
 * Cordova version (`cordova -v`):
 * Cordova platform version (`cordova platform ls`):

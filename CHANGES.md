@@ -1,5 +1,27 @@
 ## Changelog
 
+### [2.2.0] - unreleased
+### Added
+- Android, iOS limit maximum number of locations in db (maxLocations)
+- Android showAppSettings
+- Android, iOS database logging (getLogEntries)
+- Android, iOS autosync locations to server with configurable threshold
+- Android, method getValidLocations
+- iOS watchLocationMode and stopWatchingLocationMode
+- iOS configurable NSLocationAlwaysUsageDescription
+
+### Changed
+- Locations stored into db at all times
+- iOS persist locations also when url option is not used
+- iOS dropping support for iOS < 4
+
+### Fixed
+- Android fix crash on permission change
+- Android permission error code: 2
+- Android on start err callback instead configure err callback
+- Android overall background service reliability
+- iOS do not block js thread when posting locations
+
 ### [2.1.2] - 2016-06-23
 ### Fixed
 - iOS database not created
