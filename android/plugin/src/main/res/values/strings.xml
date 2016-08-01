@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CDVBackgroundGeolocation</string>
+    <string name="account_type">com.marianhello.account</string>
+    <string name="content_authority">com.marianhello.authority</string>
+</resources>
