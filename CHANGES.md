@@ -6,7 +6,7 @@
 - Android showAppSettings
 - Android, iOS database logging (getLogEntries)
 - Android, iOS autosync locations to server with configurable threshold
-- Android, method getValidLocations
+- Android, iOS method getValidLocations
 - iOS watchLocationMode and stopWatchingLocationMode
 - iOS configurable NSLocationAlwaysUsageDescription
 
