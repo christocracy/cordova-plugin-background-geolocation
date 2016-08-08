@@ -140,6 +140,7 @@ Configure options:
 
 | Parameter                 | Type              | Platform     | Description                                                                                                                                                                                                                                                                                                                                        |
 |---------------------------|-------------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `desiredAccuracy`         | `Number`          | all          | Desired accuracy in meters. Possible values [0, 10, 100, 1000]. The lower the number, the more power devoted to GeoLocation resulting in higher accuracy readings. 1000 results in lowest power drain and least accurate readings. @see Apple docs                                                                                                 |
 | `stationaryRadius`        | `Number`          | all          | Stationary radius in meters. When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.                                                                                                                                                                                  |
 | `debug`                   | `Boolean`         | all          | When enabled, the plugin will emit sounds for life-cycle events of background-geolocation! See debugging sounds table.                                                                                                                                                                                                                             |
 | `distanceFilter`          | `Number`          | all          | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. **@see** [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).        |
@@ -253,7 +254,7 @@ backgroundGeolocation.getLocations(
 ```
 
 ### getValidLocations(success, fail)
-Platform: Android
+Platform: iOS, Android
 
 Method will return locations, which has not been yet posted to server.
 NOTE: Locations does contain locationId.
