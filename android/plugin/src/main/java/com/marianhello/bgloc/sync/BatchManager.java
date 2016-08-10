@@ -67,11 +67,7 @@ public class BatchManager {
         JsonWriter writer = null;
 
         try {
-            File file = File.createTempFile("locations", ".json");
             db.beginTransactionNonExclusive();
-
-            FileOutputStream fs = new FileOutputStream(file);
-            writer = new JsonWriter(new OutputStreamWriter(fs, "UTF-8"));
 
             cursor = db.query(
                     SQLiteLocationContract.LocationEntry.TABLE_NAME,  // The table to query
@@ -82,7 +78,16 @@ public class BatchManager {
                     having,                    // don't filter by row groups
                     orderBy                    // The sort order
             );
+
+            if (cursor.getCount() == 0) {
+                return null;
+            }
+
+            File file = File.createTempFile("locations", ".json");
+            FileOutputStream fs = new FileOutputStream(file);
+            writer = new JsonWriter(new OutputStreamWriter(fs, "UTF-8"));
             writer.beginArray();
+
             while (cursor.moveToNext()) {
                 writer.beginObject();
                 String provider = cursor.getString(cursor.getColumnIndex(SQLiteLocationContract.LocationEntry.COLUMN_NAME_PROVIDER));

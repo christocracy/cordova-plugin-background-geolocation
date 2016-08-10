@@ -34,7 +34,7 @@ import java.util.HashMap;
  */
 public class SyncAdapter extends AbstractThreadedSyncAdapter implements UploadingCallback {
 
-    private static final int NOTIFICATION_ID = 1;
+    private static final int NOTIFICATION_ID = 666;
 
     ContentResolver contentResolver;
     private ConfigurationDAO configDAO;
@@ -122,7 +122,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Uploadin
                 return;
             }
 
-            log.info("Syncing batchStartMillis: {}", batchStartMillis);
+            log.info("Syncing startAt: {}", batchStartMillis);
             String url = config.hasSyncUrl() ? config.getSyncUrl() : config.getUrl();
             HashMap<String, String> httpHeaders = new HashMap<String, String>();
             httpHeaders.putAll(config.getHttpHeaders());
@@ -164,15 +164,18 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Uploadin
             log.warn("Error uploading locations: {}", e.getMessage());
             builder.setContentText("Sync failed: " + e.getMessage());
         } finally {
+            log.info("Syncing endAt: {}", System.currentTimeMillis());
+
             builder.setOngoing(false);
             builder.setProgress(0, 0, false);
             builder.setAutoCancel(true);
             notifyManager.notify(NOTIFICATION_ID, builder.build());
-
+            
             Handler h = new Handler(Looper.getMainLooper());
             long delayInMilliseconds = 5000;
             h.postDelayed(new Runnable() {
                 public void run() {
+                    log.info("Notification cancelledAt: {}", System.currentTimeMillis());
                     notifyManager.cancel(NOTIFICATION_ID);
                 }
             }, delayInMilliseconds);
@@ -182,6 +185,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Uploadin
     }
 
     public void uploadListener(int progress) {
+        log.debug("Syncing progress: {} updatedAt: {}", progress, System.currentTimeMillis());
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
         builder.setOngoing(true);
         builder.setContentTitle("Syncing locations");
