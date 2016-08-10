@@ -4,13 +4,17 @@
 
 Cross-platform geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
 
-Plugin is both foreground and background geolocation service. It is far more battery and data efficient then html5 geolocation or cordova-geolocation plugin. But it can be used together with other geolocation providers (eg. html5 navigator.geolocation).
+Plugin can be used for geolocation when app is running in foreground or background. It is more battery and data efficient then html5 geolocation or cordova-geolocation plugin. It can be used side by side with other geolocation providers (eg. html5 navigator.geolocation).
 
 On Android you can choose from two location location providers:
 * **ANDROID_DISTANCE_FILTER_PROVIDER** (forked from [cordova-plugin-background-geolocation](https://github.com/christocracy/cordova-plugin-background-geolocation))
 * **ANDROID_ACTIVITY_PROVIDER**
 
 See wiki [Which provider should I use?](https://github.com/mauron85/cordova-plugin-background-geolocation/blob/master/PROVIDERS.md) for more information about providers.
+
+## Example Application
+
+Checkout repository [cordova-plugin-background-geolocation-example](https://github.com/mauron85/cordova-plugin-background-geolocation-example).
 
 ## Submitting issues
 
@@ -20,10 +24,6 @@ All new issues should follow instructions in [ISSUE_TEMPLATE.md](https://raw.git
 This plugin is following semantic versioning as defined http://semver.org
 
 ## Migration to 2.0
-
-Warning: `option.url` for posting locations is very experimental and missing features like remote
-server synchronization. Location database can get very big as currently there is no cleaning mechanism.
-Use it at own risk. Proper server synchronization will be implemented in version 3.0.
 
 As version 2.0 platform support for Windows Phone 8 was removed.
 Some incompatible changes were introduced:
@@ -121,10 +121,6 @@ function onDeviceReady () {
     // backgroundGeolocation.stop();
 }
 ```
-
-## Example Application
-
-Checkout repository [cordova-plugin-background-geolocation-example](https://github.com/mauron85/cordova-plugin-background-geolocation-example).
 
 ## API
 
@@ -410,9 +406,7 @@ Since the plugin uses **iOS** significant-changes API, the plugin cannot detect 
 
 ### Android
 
-Android **WILL** execute your configured ```callbackFn```. This is the main difference from original christocracy plugin.
-
-On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it. Check [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-implementation) for explanation.
+On Android devices it is recommended to have a notification in the drawer (option `startForeground:true`). This gives plugin location service higher priority, decreasing probability of OS killing it. Check [wiki](https://github.com/mauron85/cordova-plugin-background-geolocation/wiki/Android-implementation) for explanation.
 
 #### Custom ROMs
 
@@ -501,7 +495,7 @@ function printLogs(logEntries, logFormatter, COLORS, MAX_LINES) {
 }
 
 function printAndroidLogs(logEntries) {
-  var COLORS = Array(5);
+  var COLORS = Object();
   COLORS['ERROR'] = 'background:white;color:red';
   COLORS['WARN'] = 'background:black;color:yellow';
   COLORS['INFO'] = 'background:white;color:blue';
@@ -519,7 +513,7 @@ function printAndroidLogs(logEntries) {
 }
 
 function printIosLogs(logEntries) {
-  var COLORS = Array(5);
+  var COLORS = Array();
   COLORS[1] = 'background:white;color:red';
   COLORS[2] = 'background:black;color:yellow';
   COLORS[4] = 'background:white;color:blue';

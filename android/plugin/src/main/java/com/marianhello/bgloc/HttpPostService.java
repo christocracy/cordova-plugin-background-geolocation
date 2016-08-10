@@ -51,7 +51,7 @@ public class HttpPostService {
         return conn.getResponseCode();
     }
 
-    public static int postJSON(String url, File file, Map headers, UploadingCallback callback) throws IOException {
+    public static int postFile(String url, File file, Map headers, UploadingCallback callback) throws IOException {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
 
         conn.setDoInput(false);

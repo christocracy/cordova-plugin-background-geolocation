@@ -24,8 +24,6 @@ import org.json.JSONException;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.HashMap;
 
 /**
@@ -152,7 +150,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter implements Uploadin
         notifyManager.notify(NOTIFICATION_ID, builder.build());
 
         try {
-            int responseCode = HttpPostService.postJSON(url, file, httpHeaders, this);
+            int responseCode = HttpPostService.postFile(url, file, httpHeaders, this);
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 builder.setContentText("Sync completed");
             } else {

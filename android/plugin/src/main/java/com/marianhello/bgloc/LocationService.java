@@ -17,7 +17,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -41,7 +40,6 @@ import com.marianhello.bgloc.data.DAOFactory;
 import com.marianhello.bgloc.data.LocationDAO;
 import com.marianhello.bgloc.sync.AccountHelper;
 import com.marianhello.bgloc.sync.AuthenticatorService;
-import com.marianhello.bgloc.sync.BatchManager;
 import com.marianhello.bgloc.sync.SyncService;
 import com.marianhello.logging.LoggerManager;
 
