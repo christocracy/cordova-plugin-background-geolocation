@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.0.alfa.4] - 2016-08-10
+### Fixed
+- Android issue #137 - fix only for API LEVEL >= 17
+
 ### [2.2.0.alfa.3] - 2016-08-10
 ### Fixed
 - Android issue #139 - Starting backgroundGeolocation just after configure failed

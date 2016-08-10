@@ -401,9 +401,7 @@ enum {
     Location *location = [locationQueue firstObject];
     [locationQueue removeObject:location];
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self sync:location];
-    });
+    [self sync:location];
 
     if (![location.type isEqual: @"current"]) {
         return;

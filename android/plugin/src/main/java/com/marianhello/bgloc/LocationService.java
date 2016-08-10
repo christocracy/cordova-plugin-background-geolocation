@@ -332,10 +332,13 @@ public class LocationService extends Service {
     public void handleLocation(BackgroundLocation location) {
         log.debug("New location {}", location.toString());
 
-        if (location.isBetterLocationThan(lastLocation) == false) {
-            log.debug("Previous location: [{} acc={} t={}] is better than current",
-                    lastLocation.getProvider(), lastLocation.getAccuracy(), lastLocation.getTime());
-            return;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // we do check only of API level >= 17 because in lower version it does more harm then good
+            if (location.isBetterLocationThan(lastLocation) == false) {
+                log.debug("Previous location: [{} acc={} t={}] is better than current",
+                        lastLocation.getProvider(), lastLocation.getAccuracy(), lastLocation.getTime());
+                return;
+            }
         }
 
         location.setBatchStartMillis(System.currentTimeMillis() + ONE_MINUTE); // prevent sync of not yet posted location

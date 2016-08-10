@@ -33,7 +33,7 @@ public class BackgroundLocation implements Parcelable {
     private boolean isValid = true;
     private Bundle extras = null;
 
-    private static final int TWO_MINUTES = 1000 * 60 * 2;
+    private static final long TWO_MINUTES_IN_NANOS = 1000000000L * 60 * 2;
 
     public BackgroundLocation() {}
 
@@ -587,11 +587,19 @@ public class BackgroundLocation implements Parcelable {
             return true;
         }
 
+        long timeDeltaInNanos = 0;
         // Check whether the new location fix is newer or older
-        long timeDelta = location.getTime() - currentBestLocation.getTime();
-        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
-        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
-        boolean isNewer = timeDelta > 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // because getTime is not monotonic
+            timeDeltaInNanos = location.getElapsedRealtimeNanos() - currentBestLocation.getElapsedRealtimeNanos();
+        } else {
+            // unfortunately there is no other way for pre JELLY_BEAN_MR1 (API Level 17)
+            timeDeltaInNanos = (location.getTime() - currentBestLocation.getTime()) * 1000000;
+        }
+
+        boolean isSignificantlyNewer = timeDeltaInNanos > TWO_MINUTES_IN_NANOS;
+        boolean isSignificantlyOlder = timeDeltaInNanos < -TWO_MINUTES_IN_NANOS;
+        boolean isNewer = timeDeltaInNanos > 0;
 
         // If it's been more than two minutes since the current location, use the new location
         // because the user has likely moved
