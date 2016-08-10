@@ -1,6 +1,10 @@
 ## Changelog
 
-### [2.2.0] - unreleased
+### [2.2.0.alfa.2] - 2016-08-10
+### Fixed
+- iOS issue #132 use Library as DB path
+
+### [2.2.0.alfa.1] - 2016-08-01
 ### Added
 - Android, iOS limit maximum number of locations in db (maxLocations)
 - Android showAppSettings
