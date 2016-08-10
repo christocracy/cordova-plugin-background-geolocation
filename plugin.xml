@@ -28,7 +28,6 @@
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/ActivityRecognitionLocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/BootCompletedReceiver.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/Config.java" target-dir="src/com/marianhello/bgloc"/>
-        <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/DummyActivity.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/HttpPostService.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/LocationProvider.java" target-dir="src/com/marianhello/bgloc"/>
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/LocationProviderFactory.java" target-dir="src/com/marianhello/bgloc"/>
@@ -71,18 +70,6 @@
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
-            <activity
-                android:name="com.marianhello.bgloc.DummyActivity"
-                android:theme="@android:style/Theme.NoDisplay"
-                android:enabled="true"
-                android:allowTaskReparenting="true"
-                android:noHistory="true"
-                android:excludeFromRecents="true"
-                android:alwaysRetainTaskState="false"
-                android:stateNotNeeded="true"
-                android:clearTaskOnLaunch="true"
-                android:finishOnTaskLaunch="true"
-                />
             <service
                 android:name="com.marianhello.bgloc.sync.SyncService"
                 android:exported="true"

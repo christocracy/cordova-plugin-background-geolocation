@@ -187,7 +187,6 @@ public class LocationService extends Service {
     public void onDestroy() {
         log.info("Destroying LocationService");
         provider.onDestroy();
-//        stopForeground(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             handlerThread.quitSafely();
         } else {
@@ -197,7 +196,6 @@ public class LocationService extends Service {
         super.onDestroy();
     }
 
-    // @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         log.debug("Task has been removed");
@@ -206,9 +204,6 @@ public class LocationService extends Service {
             stopSelf();
         } else {
             log.info("Continue running in background");
-//            Intent intent = new Intent( this, DummyActivity.class );
-//            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-//            startActivity(intent);
         }
         super.onTaskRemoved(rootIntent);
     }
@@ -333,7 +328,7 @@ public class LocationService extends Service {
         log.debug("New location {}", location.toString());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            // we do check only of API level >= 17 because in lower version it does more harm then good
+            // we do check only of API level >= 17 because in lower version it does more harm than good
             if (location.isBetterLocationThan(lastLocation) == false) {
                 log.debug("Previous location: [{} acc={} t={}] is better than current",
                         lastLocation.getProvider(), lastLocation.getAccuracy(), lastLocation.getTime());
@@ -441,15 +436,6 @@ public class LocationService extends Service {
         else {
             task.execute(location);
         }
-    }
-
-    /**
-     * Forces the main activity to re-launch if it's unloaded.
-     */
-    private void forceMainActivityReload() {
-        PackageManager pm = getPackageManager();
-        Intent launchIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
-        startActivity(launchIntent);
     }
 
     public Config getConfig() {
