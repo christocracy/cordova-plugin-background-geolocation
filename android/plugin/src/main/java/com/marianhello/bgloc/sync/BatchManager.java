@@ -28,7 +28,7 @@ public class BatchManager {
         this.context = context;
     }
 
-    public File createBatch(Long batchStartMillis) throws IOException {
+    public File createBatch(Long batchStartMillis, Integer syncThreshold) throws IOException {
         log.info("Creating batch {}", batchStartMillis);
 
         SQLiteOpenHelper helper = SQLiteOpenHelper.getHelper(context);
@@ -79,7 +79,7 @@ public class BatchManager {
                     orderBy                    // The sort order
             );
 
-            if (cursor.getCount() == 0) {
+            if (cursor.getCount() < syncThreshold) {
                 return null;
             }
 

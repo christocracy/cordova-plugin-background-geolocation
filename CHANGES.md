@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.0.alfa.6] - 2016-08-10
+### Fixed
+- Android don't try sync when locations count is lower then threshold
+
 ### [2.2.0.alfa.5] - 2016-08-10
 ### Fixed
 - Android issue #130 - sync complete notification stays visible
