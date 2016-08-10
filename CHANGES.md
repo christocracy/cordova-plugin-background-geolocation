@@ -1,5 +1,10 @@
 ## Changelog
 
+### [2.2.0.alfa.5] - 2016-08-10
+### Fixed
+- Android issue #130 - sync complete notification stays visible
+- Android don't try sync when locations count is zero
+
 ### [2.2.0.alfa.4] - 2016-08-10
 ### Fixed
 - Android issue #137 - fix only for API LEVEL >= 17
