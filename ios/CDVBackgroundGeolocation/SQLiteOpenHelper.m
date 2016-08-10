@@ -192,9 +192,9 @@ static int const OPEN_READWRITE = SQLITE_OPEN_CREATE|SQLITE_OPEN_READWRITE|SQLIT
 
 - (NSString*) getDatabasePath:(NSString*)name
 {
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *databasePath = [[NSString alloc]initWithString:[documentsDirectory stringByAppendingPathComponent:name]];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSString *libraryDirectory = [paths objectAtIndex:0];
+    NSString *databasePath = [[NSString alloc]initWithString:[libraryDirectory stringByAppendingPathComponent:name]];
     
     return databasePath;
 }
