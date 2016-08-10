@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.0.alfa.3] - 2016-08-10
+### Fixed
+- Android issue #139 - Starting backgroundGeolocation just after configure failed
+
 ### [2.2.0.alfa.2] - 2016-08-10
 ### Fixed
 - iOS issue #132 use Library as DB path

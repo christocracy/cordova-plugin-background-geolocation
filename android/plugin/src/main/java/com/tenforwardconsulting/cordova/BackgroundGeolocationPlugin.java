@@ -240,25 +240,24 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     }
 
     public boolean execute(String action, final JSONArray data, final CallbackContext callbackContext) {
-        Activity activity = getActivity();
         Context context = getContext();
 
         if (ACTION_START.equals(action)) {
-            if (config == null) {
-                log.warn("Attempt to start unconfigured service");
-                callbackContext.error("Plugin not configured. Please call configure method first.");
-                return true;
-            }
-
-            if (!hasPermissions()) {
-                log.info("Requesting permissions from user");
-                actionStartCallbackContext = callbackContext;
-                PermissionHelper.requestPermissions(this, START_REQ_CODE, permissions);
-                return true;
-            }
-
             executorService.execute(new Runnable() {
                 public void run() {
+                    if (config == null) {
+                        log.warn("Attempt to start unconfigured service");
+                        callbackContext.error("Plugin not configured. Please call configure method first.");
+                        return;
+                    }
+
+                    if (!hasPermissions()) {
+                        log.info("Requesting permissions from user");
+                        actionStartCallbackContext = callbackContext;
+                        PermissionHelper.requestPermissions(getSelf(), START_REQ_CODE, permissions);
+                        return;
+                    }
+
                     startAndBindBackgroundService();
                     callbackContext.success();
                 }
@@ -478,6 +477,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             stopBackgroundService();
         }
         super.onDestroy();
+    }
+
+    protected BackgroundGeolocationPlugin getSelf() {
+        return this;
     }
 
     protected Activity getActivity() {

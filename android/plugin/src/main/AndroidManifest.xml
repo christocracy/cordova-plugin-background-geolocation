@@ -40,11 +40,6 @@
                 android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/authenticator" />
         </service>
-        <provider
-            android:name="com.marianhello.bgloc.data.LocationContentProvider"
-            android:authorities="@string/content_authority"
-            android:exported="false"
-            android:syncable="true"/>
     </application>
 
 </manifest>

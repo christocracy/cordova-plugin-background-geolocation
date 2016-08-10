@@ -666,7 +666,11 @@ public class BackgroundLocation implements Parcelable {
         } else {
             s.append(" acc=???");
         }
-        if (time == 0) s.append(" t=?!?");
+        if (time == 0) {
+            s.append(" t=?!?");
+        } else {
+            s.append(" t=").append(time);
+        }
         if (elapsedRealtimeNanos == 0) {
             s.append(" et=?!?");
         } else {

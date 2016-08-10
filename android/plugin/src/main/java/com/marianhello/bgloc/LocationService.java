@@ -333,7 +333,7 @@ public class LocationService extends Service {
         log.debug("New location {}", location.toString());
 
         if (location.isBetterLocationThan(lastLocation) == false) {
-            log.debug("Previous location: [{} acc={} time={}] is better than current",
+            log.debug("Previous location: [{} acc={} t={}] is better than current",
                     lastLocation.getProvider(), lastLocation.getAccuracy(), lastLocation.getTime());
             return;
         }
