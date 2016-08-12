@@ -9,15 +9,5 @@
 !/package.json
 !/www
 !/android
-/android/*
-!/android/src
 !/ios
-/ios/*
-!/ios/CDVBackgroundGeolocation.xcodeproj
-/ios/CDVBackgroundGeolocation.xcodeproj/*
-!/ios/CDVBackgroundGeolocation.xcodeproj/project.pbxproj
-!/ios/CDVBackgroundGeolocation
-!/ios/CDVBackgroundGeolocationTests
-!/ios/CordovaLib
-/ios/CordovaLib/*
-!/ios/CordovaLib/README.md
+!/LICENSE
