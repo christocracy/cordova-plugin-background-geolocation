@@ -25,7 +25,8 @@ enum {
     instance.accuracy = [NSNumber numberWithDouble:location.horizontalAccuracy];
     instance.altitudeAccuracy = [NSNumber numberWithDouble:location.verticalAccuracy];
     instance.speed = [NSNumber numberWithDouble:location.speed];
-    instance.heading = [NSNumber numberWithDouble:location.course];
+    instance.heading = [NSNumber numberWithDouble:location.course]; // will be deprecated
+    instance.bearing = [NSNumber numberWithDouble:location.course];
     instance.altitude = [NSNumber numberWithDouble:location.altitude];
     instance.latitude = [NSNumber numberWithDouble:location.coordinate.latitude];
     instance.longitude = [NSNumber numberWithDouble:location.coordinate.longitude];
@@ -35,7 +36,7 @@ enum {
 
 + (NSTimeInterval) locationAge:(CLLocation*)location
 {
-    return -[location.timestamp timeIntervalSinceNow];    
+    return -[location.timestamp timeIntervalSinceNow];
 }
 
 + (NSMutableDictionary*) toDictionary:(CLLocation*)location;
@@ -48,6 +49,7 @@ enum {
     [dict setObject:[NSNumber numberWithDouble:location.verticalAccuracy] forKey:@"altitudeAccuracy"];
     [dict setObject:[NSNumber numberWithDouble:location.speed] forKey:@"speed"];
     [dict setObject:[NSNumber numberWithDouble:location.course] forKey:@"heading"];
+    [dict setObject:[NSNumber numberWithDouble:location.course] forKey:@"bearing"];
     [dict setObject:[NSNumber numberWithDouble:location.altitude] forKey:@"altitude"];
     [dict setObject:[NSNumber numberWithDouble:location.coordinate.latitude] forKey:@"latitude"];
     [dict setObject:[NSNumber numberWithDouble:location.coordinate.longitude] forKey:@"longitude"];
@@ -98,6 +100,7 @@ enum {
     if (altitudeAccuracy != nil) [dict setObject:altitudeAccuracy forKey:@"altitudeAccuracy"];
     if (speed != nil) [dict setObject:speed forKey:@"speed"];
     if (heading != nil) [dict setObject:heading forKey:@"heading"];
+    if (bearing != nil) [dict setObject:bearing forKey:@"bearing"];
     if (altitude != nil) [dict setObject:altitude forKey:@"altitude"];
     if (latitude != nil) [dict setObject:latitude forKey:@"latitude"];
     if (longitude != nil) [dict setObject:longitude forKey:@"longitude"];
@@ -199,7 +202,7 @@ enum {
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"Location: id=%ld time=%ld lat=%@ lon=%@ accu=%@ aaccu=%@ speed=%@ head=%@ alt=%@ type=%@", (long)id, (long)time, latitude, longitude, accuracy, altitudeAccuracy, speed, heading, altitude, type];
+    return [NSString stringWithFormat:@"Location: id=%ld time=%ld lat=%@ lon=%@ accu=%@ aaccu=%@ speed=%@ head=%@ alt=%@ type=%@", (long)id, (long)time, latitude, longitude, accuracy, altitudeAccuracy, speed, bearing, altitude, type];
 }
 
 - (BOOL) postAsJSON:(NSString*)url withHttpHeaders:(NSMutableDictionary*)httpHeaders error:(NSError * __autoreleasing *)outError;
@@ -231,7 +234,7 @@ enum {
         return YES;
     }
     
-    return NO;    
+    return NO;
 }
 
 -(id) copyWithZone: (NSZone *) zone
@@ -243,6 +246,7 @@ enum {
         copy.altitudeAccuracy = altitudeAccuracy;
         copy.speed = speed;
         copy.heading = heading;
+        copy.bearing = bearing;
         copy.altitude = altitude;
         copy.latitude = latitude;
         copy.longitude = longitude;
