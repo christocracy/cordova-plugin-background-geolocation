@@ -18,7 +18,12 @@ Checkout repository [cordova-plugin-background-geolocation-example](https://gith
 
 ## Submitting issues
 
-All new issues should follow instructions in [ISSUE_TEMPLATE.md](https://raw.githubusercontent.com/mauron85/cordova-plugin-background-geolocation/master/ISSUE_TEMPLATE.md). Properly filled issue report will significantly reduce number of follow up questions and decrease issue resolve time.
+All new issues should follow instructions in [ISSUE_TEMPLATE.md](https://raw.githubusercontent.com/mauron85/cordova-plugin-background-geolocation/master/ISSUE_TEMPLATE.md).
+Properly filled issue report will significantly reduce number of follow up questions and decrease issue resolving time.
+Most issues cannot be resolved without debug logs. Please try to isolate debug lines related to your issue.
+Instructions how to prepare debug logs can be found in section [Debugging](#debugging).
+If you're reporting app crash, debug logs might not contain all needed informations about the cause of the crash.
+In that case, also provide relevant parts of output of `adb logcat` command.
 
 ## Semantic Versioning
 This plugin is following semantic versioning as defined http://semver.org
@@ -293,6 +298,12 @@ backgroundGeolocation.switchMode(backgroundGeolocation.mode.FOREGROUND);
 // switch to BACKGROUND mode
 backgroundGeolocation.switchMode(backgroundGeolocation.mode.BACKGROUND);
 ```
+### getLogEntries(limit, success, fail)
+Platform: iOS, Android
+
+Return all logged events. Useful for plugin debugging.
+Parameter `limit` limits number of returned entries.
+**@see [Debugging](#debugging)** for more information.
 
 ## Real world example
 
