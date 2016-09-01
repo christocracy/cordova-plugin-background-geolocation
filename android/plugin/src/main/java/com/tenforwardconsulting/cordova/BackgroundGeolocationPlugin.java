@@ -44,7 +44,7 @@ import com.marianhello.bgloc.data.DAOFactory;
 import com.marianhello.bgloc.data.LocationDAO;
 import com.marianhello.cordova.JSONErrorFactory;
 import com.marianhello.cordova.PermissionHelper;
-import com.marianhello.logging.FileLogReader;
+import com.marianhello.logging.DBLogReader;
 import com.marianhello.logging.LogEntry;
 import com.marianhello.logging.LogReader;
 import com.marianhello.logging.LoggerManager;
@@ -230,7 +230,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         super.pluginInitialize();
 
         log = LoggerManager.getLogger(BackgroundGeolocationPlugin.class);
-        LoggerManager.enableRollingFileLogging();
+        LoggerManager.enableDBLogging();
         log.info("initializing plugin");
 
         final ResourceResolver res = ResourceResolver.newInstance(getApplication());
@@ -655,7 +655,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
 
     public JSONArray getLogs(Integer limit) throws Exception {
         JSONArray jsonLogsArray = new JSONArray();
-        LogReader logReader = new FileLogReader();
+        LogReader logReader = new DBLogReader();
         Collection<LogEntry> logEntries = logReader.getEntries(limit);
         for (LogEntry logEntry : logEntries) {
             jsonLogsArray.put(logEntry.toJSONObject());

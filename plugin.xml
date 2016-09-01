@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-mauron85-background-geolocation"
-        version="2.2.0-alpha.6">
+        version="2.2.0-alpha.7">
     <name>CDVBackgroundGeolocation</name>
     <description>Cordova Background Geolocation Plugin</description>
     <license>Apache-2.0</license>
@@ -50,7 +50,7 @@
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/sync/DummyContentProvider.java" target-dir="src/com/marianhello/bgloc/sync" />
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/sync/SyncAdapter.java" target-dir="src/com/marianhello/bgloc/sync" />
         <source-file src="android/plugin/src/main/java/com/marianhello/bgloc/sync/SyncService.java" target-dir="src/com/marianhello/bgloc/sync" />
-        <source-file src="android/plugin/src/main/java/com/marianhello/logging/FileLogReader.java" target-dir="src/com/marianhello/logging" />
+        <source-file src="android/plugin/src/main/java/com/marianhello/logging/DBLogReader.java" target-dir="src/com/marianhello/logging" />
         <source-file src="android/plugin/src/main/java/com/marianhello/logging/LogEntry.java" target-dir="src/com/marianhello/logging" />
         <source-file src="android/plugin/src/main/java/com/marianhello/logging/LoggerManager.java" target-dir="src/com/marianhello/logging" />
         <source-file src="android/plugin/src/main/java/com/marianhello/logging/LogReader.java" target-dir="src/com/marianhello/logging" />

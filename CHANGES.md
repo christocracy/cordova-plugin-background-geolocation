@@ -1,5 +1,13 @@
 ## Changelog
 
+### [2.2.0-alfa.7] - unreleased
+#### Removed
+- Android location filtering
+
+### Changed
+- Android db logging instead of file
+- iOS location prop heading renamed to bearing
+
 ### [2.2.0-alfa.6] - 2016-08-10
 ### Fixed
 - Android don't try sync when locations count is lower then threshold
