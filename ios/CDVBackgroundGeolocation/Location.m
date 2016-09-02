@@ -26,7 +26,6 @@ enum {
     instance.altitudeAccuracy = [NSNumber numberWithDouble:location.verticalAccuracy];
     instance.speed = [NSNumber numberWithDouble:location.speed];
     instance.heading = [NSNumber numberWithDouble:location.course]; // will be deprecated
-    instance.bearing = [NSNumber numberWithDouble:location.course];
     instance.altitude = [NSNumber numberWithDouble:location.altitude];
     instance.latitude = [NSNumber numberWithDouble:location.coordinate.latitude];
     instance.longitude = [NSNumber numberWithDouble:location.coordinate.longitude];
@@ -99,8 +98,8 @@ enum {
     if (accuracy != nil) [dict setObject:accuracy forKey:@"accuracy"];
     if (altitudeAccuracy != nil) [dict setObject:altitudeAccuracy forKey:@"altitudeAccuracy"];
     if (speed != nil) [dict setObject:speed forKey:@"speed"];
-    if (heading != nil) [dict setObject:heading forKey:@"heading"];
-    if (bearing != nil) [dict setObject:bearing forKey:@"bearing"];
+    if (heading != nil) [dict setObject:heading forKey:@"heading"]; // @deprecated
+    if (heading != nil) [dict setObject:heading forKey:@"bearing"];
     if (altitude != nil) [dict setObject:altitude forKey:@"altitude"];
     if (latitude != nil) [dict setObject:latitude forKey:@"latitude"];
     if (longitude != nil) [dict setObject:longitude forKey:@"longitude"];
@@ -202,7 +201,7 @@ enum {
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"Location: id=%ld time=%ld lat=%@ lon=%@ accu=%@ aaccu=%@ speed=%@ head=%@ alt=%@ type=%@", (long)id, (long)time, latitude, longitude, accuracy, altitudeAccuracy, speed, bearing, altitude, type];
+    return [NSString stringWithFormat:@"Location: id=%ld time=%ld lat=%@ lon=%@ accu=%@ aaccu=%@ speed=%@ bear=%@ alt=%@ type=%@", (long)id, (long)time, latitude, longitude, accuracy, altitudeAccuracy, speed, heading, altitude, type];
 }
 
 - (BOOL) postAsJSON:(NSString*)url withHttpHeaders:(NSMutableDictionary*)httpHeaders error:(NSError * __autoreleasing *)outError;
@@ -246,7 +245,6 @@ enum {
         copy.altitudeAccuracy = altitudeAccuracy;
         copy.speed = speed;
         copy.heading = heading;
-        copy.bearing = bearing;
         copy.altitude = altitude;
         copy.latitude = latitude;
         copy.longitude = longitude;

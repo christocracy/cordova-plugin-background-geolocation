@@ -1,6 +1,10 @@
 ## Changelog
 
-### [2.2.0-alfa.7] - unreleased
+### [2.2.0-alfa.8] - 2016-09-02
+### Fixed
+- iOS compilation errors
+
+### [2.2.0-alfa.7] - 2016-09-01
 #### Removed
 - Android location filtering
 
