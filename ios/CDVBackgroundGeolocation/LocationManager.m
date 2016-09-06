@@ -142,6 +142,7 @@ enum {
  * @param {BOOL} stopOnTerminate
  * @param {NSString*} url
  * @param {NSMutableDictionary*} httpHeaders
+ * @param {BOOL} pauseLocationUpdates
  */
 - (BOOL) configure:(Config*)config error:(NSError * __autoreleasing *)outError
 {
@@ -150,7 +151,7 @@ enum {
 
     DDLogDebug(@"%@", config);
 
-    locationManager.pausesLocationUpdatesAutomatically = YES;
+    locationManager.pausesLocationUpdatesAutomatically = _config.pauseLocationUpdates;
     locationManager.activityType = [_config decodeActivityType];
     locationManager.distanceFilter = _config.distanceFilter; // meters
     locationManager.desiredAccuracy = [_config decodeDesiredAccuracy];
