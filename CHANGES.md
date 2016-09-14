@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.0] - 2016-09-14
+### Added
+- iOS option pauseLocationUpdates PR #156
+
 ### [2.2.0-alfa.8] - 2016-09-02
 ### Fixed
 - iOS compilation errors
