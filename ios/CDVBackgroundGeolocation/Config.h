@@ -24,6 +24,7 @@
 @property NSMutableDictionary* httpHeaders;
 @property BOOL saveBatteryOnBackground;
 @property NSInteger maxLocations;
+@property BOOL pauseLocationUpdates;
 
 + (instancetype) fromDictionary:(NSDictionary*)config;
 - (CLActivityType) decodeActivityType;

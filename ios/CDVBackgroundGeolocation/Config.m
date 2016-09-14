@@ -10,11 +10,11 @@
 
 @implementation Config
 
-@synthesize stationaryRadius, distanceFilter, desiredAccuracy, isDebugging, activityType, stopOnTerminate, url, syncUrl, syncThreshold, httpHeaders, saveBatteryOnBackground, maxLocations;
+@synthesize stationaryRadius, distanceFilter, desiredAccuracy, isDebugging, activityType, stopOnTerminate, url, syncUrl, syncThreshold, httpHeaders, saveBatteryOnBackground, maxLocations, pauseLocationUpdates;
 
 -(id) init {
     self = [super init];
-    
+
     if (self == nil) {
         return self;
     }
@@ -28,7 +28,8 @@
     saveBatteryOnBackground = YES;
     maxLocations = 10000;
     syncThreshold = 100;
-    
+    pauseLocationUpdates = YES;
+
     return self;
 }
 
@@ -74,6 +75,9 @@
     if (config[@"maxLocations"]) {
         instance.maxLocations = [config[@"maxLocations"] integerValue];
     }
+    if (config[@"pauseLocationUpdates"]) {
+        instance.pauseLocationUpdates = [config[@"pauseLocationUpdates"] boolValue];
+    }
 
     return instance;
 }
@@ -117,13 +121,13 @@
     if (desiredAccuracy >= 0) {
         return kCLLocationAccuracyBest;
     }
-    
+
     return kCLLocationAccuracyHundredMeters;
 }
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"Config: distanceFilter=%ld stationaryRadius=%ld desiredAccuracy=%ld activityType=%@ isDebugging=%d stopOnTerminate=%d url=%@ httpHeaders=%@", (long)distanceFilter, (long)stationaryRadius, (long)desiredAccuracy, activityType, isDebugging, stopOnTerminate, url, httpHeaders];
+    return [NSString stringWithFormat:@"Config: distanceFilter=%ld stationaryRadius=%ld desiredAccuracy=%ld activityType=%@ isDebugging=%d stopOnTerminate=%d url=%@ httpHeaders=%@ pauseLocationUpdates=%d", (long)distanceFilter, (long)stationaryRadius, (long)desiredAccuracy, activityType, isDebugging, stopOnTerminate, url, httpHeaders, pauseLocationUpdates];
 }
 
 
