@@ -23,7 +23,7 @@ static NSInteger const kDatabaseVersion = 1;
 
 - (void) drop:(NSString*)table inDatabase:(FMDatabase*)database
 {
-    NSString *sql = [NSString stringWithFormat: @"DROP TABLE %@", table];
+    NSString *sql = [NSString stringWithFormat: @"DROP TABLE IF EXISTS %@", table];
     if (![database executeStatements:sql]) {
         NSLog(@"%@ failed code: %d: message: %@", sql, [database lastErrorCode], [database lastErrorMessage]);
     }

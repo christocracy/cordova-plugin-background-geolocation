@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.1] - 2016-09-15
+### Added
+- iOS suppress minor error messages on first app run
+
 ### [2.2.0] - 2016-09-14
 ### Added
 - iOS option pauseLocationUpdates PR #156
