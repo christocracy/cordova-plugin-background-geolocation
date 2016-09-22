@@ -1,5 +1,14 @@
 ## Changelog
 
+### [2.2.2] - 2016-09-22
+### Added
+- Android android.hardware.location permission
+
+### Fixed
+- iOS onStationary null location
+- iOS fix potential issue sending outdated location
+- iOS handle null config options
+
 ### [2.2.1] - 2016-09-15
 ### Added
 - iOS suppress minor error messages on first app run
