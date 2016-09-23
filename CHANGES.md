@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.4] - 2016-09-24
+### Fixed
+- iOS extremely stupid config bug from 2.2.3
+
 ### [2.2.3] - 2016-09-23
 ### Fixed
 - Android issue #173 - allow stop service and prevent crash on destroy

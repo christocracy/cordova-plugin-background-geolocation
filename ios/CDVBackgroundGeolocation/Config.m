@@ -8,7 +8,8 @@
 #import <Foundation/Foundation.h>
 #import "Config.h"
 
-#define isNull(value) value == nil || [value isKindOfClass:[NSNull class]]
+#define isNull(value) (value == nil || value == (id)[NSNull null])
+#define isNotNull(value) (value != nil && value != (id)[NSNull null])
 
 @implementation Config
 
@@ -39,45 +40,45 @@
 {
     Config *instance = [[Config alloc] init];
 
-    if (isNull(config[@"stationaryRadius"]) == NO) {
+    if (isNotNull(config[@"stationaryRadius"])) {
         instance.stationaryRadius = [config[@"stationaryRadius"] integerValue];
     }
-    if (isNull(config[@"distanceFilter"]) == NO) {
+    if (isNotNull(config[@"distanceFilter"])) {
         instance.distanceFilter = [config[@"distanceFilter"] integerValue];
     }
-    if (isNull(config[@"desiredAccuracy"]) == NO) {
+    if (isNotNull(config[@"desiredAccuracy"])) {
         instance.desiredAccuracy = [config[@"desiredAccuracy"] integerValue];
     }
-    if (isNull(config[@"debug"]) == NO) {
+    if (isNotNull(config[@"debug"])) {
         instance.isDebugging = [config[@"debug"] boolValue];
     }
-    if (isNull(config[@"activityType"]) == NO) {
+    if (isNotNull(config[@"activityType"])) {
         instance.activityType = config[@"activityType"];
     }
-    if (isNull(config[@"stopOnTerminate"]) == NO) {
+    if (isNotNull(config[@"stopOnTerminate"])) {
         instance.stopOnTerminate = [config[@"stopOnTerminate"] boolValue];
     }
-    if (isNull(config[@"url"]) == NO) {
+    if (isNotNull(config[@"url"])) {
         instance.url = config[@"url"];
     }
-    if (isNull(config[@"syncUrl"]) == NO) {
+    if (isNotNull(config[@"syncUrl"])) {
         instance.syncUrl = config[@"syncUrl"];
-    } else if (isNull(config[@"url"]) == NO) {
+    } else if (isNull(config[@"url"])) {
         instance.syncUrl = config[@"url"];
     }
-    if (isNull(config[@"syncThreshold"]) == NO) {
+    if (isNotNull(config[@"syncThreshold"])) {
         instance.syncThreshold = [config[@"syncThreshold"] integerValue];
     }
-    if (isNull(config[@"httpHeaders"]) == NO) {
+    if (isNotNull(config[@"httpHeaders"])) {
         instance.httpHeaders = config[@"httpHeaders"];
     }
-    if (isNull(config[@"saveBatteryOnBackground"]) == NO) {
+    if (isNotNull(config[@"saveBatteryOnBackground"])) {
         instance.saveBatteryOnBackground = [config[@"saveBatteryOnBackground"] boolValue];
     }
-    if (isNull(config[@"maxLocations"]) == NO) {
+    if (isNotNull(config[@"maxLocations"])) {
         instance.maxLocations = [config[@"maxLocations"] integerValue];
     }
-    if (isNull(config[@"pauseLocationUpdates"]) == NO) {
+    if (isNotNull(config[@"pauseLocationUpdates"])) {
         instance.pauseLocationUpdates = [config[@"pauseLocationUpdates"] boolValue];
     }
 
