@@ -385,6 +385,8 @@ When only `option.syncUrl` is defined. Locations are send only in single batch, 
 
 Request body of posted locations is always array, even when only one location is sent.
 
+Warning: `option.maxLocations` has to be larger than `option.syncTreshold`. It's recommended to be 2x larger. In other case location syncing might not work properly.
+
 ### Example of express (nodejs) server
 ```javascript
 var express    = require('express');
