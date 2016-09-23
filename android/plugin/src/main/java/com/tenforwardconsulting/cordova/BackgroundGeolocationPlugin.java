@@ -471,9 +471,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public void onDestroy() {
         log.info("Destroying plugin");
         unregisterLocationModeChangeReceiver();
-        // Unbind from the service
         doUnbindService();
-        if (config.getStopOnTerminate()) {
+        if (config != null && config.getStopOnTerminate()) {
             stopBackgroundService();
         }
         super.onDestroy();
@@ -518,12 +517,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     }
 
     protected void stopBackgroundService() {
-        if (isServiceRunning) {
-            log.info("Stopping bg service");
-            Activity activity = getActivity();
-            activity.stopService(new Intent(activity, LocationService.class));
-            isServiceRunning = false;
-        }
+        log.info("Stopping bg service");
+        Activity activity = getActivity();
+        activity.stopService(new Intent(activity, LocationService.class));
+        isServiceRunning = false;
     }
 
     void doBindService () {

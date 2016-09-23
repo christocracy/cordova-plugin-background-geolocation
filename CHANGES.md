@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.3] - 2016-09-23
+### Fixed
+- Android issue #173 - allow stop service and prevent crash on destroy
+
 ### [2.2.2] - 2016-09-22
 ### Added
 - Android android.hardware.location permission
@@ -17,11 +21,11 @@
 ### Added
 - iOS option pauseLocationUpdates PR #156
 
-### [2.2.0-alfa.8] - 2016-09-02
+### [2.2.0-alpha.8] - 2016-09-02
 ### Fixed
 - iOS compilation errors
 
-### [2.2.0-alfa.7] - 2016-09-01
+### [2.2.0-alpha.7] - 2016-09-01
 #### Removed
 - Android location filtering
 
@@ -29,28 +33,28 @@
 - Android db logging instead of file
 - iOS location prop heading renamed to bearing
 
-### [2.2.0-alfa.6] - 2016-08-10
+### [2.2.0-alpha.6] - 2016-08-10
 ### Fixed
 - Android don't try sync when locations count is lower then threshold
 
-### [2.2.0-alfa.5] - 2016-08-10
+### [2.2.0-alpha.5] - 2016-08-10
 ### Fixed
 - Android issue #130 - sync complete notification stays visible
 - Android don't try sync when locations count is zero
 
-### [2.2.0-alfa.4] - 2016-08-10
+### [2.2.0-alpha.4] - 2016-08-10
 ### Fixed
 - Android issue #137 - fix only for API LEVEL >= 17
 
-### [2.2.0-alfa.3] - 2016-08-10
+### [2.2.0-alpha.3] - 2016-08-10
 ### Fixed
 - Android issue #139 - Starting backgroundGeolocation just after configure failed
 
-### [2.2.0-alfa.2] - 2016-08-10
+### [2.2.0-alpha.2] - 2016-08-10
 ### Fixed
 - iOS issue #132 use Library as DB path
 
-### [2.2.0-alfa.1] - 2016-08-01
+### [2.2.0-alpha.1] - 2016-08-01
 ### Added
 - Android, iOS limit maximum number of locations in db (maxLocations)
 - Android showAppSettings
