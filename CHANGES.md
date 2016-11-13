@@ -1,5 +1,9 @@
 ## Changelog
 
+### [2.2.5] - 2016-11-13
+### Fixed
+- Android fixing issue #195 PR204
+
 ### [2.2.4] - 2016-09-24
 ### Fixed
 - iOS extremely stupid config bug from 2.2.3
