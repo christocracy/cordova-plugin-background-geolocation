@@ -19,6 +19,12 @@
 
     <!-- android -->
     <platform name="android">
+        <preference name="ICON" default="@mipmap/icon" />
+        <preference name="SMALL_ICON" default="@mipmap/icon" />
+        <preference name="ACCOUNT_LABEL" default="@string/app_name" />
+        <preference name="ACCOUNT_TYPE" default="$PACKAGE_NAME.account" />
+        <preference name="CONTENT_AUTHORITY" default="$PACKAGE_NAME" />
+
         <framework src="android/logtofile.gradle" custom="true" type="gradleReference"/>
         <framework src="com.google.android.gms:play-services-location:+" />
         <framework src="com.android.support:support-v4:+" />
@@ -59,14 +65,8 @@
         <source-file src="android/plugin/src/main/java/com/marianhello/cordova/PermissionHelper.java" target-dir="src/com/marianhello/cordova" />
         <source-file src="android/plugin/src/main/java/org/apache/commons/io/Charsets.java" target-dir="src/apache/commons/io" />
         <source-file src="android/plugin/src/main/java/org/apache/commons/io/input/ReversedLinesFileReader.java" target-dir="src/apache/commons/io/input" />
-        <resource-file src="android/plugin/src/main/res/xml/authenticator.xml" target="res/xml/authenticator.xml" />
         <resource-file src="android/plugin/src/main/res/xml/syncadapter.xml" target="res/xml/syncadapter.xml" />
         <resource-file src="android/plugin/src/main/res/xml/authenticator.xml" target="res/xml/authenticator.xml" />
-        <resource-file src="android/plugin/src/main/res/mipmap-mdpi/ic_launcher.png" target="res/mipmap-mdpi/ic_launcher.png" />
-        <resource-file src="android/plugin/src/main/res/mipmap-hdpi/ic_launcher.png" target="res/mipmap-hdpi/ic_launcher.png" />
-        <resource-file src="android/plugin/src/main/res/mipmap-xhdpi/ic_launcher.png" target="res/mipmap-xhdpi/ic_launcher.png" />
-        <resource-file src="android/plugin/src/main/res/mipmap-xxhdpi/ic_launcher.png" target="res/mipmap-xxhdpi/ic_launcher.png" />
-        <resource-file src="android/plugin/src/main/res/mipmap-xxxhdpi/ic_launcher.png" target="res/mipmap-xxxhdpi/ic_launcher.png" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
@@ -130,12 +130,30 @@
             </feature>
         </config-file>
 
-        <preference name="ACCOUNT_TYPE" default="$PACKAGE_NAME.account" />
-        <preference name="CONTENT_AUTHORITY" default="$PACKAGE_NAME" />
         <config-file target="res/values/strings.xml" parent="/resources">
             <string name="account_type">$ACCOUNT_TYPE</string>
             <string name="content_authority">$CONTENT_AUTHORITY</string>
         </config-file>
+
+        <edit-config file="res/xml/authenticator.xml" target="/*" mode="overwrite">
+          <account-authenticator
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:accountType="@string/account_type"
+              android:icon="$ICON"
+              android:smallIcon="$SMALL_ICON"
+              android:label="$ACCOUNT_LABEL"/>
+        </edit-config>
+
+        <edit-config file="res/xml/syncadapter.xml" target="/*" mode="overwrite">
+          <sync-adapter
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:contentAuthority="@string/content_authority"
+              android:accountType="@string/account_type"
+              android:userVisible="false"
+              android:supportsUploading="true"
+              android:allowParallelSyncs="false"
+              android:isAlwaysSyncable="true"/>
+        </edit-config>
     </platform>
 
     <platform name="ios">
